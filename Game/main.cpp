@@ -412,10 +412,10 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 	SVertex vertices[] =
 	{
-		{{-0.4f, -0.7f, 0.0f},{0.0f, 1.0f}},	// 左下
-		{{-0.4f,  0.7f, 0.0f},{0.0f, 0.0f}},	// 左上
-		{{ 0.4f, -0.7f, 0.0f},{1.0f, 1.0f}},	// 右下
-		{{ 0.4f,  0.7f, 0.0f},{1.0f, 0.0f}}		// 右上
+		{{ -1.0f, -1.0f, 0.0f},{0.0f, 1.0f}},	// 左下
+		{{ -1.0f,  1.0f, 0.0f},{0.0f, 0.0f}},	// 左上
+		{{ 1.0f, -1.0f, 0.0f},{1.0f, 1.0f}},	// 右下
+		{{ 1.0f,  1.0f, 0.0f},{1.0f, 0.0f}}		// 右上
 	};
 
 	// 〇テクスチャデータの作成
@@ -429,6 +429,31 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	//}
 
 	DirectX::XMMATRIX matrix = DirectX::XMMatrixIdentity();
+
+	// ワールド行列計算
+	DirectX::XMMATRIX mWorld = DirectX::XMMatrixRotationY(DirectX::XM_PIDIV4);
+
+	// ビュー行列計算
+	DirectX::XMFLOAT3 eyePos(0.0f, 0.0f, -5.0f);
+	DirectX::XMFLOAT3 targetPos(0.0f, 0.0f, 0.0f);
+	DirectX::XMFLOAT3 upVec(0.0f, 1.0f, 0.0f);
+	DirectX::XMMATRIX mView = DirectX::XMMatrixLookAtLH(
+		DirectX::XMLoadFloat3(&eyePos),
+		DirectX::XMLoadFloat3(&targetPos),
+		DirectX::XMLoadFloat3(&upVec)
+	);
+
+	// プロジェクション行列計算
+	DirectX::XMMATRIX mProj = DirectX::XMMatrixPerspectiveFovLH(
+		DirectX::XM_PIDIV2,
+		static_cast<float>(kWindowWidth) / static_cast<float>(kWindowHeight),
+		1.0f,
+		10.0f
+	);
+
+	matrix = mWorld * mView * mProj;
+
+
 
 	// 〇画像ファイルのロード
 
@@ -1155,6 +1180,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	scissorRect.bottom = scissorRect.top + kWindowHeight;
 
 
+	float angle = 0.0f;
+
+
 	// ウィンドウ表示
 #ifdef _DEBUG
 	ShowWindow(hwnd, SW_SHOW);
@@ -1176,6 +1204,11 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		{
 			break;
 		}
+
+		angle += 0.1f;
+		mWorld = DirectX::XMMatrixRotationY(angle);
+		*mapMatrix = mWorld * mView * mProj;
+
 
 		// 〇コマンドアロケータとコマンドリストをクリア。
 		// キューをクリア。
