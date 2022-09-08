@@ -40,6 +40,19 @@ struct STexRGBA
 };
 
 /**
+ * @brief PMDファイルのヘッダ情報構造体
+*/
+struct SPMDHeader
+{
+	// 先頭3バイトにシグネチャとして"pmd"という文字列が入っているが、
+	// これを構造体に含めてfread()してしまうと、アライメントによるズレが
+	// 発生して面倒なため、構造体には含めない。
+	float version;
+	char model_name[20];
+	char comment[256];
+};
+
+/**
  * @brief アライメントにそろえたサイズを返す。
  * @param[in] size 元のサイズ
  * @param[in] alignment アライメントサイズ
@@ -166,7 +179,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		nullptr,				// メニューハンドル
 		w.hInstance,			// 呼び出しアプリケーションハンドル
 		nullptr					// 追加パラメータ
-		);
+	);
 
 
 
@@ -183,7 +196,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 	// 〇アダプターの特定
 
-	
+
 	HRESULT result;
 	// DXGIFactoryオブジェクトの生成。
 #ifdef _DEBUG
@@ -383,7 +396,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		// 先頭アドレスのハンドルを取得。
 		D3D12_CPU_DESCRIPTOR_HANDLE handle = rtvHeaps->GetCPUDescriptorHandleForHeapStart();
 		// 複数のディスクリプタを取得するため、アドレスをずらす。
-		handle.ptr += static_cast<unsigned long long int>(idx) * 
+		handle.ptr += static_cast<unsigned long long int>(idx) *
 			_dev->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 		// レンダーターゲットビューを作成。
 		_dev->CreateRenderTargetView(_backBuffers[idx], &rtvDesc, handle);
@@ -404,6 +417,37 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	// 初期化
 	result = CoInitializeEx(0, COINIT_MULTITHREADED);
 
+
+
+	// 〇PMDファイルの読み込み
+
+	FILE* fileStream = nullptr;
+	unsigned int pmdVertNum = 0;
+	std::vector<unsigned char> pmdVertices;
+	constexpr size_t kPmdVertexSize = 38;
+	if (fopen_s(&fileStream, "Assets/Models/Samples/初音ミク.pmd", "rb") == 0)
+	{
+		// ヘッダの読み込み
+		char signature[3] = {};
+		SPMDHeader pmdHeader = {};
+		fread_s(signature, sizeof(signature), sizeof(signature), 1, fileStream);
+		fread_s(&pmdHeader, sizeof(pmdHeader), sizeof(pmdHeader), 1, fileStream);
+
+		// 頂点数の読み込み
+		fread_s(&pmdVertNum, sizeof(pmdVertNum), sizeof(pmdVertNum), 1, fileStream);
+
+		// 頂点データの読み込み
+		pmdVertices.resize(pmdVertNum * kPmdVertexSize);
+		fread_s(pmdVertices.data(), pmdVertices.size(), pmdVertices.size(), 1, fileStream);
+
+
+		fclose(fileStream);
+	}
+	else
+	{
+		// PMDファイルの読み込み失敗。
+		DebugOutputFormatString("PMDファイルの読み込みに失敗しました。");
+	}
 
 
 	// 〇三角形の表示の準備
@@ -434,8 +478,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	DirectX::XMMATRIX mWorld = DirectX::XMMatrixRotationY(DirectX::XM_PIDIV4);
 
 	// ビュー行列計算
-	DirectX::XMFLOAT3 eyePos(0.0f, 0.0f, -5.0f);
-	DirectX::XMFLOAT3 targetPos(0.0f, 0.0f, 0.0f);
+	DirectX::XMFLOAT3 eyePos(0.0f, 10.0f, -15.0f);
+	DirectX::XMFLOAT3 targetPos(0.0f, 10.0f, 0.0f);
 	DirectX::XMFLOAT3 upVec(0.0f, 1.0f, 0.0f);
 	DirectX::XMMATRIX mView = DirectX::XMMatrixLookAtLH(
 		DirectX::XMLoadFloat3(&eyePos),
@@ -448,7 +492,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		DirectX::XM_PIDIV2,
 		static_cast<float>(kWindowWidth) / static_cast<float>(kWindowHeight),
 		1.0f,
-		10.0f
+		100.0f
 	);
 
 	matrix = mWorld * mView * mProj;
@@ -492,7 +536,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	UINT64 texResDescWidth = static_cast<UINT64>(
 		AlignmentedSize(img->rowPitch, D3D12_TEXTURE_DATA_PITCH_ALIGNMENT) * img->height
 		);
-	D3D12_RESOURCE_DESC texResDesc = CD3DX12_RESOURCE_DESC::Buffer(texResDescWidth);;
+	//D3D12_RESOURCE_DESC texResDesc = CD3DX12_RESOURCE_DESC::Buffer(texResDescWidth);
+	D3D12_RESOURCE_DESC texResDesc = CD3DX12_RESOURCE_DESC::Buffer(pmdVertices.size());
 	//texResDesc.Format = DXGI_FORMAT_UNKNOWN;	// 単なるデータの塊のためUNKNOWN
 	//texResDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;	// 単なるバッファとして指定
 	//// データサイズ
@@ -788,7 +833,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	//heapProp.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
 
 	// サイズに応じて適切な設定をしてくれる。
-	D3D12_RESOURCE_DESC resdesc = CD3DX12_RESOURCE_DESC::Buffer(sizeof(vertices));
+	//D3D12_RESOURCE_DESC resdesc = CD3DX12_RESOURCE_DESC::Buffer(sizeof(vertices));
+	D3D12_RESOURCE_DESC resdesc = CD3DX12_RESOURCE_DESC::Buffer(pmdVertices.size());
 	//resdesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;	// バッファーに使う
 	//resdesc.Width = sizeof(vertices);	// 頂点情報が入るだけのサイズ
 	//resdesc.Height = 1;
@@ -818,19 +864,19 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	}
 
 	// 〇頂点情報のコピー（マップ）
-	SVertex* vertMap = nullptr;
+	unsigned char* vertMap = nullptr;
 	// GPUのバッファーの（仮想）アドレスを取得。
 	result = vertBuff->Map(0, nullptr, reinterpret_cast<void**>(&vertMap));
 	// マップしてきたバッファーに、頂点データを書き込む。
-	std::copy(std::begin(vertices), std::end(vertices), vertMap);
+	std::copy(std::begin(pmdVertices), std::end(pmdVertices), vertMap);
 	// マップ解除。
 	vertBuff->Unmap(0, nullptr);
 
 	// 〇頂点バッファビューの作成
 	D3D12_VERTEX_BUFFER_VIEW vbView = {};
 	vbView.BufferLocation = vertBuff->GetGPUVirtualAddress();	// バッファーの仮想アドレス
-	vbView.SizeInBytes = sizeof(vertices);	// 全バイト数
-	vbView.StrideInBytes = sizeof(vertices[0]);	// 1頂点あたりのバイト数
+	vbView.SizeInBytes = static_cast<UINT>(pmdVertices.size());	// 全バイト数
+	vbView.StrideInBytes = static_cast<UINT>(kPmdVertexSize);	// 1頂点あたりのバイト数
 
 	// 〇インデックスバッファの作成
 
@@ -964,6 +1010,29 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	}
 
 	// 〇頂点レイアウト
+	//D3D12_INPUT_ELEMENT_DESC inputLayout[] =
+	//{
+	//	// 座標情報
+	//	{
+	//		"POSITION",	// セマンティクス名
+	//		0,
+	//		DXGI_FORMAT_R32G32B32_FLOAT,	// フォーマット
+	//		0,	// 入力スロットのインデックス
+	//		D3D12_APPEND_ALIGNED_ELEMENT,	// データのオフセット位置
+	//		D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
+	//		0	// 一度に描画するインスタンスの数
+	//	},
+	//	// UV
+	//	{
+	//		"TEXCOORD",
+	//		0,
+	//		DXGI_FORMAT_R32G32_FLOAT,
+	//		0,
+	//		D3D12_APPEND_ALIGNED_ELEMENT,
+	//		D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
+	//		0
+	//	}
+	//};
 	D3D12_INPUT_ELEMENT_DESC inputLayout[] =
 	{
 		// 座標情報
@@ -976,11 +1045,47 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
 			0	// 一度に描画するインスタンスの数
 		},
+		{
+			"NORMAL",
+			0,
+			DXGI_FORMAT_R32G32B32_FLOAT,
+			0,
+			D3D12_APPEND_ALIGNED_ELEMENT,
+			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
+			0
+		},
 		// UV
 		{
 			"TEXCOORD",
 			0,
 			DXGI_FORMAT_R32G32_FLOAT,
+			0,
+			D3D12_APPEND_ALIGNED_ELEMENT,
+			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
+			0
+		},
+		{
+			"BONE_NO",
+			0,
+			DXGI_FORMAT_R16G16_UINT,
+			0,
+			D3D12_APPEND_ALIGNED_ELEMENT,
+			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
+			0
+		},
+		{
+			"WEIGHT",
+			0,
+			DXGI_FORMAT_R8_UINT,
+			0,
+			D3D12_APPEND_ALIGNED_ELEMENT,
+			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
+			0
+		},
+		{
+			"EDGE_FLG",
+			0,
+			DXGI_FORMAT_R8_UINT,
 			0,
 			D3D12_APPEND_ALIGNED_ELEMENT,
 			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
@@ -1205,7 +1310,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 			break;
 		}
 
-		angle += 0.1f;
+		angle += 0.01f;
 		mWorld = DirectX::XMMatrixRotationY(angle);
 		*mapMatrix = mWorld * mView * mProj;
 
@@ -1247,7 +1352,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		_cmdList->OMSetRenderTargets(1, &rtvH, true, nullptr);
 
 		// 〇レンダーターゲットのクリア
-		constexpr float clearColor[] = { 1.0f,1.0f,0.0f,1.0f };	// 黄色
+		constexpr float clearColor[] = { 1.0f,1.0f,1.0f,1.0f };
 		_cmdList->ClearRenderTargetView(rtvH, clearColor, 0, nullptr);
 
 		// 〇溜めておいた命令の実行
@@ -1255,7 +1360,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		_cmdList->RSSetScissorRects(1, &scissorRect);
 		_cmdList->SetGraphicsRootSignature(_rootsignature);
 
-		_cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		//_cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		_cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_POINTLIST);
 		_cmdList->IASetVertexBuffers(0, 1, &vbView);
 		_cmdList->IASetIndexBuffer(&ibView);
 
@@ -1277,7 +1383,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 			heapHandle	// ヒープアドレス
 		);
 
-		_cmdList->DrawIndexedInstanced(6, 1, 0, 0, 0);
+		//_cmdList->DrawIndexedInstanced(6, 1, 0, 0, 0);
+		_cmdList->DrawInstanced(pmdVertNum, 1, 0, 0);
 
 
 		// リソースバリアをPRESENTにする。
