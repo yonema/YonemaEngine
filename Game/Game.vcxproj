@@ -117,6 +117,9 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>../ExLibrary/DirectXTex-main\DirectXTex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>YonemaEnginePreComplie.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>YonemaEnginePreComplie.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -133,6 +136,9 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>../ExLibrary/DirectXTex-main\DirectXTex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>YonemaEnginePreComplie.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>YonemaEnginePreComplie.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -143,7 +149,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="YonemaEngine\Graphics\GraphicsEngine.cpp" />
+    <ClCompile Include="YonemaEngine\Windows\Window.cpp" />
+    <ClCompile Include="YonemaEngine\YonemaEngine.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="YonemaEngine\YonemaEnginePreComplie.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Assets\Shaders\BasicPixelShader.hlsl">
@@ -168,6 +181,12 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Images\StarMan.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="YonemaEngine\Graphics\GraphicsEngine.h" />
+    <ClInclude Include="YonemaEngine\Windows\Window.h" />
+    <ClInclude Include="YonemaEngine\YonemaEngine.h" />
+    <ClInclude Include="YonemaEngine\YonemaEnginePreComplie.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
