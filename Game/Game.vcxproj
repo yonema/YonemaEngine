@@ -116,10 +116,10 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../ExLibrary/DirectXTex-main\DirectXTex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../ExLibrary/DirectXTex-main\DirectXTex;YonemaEngine/PreCompileHeader;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>YonemaEnginePreComplie.h</PrecompiledHeaderFile>
-      <ForcedIncludeFiles>YonemaEnginePreComplie.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <PrecompiledHeaderFile>YonemaEnginePreCompile.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>YonemaEnginePreCompile.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -135,10 +135,10 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../ExLibrary/DirectXTex-main\DirectXTex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../ExLibrary/DirectXTex-main\DirectXTex;YonemaEngine/PreCompileHeader;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>YonemaEnginePreComplie.h</PrecompiledHeaderFile>
-      <ForcedIncludeFiles>YonemaEnginePreComplie.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <PrecompiledHeaderFile>YonemaEnginePreCompile.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>YonemaEnginePreCompile.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -153,7 +153,7 @@
     <ClCompile Include="YonemaEngine\Windows\Window.cpp" />
     <ClCompile Include="YonemaEngine\YonemaEngine.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="YonemaEngine\YonemaEnginePreComplie.cpp">
+    <ClCompile Include="YonemaEngine\PreCompileHeader\YonemaEnginePreCompile.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
@@ -186,7 +186,7 @@
     <ClInclude Include="YonemaEngine\Graphics\GraphicsEngine.h" />
     <ClInclude Include="YonemaEngine\Windows\Window.h" />
     <ClInclude Include="YonemaEngine\YonemaEngine.h" />
-    <ClInclude Include="YonemaEngine\YonemaEnginePreComplie.h" />
+    <ClInclude Include="YonemaEngine\PreCompileHeader\YonemaEnginePreCompile.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
