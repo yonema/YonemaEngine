@@ -21,7 +21,7 @@ SOutput BasicVS(
 	output.uv = uv;
 
 	output.cameraToPosDirWS = normalize(pos.xyz - g_cameraPosWS);
-	output.cameraToPosDirVS = normalize(mul(g_mView, output.cameraToPosDirWS));
+	output.cameraToPosDirVS = normalize(mul(g_mView, float4(output.cameraToPosDirWS,0.0f)).xyz);
 
 	return output; 
 }
