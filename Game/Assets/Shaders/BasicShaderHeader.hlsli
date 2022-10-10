@@ -16,16 +16,20 @@ Texture2D<float4> g_spaTexture : register(t2);
 SamplerState g_sampler : register(s0);	// 0番スロットに設定されたサンプラ
 
 // 定数バッファ
-cbuffer cbuff0 : register(b0)
+cbuffer SceneDataCB : register(b0)
 {
-	matrix g_mWorldViewProj;
-	matrix g_mWorld;
-	matrix g_mView;
-	matrix g_mProj;
+	float4x4 g_mView;
+	float4x4 g_mProj;
 	float3 g_cameraPosWS;
 }
 
-cbuffer Material : register(b1)
+cbuffer TransformCB : register(b1) 
+{
+	float4x4 g_mWorld;
+	float4x4 g_mWorldViewProj;
+}
+
+cbuffer MaterialCB : register(b2)
 {
 	float4 g_diffuse;
 	float4 g_specular;

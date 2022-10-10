@@ -1,9 +1,11 @@
-#include "Window.h"
+#include "GameWindow.h"
 
 namespace nsYMEngine
 {
-	namespace nsWindows
+	namespace nsGameWindow
 	{
+
+		CGameWindow* CGameWindow::m_instance = nullptr;
 
 		/**
 		 * @brief ウィンドウプロシージャ。アプリケーションに送られてきたメッセージを処理する。
@@ -34,7 +36,7 @@ namespace nsYMEngine
 
 
 
-		CWindows::CWindows(const int kWindowWidth, const int kWindowHeight)
+		CGameWindow::CGameWindow(const int kWindowWidth, const int kWindowHeight)
 		{
 			// 〇ウィンドウクラスの作成と登録。
 			// ウィンドウクラスのパラメータを設定。
@@ -80,7 +82,7 @@ namespace nsYMEngine
 		}
 
 
-		CWindows::~CWindows()
+		CGameWindow::~CGameWindow()
 		{
 
 			// もうクラスは使わないので、登録解除する。
@@ -88,5 +90,34 @@ namespace nsYMEngine
 
 			return;
 		}
+
+		void CGameWindow::DisplayWindow(int nCmdShow)
+		{
+			ShowWindow(m_hwnd, nCmdShow);
+
+			return;
+		}
+
+		bool CGameWindow::DispatchWindowMessage()
+		{
+			MSG msg = { 0 };
+			while (WM_QUIT != msg.message)
+			{
+				//ウィンドウからのメッセージを受け取る。
+				if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+				{
+					TranslateMessage(&msg);
+					DispatchMessage(&msg);
+				}
+				else 
+				{
+					//ウィンドウメッセージが空になった。
+					break;
+				}
+			}
+			return msg.message != WM_QUIT;
+		}
+
+
 	}
 }

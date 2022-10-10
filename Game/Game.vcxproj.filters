@@ -21,13 +21,31 @@
     <ClCompile Include="YonemaEngine\YonemaEngine.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="YonemaEngine\Windows\Window.cpp">
+    <ClCompile Include="YonemaEngine\GameWindow\GameWindow.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="YonemaEngine\PreCompileHeader\YonemaEnginePreCompile.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="YonemaEngine\Graphics\GraphicsEngine.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Application.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YonemaEngine\GameWindow\MessageBox.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YonemaEngine\Graphics\Texture.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YonemaEngine\Graphics\PMDModels\PMDGenericRenderer.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YonemaEngine\Graphics\PMDModels\PMDRenderer.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YonemaEngine\Util\StringManipulation.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -47,13 +65,40 @@
     <ClInclude Include="YonemaEngine\YonemaEngine.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="YonemaEngine\Windows\Window.h">
+    <ClInclude Include="YonemaEngine\GameWindow\GameWindow.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="YonemaEngine\PreCompileHeader\YonemaEnginePreCompile.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="YonemaEngine\Graphics\GraphicsEngine.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YonemaEngine\Util\Noncopyable.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Application.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YonemaEngine\GameWindow\MessageBox.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YonemaEngine\Graphics\Texture.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YonemaEngine\Memory\ResourceBank.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YonemaEngine\Util\StringManipulation.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YonemaEngine\Util\AlignmentedSize.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YonemaEngine\Graphics\PMDModels\PMDGenericRenderer.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YonemaEngine\Graphics\PMDModels\PMDRenderer.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

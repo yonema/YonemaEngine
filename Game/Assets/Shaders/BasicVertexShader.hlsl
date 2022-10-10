@@ -12,7 +12,10 @@ SOutput BasicVS(
 	SOutput output;
 	// シェーダ―での行列演算は列優先のため、左方向にかける。
 	// 座標に対して、左側に行列を置く。
-	output.svpos = mul(g_mWorldViewProj, pos);
+	//output.svpos = mul(g_mWorldViewProj, pos);
+	output.svpos = mul(g_mWorld, pos);
+	output.svpos = mul(g_mView, output.svpos);
+	output.svpos = mul(g_mProj, output.svpos);
 
 	// 法線の平行移動成分を無効にする。
 	normal.w = 0.0f;
