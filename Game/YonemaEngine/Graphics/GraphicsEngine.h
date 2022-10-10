@@ -71,6 +71,10 @@ namespace nsYMEngine
 
 			void Update();
 
+			/**
+			 * @brief 描画開始処理。更新処理より後、描画処理より前に呼ぶこと。
+			 * @return 
+			*/
 			void BeginDraw();
 
 			void EndDraw();

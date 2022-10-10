@@ -319,12 +319,12 @@ namespace nsYMEngine
 		bool CGraphicsEngine::CreateDXGIFactory(IDXGIFactory6** dxgiFactory)
 		{
 			HRESULT result;
-			UINT dxgiFlags = 0;
+			UINT dxgiFactoryFlags = 0;
 #ifdef _DEBUG
 			EnableDebugLayer();	
-			dxgiFlags = DXGI_CREATE_FACTORY_DEBUG;
+			dxgiFactoryFlags |= DXGI_CREATE_FACTORY_DEBUG;
 #endif
-			result = CreateDXGIFactory2(dxgiFlags, IID_PPV_ARGS(dxgiFactory));
+			result = CreateDXGIFactory2(dxgiFactoryFlags, IID_PPV_ARGS(dxgiFactory));
 
 			if (FAILED(result))
 			{
@@ -555,23 +555,24 @@ namespace nsYMEngine
 			swapChainDesc.Scaling = DXGI_SCALING_STRETCH;
 			swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 			swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
-			swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+			//swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
-			DXGI_SWAP_CHAIN_FULLSCREEN_DESC fullScreenDesc = {};
-			fullScreenDesc.RefreshRate.Denominator = 1;
-			fullScreenDesc.RefreshRate.Numerator = 60;
-			fullScreenDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-			fullScreenDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-			fullScreenDesc.Windowed = true;
+			//DXGI_SWAP_CHAIN_FULLSCREEN_DESC fullScreenDesc = {};
+			//fullScreenDesc.RefreshRate.Denominator = 1;
+			//fullScreenDesc.RefreshRate.Numerator = 60;
+			//fullScreenDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+			//fullScreenDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+			//fullScreenDesc.Windowed = true;
 
 			IDXGISwapChain1* swapChain;
 			auto result = dxgiFactory->CreateSwapChainForHwnd(
 				m_commandQueue,
 				nsGameWindow::CGameWindow::GetInstance()->GetHWND(),
 				&swapChainDesc,
-				&fullScreenDesc,
 				nullptr,
-				reinterpret_cast<IDXGISwapChain1**>(&swapChain)
+				//&fullScreenDesc,
+				nullptr,
+				&swapChain
 			);
 
 			swapChain->QueryInterface(IID_PPV_ARGS(&m_swapChain));
