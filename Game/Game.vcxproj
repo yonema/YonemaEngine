@@ -156,7 +156,7 @@
     <ClCompile Include="YonemaEngine\GameWindow\MessageBox.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\GraphicsEngine.cpp" />
     <ClCompile Include="YonemaEngine\GameWindow\GameWindow.cpp" />
-    <ClCompile Include="YonemaEngine\Util\StringManipulation.cpp" />
+    <ClCompile Include="YonemaEngine\Utils\StringManipulation.cpp" />
     <ClCompile Include="YonemaEngine\YonemaEngine.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="YonemaEngine\PreCompileHeader\YonemaEnginePreCompile.cpp">
@@ -194,9 +194,9 @@
     <ClInclude Include="YonemaEngine\Graphics\PMDModels\PMDRenderer.h" />
     <ClInclude Include="YonemaEngine\Graphics\Texture.h" />
     <ClInclude Include="YonemaEngine\GameWindow\MessageBox.h" />
-    <ClInclude Include="YonemaEngine\Util\AlignmentedSize.h" />
-    <ClInclude Include="YonemaEngine\Util\StringManipulation.h" />
-    <ClInclude Include="YonemaEngine\Util\Noncopyable.h" />
+    <ClInclude Include="YonemaEngine\Utils\AlignmentedSize.h" />
+    <ClInclude Include="YonemaEngine\Utils\StringManipulation.h" />
+    <ClInclude Include="YonemaEngine\Utils\Noncopyable.h" />
     <ClInclude Include="YonemaEngine\Graphics\GraphicsEngine.h" />
     <ClInclude Include="YonemaEngine\GameWindow\GameWindow.h" />
     <ClInclude Include="YonemaEngine\Memory\ResourceBank.h" />

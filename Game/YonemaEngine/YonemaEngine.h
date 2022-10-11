@@ -14,7 +14,7 @@ namespace nsYMEngine
 
 namespace nsYMEngine
 {
-	class CYonemaEngine : private nsUtil::SNoncopyable
+	class CYonemaEngine : private nsUtils::SNoncopyable
 	{
 	private:
 		CYonemaEngine() = default;

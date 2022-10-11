@@ -11,7 +11,7 @@ namespace nsYMEngine
 
 namespace nsYMEngine
 {
-	class CApplication : private nsUtil::SNoncopyable
+	class CApplication : private nsUtils::SNoncopyable
 	{
 	private:
 		static const int m_kWindowWidth;

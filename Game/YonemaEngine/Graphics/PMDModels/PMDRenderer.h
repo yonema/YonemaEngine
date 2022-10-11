@@ -14,7 +14,7 @@ namespace nsYMEngine
 		namespace nsPMDModels
 		{
 
-			class CPMDRenderer : private nsUtil::SNoncopyable
+			class CPMDRenderer : private nsUtils::SNoncopyable
 			{
 			private:
 				static const size_t m_kPmdVertexSize;
@@ -33,12 +33,13 @@ namespace nsYMEngine
 					char comment[256];
 				};
 
-				// 1バイトパッキングにして、アライメントによるサイズのずれを防ぐ。
-				// 処理効率は落ちるが、読み込むのは最初だけであり、さらに後で別の構造体にコピーするから
-				// あまり問題はないと思う。
+
 #pragma pack(1)
 				/**
 				 * @brief PMDファイルのマテリアルデータ
+				 * @details 1バイトパッキングにして、アライメントによるサイズのずれを防ぐ。
+				 * 処理効率は落ちるが、読み込むのは最初だけであり、
+				 * さらに後で別の構造体にコピーするから、あまり問題はないと思う。
 				*/
 				struct SPMDMaterial
 				{
@@ -93,6 +94,23 @@ namespace nsYMEngine
 					DirectX::XMFLOAT4X4 mWorld;
 					DirectX::XMFLOAT4X4 mWorldViewProj;
 				};
+
+#pragma pack(1)
+				/**
+				 * @brief PMDモデルの読み込み用ボーンデータ
+				 * @details 1バイトパッキングにして、アライメントによるサイズのずれを防ぐ。
+				*/
+				struct SPMDBone
+				{
+					char boneName[20];
+					unsigned short parentNo;
+					unsigned short nextNo;
+					unsigned char type;
+					// ここでアライメントが発生してしまう。
+					unsigned short ikBoneNo;
+					DirectX::XMFLOAT3 pos;
+				};
+#pragma pack()
 
 
 

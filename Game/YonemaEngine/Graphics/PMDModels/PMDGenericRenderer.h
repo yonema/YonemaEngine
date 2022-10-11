@@ -5,7 +5,7 @@ namespace nsYMEngine
 	{
 		namespace nsPMDModels
 		{
-			class CPMDGenericRenderer : private nsUtil::SNoncopyable
+			class CPMDGenericRenderer : private nsUtils::SNoncopyable
 			{
 			private:
 				static const unsigned int m_kNumDescTableRanges;

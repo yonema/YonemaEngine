@@ -5,7 +5,7 @@ namespace nsYMEngine
 	namespace nsMemory
 	{
 		template<class TResource>
-		class TRsourceBank : private nsUtil::SNoncopyable
+		class TRsourceBank : private nsUtils::SNoncopyable
 		{
 		private:
 			using TResourcePtr = std::unique_ptr<TResource>;

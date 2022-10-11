@@ -1,7 +1,7 @@
 #pragma once
 namespace nsYMEngine
 {
-	namespace nsUtil
+	namespace nsUtils
 	{
 		/**
 		 * @brief アライメントにそろえたサイズを返す。

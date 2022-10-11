@@ -1,6 +1,6 @@
 namespace nsYMEngine
 {
-	namespace nsUtil
+	namespace nsUtils
 	{
 		std::string GetExtension(const std::string& filePath)
 		{

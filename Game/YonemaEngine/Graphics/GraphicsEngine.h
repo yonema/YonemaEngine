@@ -15,7 +15,7 @@ namespace nsYMEngine
 {
 	namespace nsGraphics
 	{
-		class CGraphicsEngine : private nsUtil::SNoncopyable
+		class CGraphicsEngine : private nsUtils::SNoncopyable
 		{
 		private:
 			enum EnGPUAdapterType

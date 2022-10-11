@@ -10,7 +10,7 @@ namespace nsYMEngine
 {
 	namespace nsGraphics
 	{
-		class CTexture : private nsUtil::SNoncopyable
+		class CTexture : private nsUtils::SNoncopyable
 		{
 		private:
 			static const int m_kNumWICFileExtensions = 5;

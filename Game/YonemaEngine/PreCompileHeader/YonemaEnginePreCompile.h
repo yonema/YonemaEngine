@@ -21,4 +21,4 @@
 #pragma comment(lib, "d3dcompiler.lib")
 #pragma comment(lib, "DirectXTex.lib")
 
-#include "../Util/Noncopyable.h"
+#include "../Utils/Noncopyable.h"

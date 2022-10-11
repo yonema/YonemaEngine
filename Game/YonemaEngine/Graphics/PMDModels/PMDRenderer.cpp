@@ -1,6 +1,6 @@
 #include "PMDRenderer.h"
 #include "../../GameWindow/MessageBox.h"
-#include "../Util/StringManipulation.h"
+#include "../Utils/StringManipulation.h"
 #include "../Texture.h"
 #include "../GraphicsEngine.h"
 
@@ -155,6 +155,9 @@ namespace nsYMEngine
 				std::vector<SPMDMaterial> pmdMaterials;
 				size_t pmdMaterialSize = 0;
 
+				unsigned short pmdBoneNum = 0;
+				std::vector<SPMDBone> pmdBones;
+
 				if (fopen_s(&fileStream, filePath, "rb") == 0)
 				{
 					// ヘッダの読み込み
@@ -186,13 +189,23 @@ namespace nsYMEngine
 					pmdMaterialSize = pmdMaterials.size() * sizeof(SPMDMaterial);
 					fread_s(pmdMaterials.data(), pmdMaterialSize, pmdMaterialSize, 1, fileStream);
 
+					// ボーン数の読み込み
+					fread_s(&pmdBoneNum, sizeof(pmdBoneNum), sizeof(pmdBoneNum), 1, fileStream);
+
+					// ボーンデータの読み込み
+					pmdBones.resize(pmdBoneNum);
+					auto pmdBoneSize = pmdBones.size() * sizeof(SPMDBone);
+					//fread_s(pmdBones.data(), sizeof(SPMDBone), sizeof(SPMDBone), pmdBoneNum, fileStream);
+					fread_s(pmdBones.data(), pmdBoneSize, pmdBoneSize, 1, fileStream);
+					
+
 
 					fclose(fileStream);
 				}
 				else
 				{
 					std::wstring wstr = L"PMDファイルの読み込みに失敗しました。ファイルパスを確認してください。";
-					wstr += nsUtil::GetWideStringFromString(filePath);
+					wstr += nsUtils::GetWideStringFromString(filePath);
 					nsGameWindow::MessageBoxWarning(wstr.c_str());
 				}
 
@@ -227,12 +240,12 @@ namespace nsYMEngine
 					{
 						// スプリッタあり。
 
-						auto namePair = nsUtil::SplitFilename(texFileName);
+						auto namePair = nsUtils::SplitFilename(texFileName);
 						std::string otherTexFileName;
 
 						// スフィアマップじゃないほうをテクスチャ名にする。
-						if (nsUtil::GetExtension(namePair.first) == "sph" ||
-							nsUtil::GetExtension(namePair.first) == "spa")
+						if (nsUtils::GetExtension(namePair.first) == "sph" ||
+							nsUtils::GetExtension(namePair.first) == "spa")
 						{
 							texFileName = namePair.second;
 							otherTexFileName = namePair.first;
@@ -245,12 +258,12 @@ namespace nsYMEngine
 
 						// スフィアマップの方のロード。
 
-						auto otherTexFilePath = nsUtil::GetTexturePathFromModelAndTexPath(
+						auto otherTexFilePath = nsUtils::GetTexturePathFromModelAndTexPath(
 							filePath,
 							otherTexFileName.c_str()
 						);
 
-						if (nsUtil::GetExtension(otherTexFilePath) == "sph")
+						if (nsUtils::GetExtension(otherTexFilePath) == "sph")
 						{
 							m_sphTextures[i] = new CTexture();
 							m_sphTextures[i]->Init(otherTexFilePath.c_str());
@@ -262,17 +275,17 @@ namespace nsYMEngine
 						}
 					}
 
-					auto texFilePath = nsUtil::GetTexturePathFromModelAndTexPath(
+					auto texFilePath = nsUtils::GetTexturePathFromModelAndTexPath(
 						filePath,
 						texFileName.c_str()
 					);
 
-					if (nsUtil::GetExtension(texFilePath) == "sph")
+					if (nsUtils::GetExtension(texFilePath) == "sph")
 					{
 						m_sphTextures[i] = new CTexture();
 						m_sphTextures[i]->Init(texFilePath.c_str());
 					}
-					else if (nsUtil::GetExtension(texFilePath) == "spa")
+					else if (nsUtils::GetExtension(texFilePath) == "spa")
 					{
 						m_spaTextures[i] = new CTexture();
 						m_spaTextures[i]->Init(texFilePath.c_str());

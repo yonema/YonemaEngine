@@ -4,7 +4,7 @@ namespace nsYMEngine
 {
 	namespace nsGameWindow
 	{
-		class CGameWindow : private nsUtil::SNoncopyable
+		class CGameWindow : private nsUtils::SNoncopyable
 		{
 		private:
 			CGameWindow(const int kWindowWidth, const int kWindowHeight);

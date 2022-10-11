@@ -45,7 +45,7 @@
     <ClCompile Include="YonemaEngine\Graphics\PMDModels\PMDRenderer.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="YonemaEngine\Util\StringManipulation.cpp">
+    <ClCompile Include="YonemaEngine\Utils\StringManipulation.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -74,7 +74,7 @@
     <ClInclude Include="YonemaEngine\Graphics\GraphicsEngine.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="YonemaEngine\Util\Noncopyable.h">
+    <ClInclude Include="YonemaEngine\Utils\Noncopyable.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Application.h">
@@ -89,10 +89,10 @@
     <ClInclude Include="YonemaEngine\Memory\ResourceBank.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="YonemaEngine\Util\StringManipulation.h">
+    <ClInclude Include="YonemaEngine\Utils\StringManipulation.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="YonemaEngine\Util\AlignmentedSize.h">
+    <ClInclude Include="YonemaEngine\Utils\AlignmentedSize.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="YonemaEngine\Graphics\PMDModels\PMDGenericRenderer.h">

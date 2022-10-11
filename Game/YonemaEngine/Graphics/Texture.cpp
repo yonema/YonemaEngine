@@ -1,7 +1,7 @@
 #include "Texture.h"
 #include "GraphicsEngine.h"
-#include "../Util/StringManipulation.h"
-#include "../Util/AlignmentedSize.h"
+#include "../Utils/StringManipulation.h"
+#include "../Utils/AlignmentedSize.h"
 #include "../GameWindow/MessageBox.h"
 
 namespace nsYMEngine
@@ -67,7 +67,7 @@ namespace nsYMEngine
 
 			// バッファ用256の倍数でアライメントされたrowPitch。
 			const auto alignmentedRowPitch =
-				nsUtil::AlignmentedSize(image->rowPitch, D3D12_TEXTURE_DATA_PITCH_ALIGNMENT);
+				nsUtils::AlignmentedSize(image->rowPitch, D3D12_TEXTURE_DATA_PITCH_ALIGNMENT);
 
 			// 1.中間バッファとしての、アップロードリソースを作成
 			ID3D12Resource* uploadBuff = nullptr;
@@ -130,7 +130,7 @@ namespace nsYMEngine
 			DirectX::ScratchImage* scratchImage
 		)
 		{
-			auto extension = nsUtil::GetExtension(filePath);
+			auto extension = nsUtils::GetExtension(filePath);
 			HRESULT result;
 			bool roaded = false;
 
@@ -142,7 +142,7 @@ namespace nsYMEngine
 				}
 
 				result = DirectX::LoadFromWICFile(
-					nsUtil::GetWideStringFromString(filePath).c_str(),
+					nsUtils::GetWideStringFromString(filePath).c_str(),
 					DirectX::WIC_FLAGS_NONE,
 					metadata,
 					*scratchImage
@@ -156,7 +156,7 @@ namespace nsYMEngine
 				if (strcmp(extension, m_kTGAFileExtension) == 0)
 				{
 					result = DirectX::LoadFromTGAFile(
-						nsUtil::GetWideStringFromString(filePath).c_str(),
+						nsUtils::GetWideStringFromString(filePath).c_str(),
 						metadata,
 						*scratchImage
 					);
@@ -165,7 +165,7 @@ namespace nsYMEngine
 				else if (strcmp(extension, m_kDDSFileExtension) == 0)
 				{
 					result = DirectX::LoadFromDDSFile(
-						nsUtil::GetWideStringFromString(filePath).c_str(),
+						nsUtils::GetWideStringFromString(filePath).c_str(),
 						DirectX::DDS_FLAGS_NONE,
 						metadata,
 						*scratchImage
@@ -178,7 +178,7 @@ namespace nsYMEngine
 			{
 				std::string msg = "テクスチャのロードに失敗しました。\n拡張子が対応していません。\n";
 				msg += filePath;
-				nsGameWindow::MessageBoxError(nsUtil::GetWideStringFromString(msg).c_str());
+				nsGameWindow::MessageBoxError(nsUtils::GetWideStringFromString(msg).c_str());
 				return false;
 			}
 
@@ -186,7 +186,7 @@ namespace nsYMEngine
 			{
 				std::string msg = "テクスチャのロードに失敗しました。\nファイルパスを確認してください。\n";
 				msg += filePath;
-				nsGameWindow::MessageBoxError(nsUtil::GetWideStringFromString(msg).c_str());
+				nsGameWindow::MessageBoxError(nsUtils::GetWideStringFromString(msg).c_str());
 				return false;
 			}
 

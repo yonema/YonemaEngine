@@ -2,7 +2,7 @@
 
 namespace nsYMEngine
 {
-	namespace nsUtil
+	namespace nsUtils
 	{
 		/**
 		 * @brief ファイルパスから拡張子を取得する。
