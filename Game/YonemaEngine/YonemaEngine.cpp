@@ -31,12 +31,15 @@ namespace nsYMEngine
 		m_mikuMetalPmdR->DebugSetPosition(0.0f);
 		m_rukaPmdR->DebugSetPosition(-distance);
 
+		nsMath::CMatrix mat = nsMath::CMatrix::Identity();
+
+
 		return true;
 	}
 
 	void CYonemaEngine::Terminate()
 	{
-		if (m_mikuMetalPmdR)
+		if (m_rukaPmdR)
 		{
 			delete m_rukaPmdR;
 		}
@@ -44,7 +47,7 @@ namespace nsYMEngine
 		{
 			delete m_mikuMetalPmdR;
 		}
-		if (m_mikuMetalPmdR)
+		if (m_mikuPmdR)
 		{
 			delete m_mikuPmdR;
 		}

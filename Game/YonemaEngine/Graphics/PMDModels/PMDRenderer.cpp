@@ -31,28 +31,16 @@ namespace nsYMEngine
 			{
 				
 				m_debugRotY += 0.01f;
-				{
-					auto mTrans = DirectX::XMMatrixTranslation(m_debugPosX, 0.0f, 0.0f);
-					auto mRot = DirectX::XMMatrixRotationY(m_debugRotY);
-					auto mScale = DirectX::XMMatrixScaling(1.0f, 1.0f, 1.0f);
-					auto mWorld = mScale * mRot * mTrans;
-					DirectX::XMStoreFloat4x4(
-						&m_mWorld,
-						mWorld
-					);
-				}
-
+				nsMath::CMatrix mTrans;
+				mTrans.MakeTranslation(m_debugPosX, 0.0f, 0.0f);
+				nsMath::CMatrix mRot;
+				mRot.MakeRotationY(m_debugRotY);
+				nsMath::CMatrix mScale;
+				mScale.MakeScaling(1.0f, 1.0f, 1.0f);
+				m_mWorld = mScale * mRot * mTrans;
 				m_mappedConstantBuff->mWorld = m_mWorld;
-				auto mWorld = DirectX::XMLoadFloat4x4(&m_mWorld);
-				auto viewProj = CGraphicsEngine::GetInstance()->GetMatrixViewProj();
-				auto mViewProj =
-					DirectX::XMLoadFloat4x4(&viewProj);
-				DirectX::XMFLOAT4X4 worldViewProj;
-				DirectX::XMStoreFloat4x4(
-					&worldViewProj,
-					mWorld * mViewProj
-				);
-				m_mappedConstantBuff->mWorldViewProj = worldViewProj;
+				auto mViewProj = CGraphicsEngine::GetInstance()->GetMatrixViewProj();
+				m_mappedConstantBuff->mWorldViewProj = m_mWorld * mViewProj;
 
 				return;
 			}
@@ -428,16 +416,8 @@ namespace nsYMEngine
 
 				result = m_constantBuff->Map(0, nullptr, reinterpret_cast<void**>(&m_mappedConstantBuff));
 				m_mappedConstantBuff->mWorld = m_mWorld;
-				auto mWorld = DirectX::XMLoadFloat4x4(&m_mWorld);
-				auto viewProj = CGraphicsEngine::GetInstance()->GetMatrixViewProj();
-				auto mViewProj =
-					DirectX::XMLoadFloat4x4(&viewProj);
-				DirectX::XMFLOAT4X4 worldViewProj;
-				DirectX::XMStoreFloat4x4(
-					&worldViewProj,
-					DirectX::XMMatrixMultiply(mWorld, mViewProj)
-				);
-				m_mappedConstantBuff->mWorldViewProj = worldViewProj;
+				auto mViewProj = CGraphicsEngine::GetInstance()->GetMatrixViewProj();
+				m_mappedConstantBuff->mWorldViewProj = m_mWorld * mViewProj;
 
 				D3D12_DESCRIPTOR_HEAP_DESC descHeapDesc = {};
 				descHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;

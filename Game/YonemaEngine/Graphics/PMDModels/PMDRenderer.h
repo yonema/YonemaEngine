@@ -43,11 +43,11 @@ namespace nsYMEngine
 				*/
 				struct SPMDMaterial
 				{
-					DirectX::XMFLOAT3 diffuse;
+					nsMath::CVector3 diffuse;
 					float alpha = 0.0f;
 					float specularity = 0.0f;
-					DirectX::XMFLOAT3 specular;
-					DirectX::XMFLOAT3 ambient;
+					nsMath::CVector3 specular;
+					nsMath::CVector3 ambient;
 					unsigned char toonIdx;
 					unsigned char edgeFlg;
 					// 注意：アライメントにより、ここに2バイトのパディングが入る。
@@ -62,11 +62,11 @@ namespace nsYMEngine
 				*/
 				struct SMaterialForHlsl
 				{
-					DirectX::XMFLOAT3 diffuse;
+					nsMath::CVector3 diffuse;
 					float alpha = 0.0f;
-					DirectX::XMFLOAT3 specular;
+					nsMath::CVector3 specular;
 					float specularity = 0.0f;
-					DirectX::XMFLOAT3 ambient;
+					nsMath::CVector3 ambient;
 				};
 
 				/**
@@ -91,8 +91,8 @@ namespace nsYMEngine
 
 				struct SConstantBuff
 				{
-					DirectX::XMFLOAT4X4 mWorld;
-					DirectX::XMFLOAT4X4 mWorldViewProj;
+					nsMath::CMatrix mWorld;
+					nsMath::CMatrix mWorldViewProj;
 				};
 
 #pragma pack(1)
@@ -108,7 +108,7 @@ namespace nsYMEngine
 					unsigned char type;
 					// ここでアライメントが発生してしまう。
 					unsigned short ikBoneNo;
-					DirectX::XMFLOAT3 pos;
+					nsMath::CVector3 pos;
 				};
 #pragma pack()
 
@@ -172,7 +172,7 @@ namespace nsYMEngine
 				std::vector<CTexture*> m_spaTextures;
 				// XMMATRIXは16バイトアライメントが強制されるため、newすると危険。
 				// そのため、XMFLOAT4X4を使用する。
-				DirectX::XMFLOAT4X4 m_mWorld;
+				nsMath::CMatrix m_mWorld;
 				ID3D12Resource* m_vertexBuff = nullptr;
 				D3D12_VERTEX_BUFFER_VIEW m_vertexBuffView = {};
 				ID3D12Resource* m_indexBuff = nullptr;

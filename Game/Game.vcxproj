@@ -150,6 +150,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="YonemaEngine\Math\Quaternion.cpp" />
+    <ClCompile Include="YonemaEngine\Math\Vector2.cpp" />
+    <ClCompile Include="YonemaEngine\Math\Vector3.cpp" />
+    <ClCompile Include="YonemaEngine\Math\Matrix.cpp" />
+    <ClCompile Include="YonemaEngine\Math\Vector4.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\PMDModels\PMDGenericRenderer.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\PMDModels\PMDRenderer.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\Texture.cpp" />
@@ -190,6 +195,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
+    <ClInclude Include="YonemaEngine\Math\Math.h" />
+    <ClInclude Include="YonemaEngine\Math\Quaternion.h" />
+    <ClInclude Include="YonemaEngine\Math\Vector2.h" />
+    <ClInclude Include="YonemaEngine\Math\Vector3.h" />
+    <ClInclude Include="YonemaEngine\Math\Matrix.h" />
+    <ClInclude Include="YonemaEngine\Math\Vector4.h" />
     <ClInclude Include="YonemaEngine\Graphics\PMDModels\PMDGenericRenderer.h" />
     <ClInclude Include="YonemaEngine\Graphics\PMDModels\PMDRenderer.h" />
     <ClInclude Include="YonemaEngine\Graphics\Texture.h" />

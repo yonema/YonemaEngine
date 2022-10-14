@@ -118,28 +118,15 @@ namespace nsYMEngine
 			m_whiteTexture->Init("Assets/Models/white.jpg");
 			m_blackTexture->Init("Assets/Models/black.jpg");
 
-			m_eyePos = {0.0f, 10.0f, -15.0f};
+			m_cameraPos = {0.0f, 10.0f, -15.0f};
 			m_targetPos = { 0.0f, 10.0f, 0.0f };
-			m_upVec = { 0.0f, 1.0f, 0.0f };
-
-			DirectX::XMStoreFloat4x4(
-				&m_mView,
-				DirectX::XMMatrixLookAtLH(
-					DirectX::XMLoadFloat3(&m_eyePos),
-					DirectX::XMLoadFloat3(&m_targetPos),
-					DirectX::XMLoadFloat3(&m_upVec)
-				)
-			);
-
-			DirectX::XMStoreFloat4x4(
-				&m_mProj,
-				DirectX::XMMatrixPerspectiveFovLH(
-					DirectX::XM_PIDIV2,
-					static_cast<float>(kWindowWidth) /
-					static_cast<float>(kWindowHeight),
-					1.0f,
-					100.0f
-				)
+			m_upDir = { 0.0f, 1.0f, 0.0f };
+			m_mView.MakeViewMatrix(m_cameraPos, m_targetPos, m_upDir);
+			m_mProj.MakeProjectionMatrix(
+				nsMath::YM_PIDIV2,
+				static_cast<float>(kWindowWidth) / static_cast<float>(kWindowHeight),
+				1.0f,
+				100.0f
 			);
 
 
@@ -221,18 +208,10 @@ namespace nsYMEngine
 
 		void CGraphicsEngine::Update()
 		{
-			DirectX::XMStoreFloat4x4(
-				&m_mView,
-				DirectX::XMMatrixLookAtLH(
-					DirectX::XMLoadFloat3(&m_eyePos),
-					DirectX::XMLoadFloat3(&m_targetPos),
-					DirectX::XMLoadFloat3(&m_upVec)
-				)
-			);
+			m_mView.MakeViewMatrix(m_cameraPos, m_targetPos, m_upDir);
 			m_mappedSceneDataMatrix->mView = m_mView;
 			m_mappedSceneDataMatrix->mProj = m_mProj;
-			m_mappedSceneDataMatrix->cameraPosWS = m_eyePos;
-
+			m_mappedSceneDataMatrix->cameraPosWS = m_cameraPos;
 
 			return;
 		}
@@ -756,7 +735,7 @@ namespace nsYMEngine
 			result = m_sceneDataConstantBuff->Map(0, nullptr, reinterpret_cast<void**>(&m_mappedSceneDataMatrix));	// ƒ}ƒbƒv
 			m_mappedSceneDataMatrix->mView = m_mView;
 			m_mappedSceneDataMatrix->mProj = m_mProj;
-			m_mappedSceneDataMatrix->cameraPosWS = m_eyePos;
+			m_mappedSceneDataMatrix->cameraPosWS = m_cameraPos;
 
 			D3D12_DESCRIPTOR_HEAP_DESC descHeapDesc = {};
 			descHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;

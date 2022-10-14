@@ -35,9 +35,9 @@ namespace nsYMEngine
 
 			struct SSceneDataMatrix
 			{
-				DirectX::XMFLOAT4X4 mView;
-				DirectX::XMFLOAT4X4 mProj;
-				DirectX::XMFLOAT3 cameraPosWS;
+				nsMath::CMatrix mView;
+				nsMath::CMatrix mProj;
+				nsMath::CVector3 cameraPosWS;
 			};
 
 		private:
@@ -109,26 +109,19 @@ namespace nsYMEngine
 				return &m_fenceVal;
 			}
 
-			CTexture* GetWhiteTexture()
+			inline CTexture* GetWhiteTexture()
 			{
 				return m_whiteTexture;
 			}
 
-			CTexture* GetBlackTexture()
+			inline CTexture* GetBlackTexture()
 			{
 				return m_blackTexture;
 			}
 
-			DirectX::XMFLOAT4X4 GetMatrixViewProj() const
+			inline nsMath::CMatrix GetMatrixViewProj() const
 			{
-				DirectX::XMFLOAT4X4 lm;
-				auto mView = DirectX::XMLoadFloat4x4(&m_mView);
-				auto mProj = DirectX::XMLoadFloat4x4(&m_mProj);
-				DirectX::XMStoreFloat4x4(
-					&lm,
-					DirectX::XMMatrixMultiply(mView, mProj)
-				);
-				return lm;
+				return m_mView * m_mProj;
 			}
 
 		private:
@@ -182,12 +175,11 @@ namespace nsYMEngine
 			CTexture* m_whiteTexture;
 			CTexture* m_blackTexture;
 
-
-			DirectX::XMFLOAT3 m_eyePos;
-			DirectX::XMFLOAT3 m_targetPos;
-			DirectX::XMFLOAT3 m_upVec;
-			DirectX::XMFLOAT4X4 m_mView;
-			DirectX::XMFLOAT4X4 m_mProj;
+			nsMath::CVector3 m_cameraPos;
+			nsMath::CVector3 m_targetPos;
+			nsMath::CVector3 m_upDir;
+			nsMath::CMatrix m_mView;
+			nsMath::CMatrix m_mProj;
 
 			ID3D12Resource* m_sceneDataConstantBuff = nullptr;
 			ID3D12DescriptorHeap* m_sceneDataDescriptorHeap = nullptr;
