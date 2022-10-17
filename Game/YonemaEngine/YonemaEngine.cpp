@@ -22,8 +22,13 @@ namespace nsYMEngine
 			return false;
 		}
 
-		m_mikuPmdR = new nsGraphics::nsPMDModels::CPMDRenderer("Assets/Models/Samples/初音ミク.pmd");
-		m_mikuMetalPmdR = new nsGraphics::nsPMDModels::CPMDRenderer("Assets/Models/Samples/初音ミクmetal.pmd");
+		m_mikuPmdR = new nsGraphics::nsPMDModels::CPMDRenderer(
+			"Assets/Models/Samples/初音ミク.pmd",
+			//"Assets/Animations/Samples/squat.vmd"
+			"Assets/Animations/Samples/charge.vmd"
+		);
+		m_mikuMetalPmdR = new nsGraphics::nsPMDModels::CPMDRenderer(
+			"Assets/Models/Samples/初音ミクmetal.pmd", "Assets/Animations/Samples/pose.vmd");
 		m_rukaPmdR = new nsGraphics::nsPMDModels::CPMDRenderer("Assets/Models/Samples/巡音ルカ.pmd");
 
 		constexpr float distance = 15.0f;
@@ -59,7 +64,7 @@ namespace nsYMEngine
 
 	void CYonemaEngine::Update()
 	{
-		
+		m_gameTime.StartTimeMeasurement();
 		// アップデート中の、モデルの破棄と生成のテスト。
 
 		static int debugCount = 0;
@@ -76,7 +81,7 @@ namespace nsYMEngine
 		{
 			if (m_mikuMetalPmdR == nullptr)
 			{
-				m_mikuMetalPmdR = new nsGraphics::nsPMDModels::CPMDRenderer("Assets/Models/Samples/初音ミクmetal.pmd");
+				m_mikuMetalPmdR = new nsGraphics::nsPMDModels::CPMDRenderer("Assets/Models/Samples/初音ミクmetal.pmd", "Assets/Animations/Samples/pose.vmd");
 				debugCount = 0;
 			}
 		}
@@ -104,6 +109,8 @@ namespace nsYMEngine
 		m_rukaPmdR->Draw();
 
 		m_graphicsEngine->EndDraw();
+
+		m_gameTime.EndTimeMeasurement();
 
 
 		return;

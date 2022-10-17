@@ -3,6 +3,7 @@
 #include "../Utils/StringManipulation.h"
 #include "../Texture.h"
 #include "../GraphicsEngine.h"
+#include "../../YonemaEngine.h"
 
 namespace nsYMEngine
 {
@@ -12,11 +13,12 @@ namespace nsYMEngine
 		{
 			const size_t CPMDRenderer::m_kPmdVertexSize = 38;
 			const int CPMDRenderer::m_kNumMaterialDescriptors = 4;
+			const int CPMDRenderer::m_kNumCalculationsOnBezier = 12;
 
 
-			CPMDRenderer::CPMDRenderer(const char* filePath)
+			CPMDRenderer::CPMDRenderer(const char* filePath, const char* animFilePath)
 			{
-				Init(filePath);
+				Init(filePath, animFilePath);
 
 				return;
 			}
@@ -38,17 +40,19 @@ namespace nsYMEngine
 				nsMath::CMatrix mScale;
 				mScale.MakeScaling(1.0f, 1.0f, 1.0f);
 				m_mWorld = mScale * mRot * mTrans;
-				m_mappedConstantBuff->mWorld = m_mWorld;
+				m_mappedConstantBuff[0] = m_mWorld;
 				auto mViewProj = CGraphicsEngine::GetInstance()->GetMatrixViewProj();
-				m_mappedConstantBuff->mWorldViewProj = m_mWorld * mViewProj;
+				m_mappedConstantBuff[1] = m_mWorld * mViewProj;
+
+				UpdateAnimation();
 
 				return;
 			}
 
 			void CPMDRenderer::Draw()
 			{
-				auto commandList = CGraphicsEngine::GetInstance()->GetCommandList();
-				auto device = CGraphicsEngine::GetInstance()->GetDevice();
+				static auto commandList = CGraphicsEngine::GetInstance()->GetCommandList();
+				static auto device = CGraphicsEngine::GetInstance()->GetDevice();
 
 				// ○頂点バッファとインデックスバッファをセット
 				commandList->IASetVertexBuffers(0, 1, &m_vertexBuffView);
@@ -82,10 +86,21 @@ namespace nsYMEngine
 				return;
 			}
 
-			void CPMDRenderer::Init(const char* filePath)
+			void CPMDRenderer::PlayAnimation()
 			{
-				LoadPMDModel(filePath);
 
+
+			}
+
+
+			void CPMDRenderer::Init(const char* filePath, const char* animFilePath)
+			{
+				if (animFilePath)
+				{
+					LoadVMDAnimation(animFilePath);
+				}
+
+				LoadPMDModel(filePath);
 
 				return;
 			}
@@ -286,6 +301,53 @@ namespace nsYMEngine
 
 				}
 
+				// ボーンデータのコピー
+
+				std::vector<const char*> boneNames(pmdBones.size());
+				// ボーンノードテーブルを作成
+				for (int i = 0; i < pmdBones.size(); i++)
+				{
+					auto& pb = pmdBones[i];
+					boneNames[i] = pb.boneName;
+					auto& node = m_boneNodeTable[pb.boneName];
+					node.boneIdx = i;
+					node.startPos = pb.pos;
+				}
+
+				// 親子関係を構築する
+				for (auto& pb : pmdBones)
+				{
+					if (pb.parentNo >= pmdBones.size())
+					{
+						// 親インデックスチェック。ありえない番号は飛ばす。
+						continue;
+					}
+
+					auto parentName = boneNames[pb.parentNo];
+					m_boneNodeTable[parentName].children.emplace_back(&m_boneNodeTable[pb.boneName]);
+				}
+
+				m_boneMatrices.resize(pmdBones.size());
+
+				for (auto& boneMotion : m_motionData)
+				{
+					auto itBoneNode = m_boneNodeTable.find(boneMotion.first);
+					if (itBoneNode == m_boneNodeTable.end())
+					{
+						// モデルにないボーンは無視する。
+						continue;
+					}
+					auto node = itBoneNode->second;
+					auto& pos = node.startPos;
+					auto mat = nsMath::CMatrix::Translation(-pos.x, -pos.y, -pos.z) *
+						nsMath::CMatrix::RotationFromQuaternion(boneMotion.second[0].rotation) *
+						nsMath::CMatrix::Translation(pos);
+					m_boneMatrices[node.boneIdx] = mat;
+				}
+
+				// ルートノードから開始する
+				RecursiveMatrixMultiply(&m_boneNodeTable["センター"], nsMath::CMatrix::Identity());
+
 				CreateBuff(pmdVertices, pmdIndices, pmdIndicesSize, pmdMaterialNum);
 
 				return;
@@ -302,7 +364,7 @@ namespace nsYMEngine
 				D3D12_HEAP_PROPERTIES heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
 				D3D12_RESOURCE_DESC resDesc = CD3DX12_RESOURCE_DESC::Buffer(pmdVertices.size());
 
-				auto device = CGraphicsEngine::GetInstance()->GetDevice();
+				static auto device = CGraphicsEngine::GetInstance()->GetDevice();
 
 				CreateVertexBuff(device, heapProp, resDesc, pmdVertices);
 
@@ -397,7 +459,9 @@ namespace nsYMEngine
 			void CPMDRenderer::CreateConstantBuff(ID3D12Device5* const device)
 			{
 				D3D12_HEAP_PROPERTIES constBuffHeapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-				UINT64 constBuffSize = (sizeof(SConstantBuff) + 0xff) & ~0xff;
+				// mWorld + mWorldViewProj + mBones
+				UINT64 constBuffSize = sizeof(nsMath::CMatrix) * (2 + m_boneMatrices.size());
+				constBuffSize = (constBuffSize + 0xff) & ~0xff;
 				D3D12_RESOURCE_DESC constBuffResDesc = CD3DX12_RESOURCE_DESC::Buffer(constBuffSize);
 				auto result = device->CreateCommittedResource(
 					&constBuffHeapProp,
@@ -415,9 +479,10 @@ namespace nsYMEngine
 				}
 
 				result = m_constantBuff->Map(0, nullptr, reinterpret_cast<void**>(&m_mappedConstantBuff));
-				m_mappedConstantBuff->mWorld = m_mWorld;
+				m_mappedConstantBuff[0] = m_mWorld;
 				auto mViewProj = CGraphicsEngine::GetInstance()->GetMatrixViewProj();
-				m_mappedConstantBuff->mWorldViewProj = m_mWorld * mViewProj;
+				m_mappedConstantBuff[1] = m_mWorld * mViewProj;
+				copy(m_boneMatrices.begin(), m_boneMatrices.end(), m_mappedConstantBuff + 2);
 
 				D3D12_DESCRIPTOR_HEAP_DESC descHeapDesc = {};
 				descHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
@@ -600,6 +665,172 @@ namespace nsYMEngine
 				return;
 			}
 
+			void CPMDRenderer::RecursiveMatrixMultiply(SBoneNode* node, const nsMath::CMatrix& mat)
+			{
+				m_boneMatrices[node->boneIdx] *= mat;
+				for (auto& childNode : node->children)
+				{
+					RecursiveMatrixMultiply(childNode, m_boneMatrices[node->boneIdx]);
+				}
+				return;
+			}
+
+			void CPMDRenderer::LoadVMDAnimation(const char* filePath)
+			{
+				FILE* fileStream = nullptr;
+				if (fopen_s(&fileStream, filePath, "rb") == 0)
+				{
+					// ヘッダ50バイトは見る必要なし。
+					fseek(fileStream, 50, SEEK_SET);
+
+					unsigned int numMotionData = 0;
+					fread_s(&numMotionData, sizeof(numMotionData), sizeof(numMotionData), 1, fileStream);
+
+					std::vector<SVMDMotion> vmdMotionDatas(numMotionData);
+					for (auto& motion : vmdMotionDatas)
+					{
+						fread_s(&motion.boneName, sizeof(motion.boneName), sizeof(motion.boneName), 1, fileStream);
+						// アライメントにより、boneNameの後にアライメントが発生しているため、分けて読み込む。
+						auto sizeRemainingData =
+							sizeof(motion.frameNo) +
+							sizeof(motion.location) +
+							sizeof(motion.rotation) +
+							sizeof(motion.bezier);
+						fread_s(&motion.frameNo, sizeRemainingData, sizeRemainingData, 1, fileStream);
+					}
+
+
+					for (auto& vmdMotion : vmdMotionDatas)
+					{
+						nsMath::CVector2 p1 = {
+							static_cast<float>(vmdMotion.bezier[3]) / 127.0f,
+							static_cast<float>(vmdMotion.bezier[7]) / 127.0f };
+						nsMath::CVector2 p2 = {
+							static_cast<float>(vmdMotion.bezier[11]) / 127.0f,
+							static_cast<float>(vmdMotion.bezier[15]) / 127.0f };
+						m_motionData[vmdMotion.boneName].emplace_back(
+							vmdMotion.frameNo, vmdMotion.rotation, p1, p2);
+
+						m_maxFrameNo = std::max<unsigned int>(m_maxFrameNo, vmdMotion.frameNo);
+					}
+
+					for (auto& motion : m_motionData)
+					{
+						std::sort(motion.second.begin(), motion.second.end(),
+							[](const SKeyFrame& lval, const SKeyFrame& rval)
+							{
+								return lval.frameNo <= rval.frameNo;
+							});
+						
+					}
+
+					fclose(fileStream);
+				}
+				else
+				{
+					std::wstring wstr = L"VMDファイルの読み込みに失敗しました。ファイルパスを確認してください。";
+					wstr += nsUtils::GetWideStringFromString(filePath);
+					nsGameWindow::MessageBoxWarning(wstr.c_str());
+				}
+
+				return;
+			}
+
+
+			void CPMDRenderer::UpdateAnimation()
+			{
+				const auto deltaTime = CYonemaEngine::GetInstance()->GetDeltaTime();
+				m_playAnimTime += deltaTime;
+				unsigned int frameNo = static_cast<unsigned int>(30.0f * m_playAnimTime);
+
+				if (frameNo > m_maxFrameNo)
+				{
+					m_playAnimTime = 0.0f;
+					frameNo = 0;
+				}
+
+				// ボーンの行列をクリア。
+				// クリアしないと、前フレームのポーズが重ね掛けされてモデルがおかしくなる。
+				std::fill(m_boneMatrices.begin(), m_boneMatrices.end(),
+					nsMath::CMatrix::Identity());
+
+				for (auto& boneMotion : m_motionData)
+				{
+					auto node = m_boneNodeTable[boneMotion.first];
+
+					auto motions = boneMotion.second;
+					auto rIt = std::find_if(motions.rbegin(), motions.rend(),
+						[frameNo](const SKeyFrame& keyFrame)
+						{
+							return keyFrame.frameNo <= frameNo;
+						});
+
+					if (rIt == motions.rend())
+					{
+						// 合致するものがなければ処理を飛ばす。
+						continue;
+					}
+
+					nsMath::CQuaternion rotation(rIt->rotation);
+					auto it = rIt.base();
+					if (it != motions.end())
+					{
+						auto rate = static_cast<float>(30.0f * m_playAnimTime - rIt->frameNo) /
+							static_cast<float>(it->frameNo - rIt->frameNo);
+						rotation.Slerp(rate, rIt->rotation, it->rotation);
+
+						rate = GetYFromXOnBezier(rate, it->p1, it->p2, m_kNumCalculationsOnBezier);
+					}
+
+					auto& pos = node.startPos;
+					auto mat = nsMath::CMatrix::Translation(-pos.x, -pos.y, -pos.z) *
+						nsMath::CMatrix::RotationFromQuaternion(rotation) *
+						nsMath::CMatrix::Translation(pos);
+					m_boneMatrices[node.boneIdx] = mat;
+
+				}
+
+				RecursiveMatrixMultiply(&m_boneNodeTable["センター"], nsMath::CMatrix::Identity());
+
+				copy(m_boneMatrices.begin(), m_boneMatrices.end(), m_mappedConstantBuff + 2);
+
+				return;
+			}
+
+			float CPMDRenderer::GetYFromXOnBezier(
+				float x, const nsMath::CVector2& a, const nsMath::CVector2& b, uint8_t n)
+			{
+				if (a.x == a.y && b.x == b.y)
+				{
+					// 計算不要
+					return x;
+				}
+
+				float t = x;
+				const float k0 = 1.0f + 3.0f * a.x - 3.0f * b.x;	// t^3の係数
+				const float k1 = 3.0f * b.x - 6.0f * a.x;			// t^2の係数
+				const float k2 = 3.0f * a.x;						// tの係数
+
+				constexpr float epsilon = 0.0005f;
+
+				for (int i = 0; i < n; i++)
+				{
+					// f(t)を求める
+					float ft = k0 * t * t * t + k1 * t * t + k2 * t - x;
+
+					if (ft <= epsilon && ft >= -epsilon)
+					{
+						break;
+					}
+
+					// 刻む
+					t -= ft / 2.0f;
+				}
+
+				float r = 1.0f - t;
+
+				return t * t * t + 3.0f * t * t * r * b.y + 3.0f * t * r * r * a.y;
+			}
 
 		}
 	}

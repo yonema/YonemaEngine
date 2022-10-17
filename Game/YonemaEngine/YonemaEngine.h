@@ -1,4 +1,5 @@
 #pragma once
+#include "Time/GameTime.h"
 
 namespace nsYMEngine
 {
@@ -48,6 +49,11 @@ namespace nsYMEngine
 
 		void Update();
 
+		constexpr float GetDeltaTime() const noexcept
+		{
+			return m_gameTime.GetDeltaTime();
+		}
+
 	private:
 
 		void Terminate();
@@ -55,6 +61,7 @@ namespace nsYMEngine
 	private:
 		static CYonemaEngine* m_instance;
 		nsGraphics::CGraphicsEngine* m_graphicsEngine = nullptr;
+		nsTime::CGameTime m_gameTime;
 		nsGraphics::nsPMDModels::CPMDRenderer* m_mikuPmdR = nullptr;
 		nsGraphics::nsPMDModels::CPMDRenderer* m_mikuMetalPmdR = nullptr;
 		nsGraphics::nsPMDModels::CPMDRenderer* m_rukaPmdR = nullptr;

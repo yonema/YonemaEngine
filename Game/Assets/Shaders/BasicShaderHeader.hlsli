@@ -1,6 +1,17 @@
 
+
+struct SVSInput
+{
+	float4 pos : POSITION;
+	float4 normal : NORMAL;
+	float2 uv : TEXCOORD;
+	min16uint2 boneNo : BONE_NO;
+	min16uint weight : WEIGHT;
+	min16uint edge_flg : EDGE_FLG;
+};
+
 // 頂点シェーダーからピクセルシェーダーへのやり取りに使用する構造体
-struct SOutput
+struct SPSInput
 {
 	float4 svpos : SV_POSITION;	// システム用頂点座標
 	float3 normal : NORMAL0;	// 法線ベクトル
@@ -27,6 +38,7 @@ cbuffer TransformCB : register(b1)
 {
 	float4x4 g_mWorld;
 	float4x4 g_mWorldViewProj;
+	float4x4 g_mBones[256];
 }
 
 cbuffer MaterialCB : register(b2)

@@ -1,30 +1,24 @@
 #include "BasicShaderHeader.hlsli"
 
-SOutput BasicVS(
-	float4 pos : POSITION,
-	float4 normal : NORMAL,
-	float2 uv : TEXCOORD,
-	min16uint2 boneNo : BONE_NO,
-	min16uint weight : WEIGHT,
-	min16uint edge_flg : EDGE_FLG
-)
+SPSInput BasicVS(SVSInput svInput)
 {
-	SOutput output;
+	SPSInput psInput;
+	float w = svInput.weight / 100.0f;
+	float4x4 bm = g_mBones[svInput.boneNo[0]] * w + g_mBones[svInput.boneNo[1]] * (1.0f - w);
 	// シェーダ―での行列演算は列優先のため、左方向にかける。
 	// 座標に対して、左側に行列を置く。
-	//output.svpos = mul(g_mWorldViewProj, pos);
-	output.svpos = mul(g_mWorld, pos);
-	output.svpos = mul(g_mView, output.svpos);
-	output.svpos = mul(g_mProj, output.svpos);
+	psInput.svpos = mul(bm, svInput.pos);
+	psInput.svpos = mul(g_mWorldViewProj, psInput.svpos);
+	//psInput.svpos = mul(g_mWorldViewProj, svInput.pos);
 
 	// 法線の平行移動成分を無効にする。
-	normal.w = 0.0f;
-	output.normal = normalize(mul(g_mWorld, normal).xyz);
-	output.normalVS = normalize(mul(g_mView, float4(output.normal,0.0f)).xyz);
-	output.uv = uv;
+	svInput.normal.w = 0.0f;
+	psInput.normal = normalize(mul(g_mWorld, svInput.normal).xyz);
+	psInput.normalVS = normalize(mul(g_mView, float4(psInput.normal,0.0f)).xyz);
+	psInput.uv = svInput.uv;
 
-	output.cameraToPosDirWS = normalize(pos.xyz - g_cameraPosWS);
-	output.cameraToPosDirVS = normalize(mul(g_mView, float4(output.cameraToPosDirWS,0.0f)).xyz);
+	psInput.cameraToPosDirWS = normalize(svInput.pos.xyz - g_cameraPosWS);
+	psInput.cameraToPosDirVS = normalize(mul(g_mView, float4(psInput.cameraToPosDirWS,0.0f)).xyz);
 
-	return output; 
+	return psInput;
 }

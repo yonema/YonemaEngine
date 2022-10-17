@@ -19,6 +19,7 @@ namespace nsYMEngine
 			private:
 				static const size_t m_kPmdVertexSize;
 				static const int m_kNumMaterialDescriptors;
+				static const int m_kNumCalculationsOnBezier;
 
 				/**
 				 * @brief PMDファイルのヘッダ情報構造体
@@ -93,6 +94,7 @@ namespace nsYMEngine
 				{
 					nsMath::CMatrix mWorld;
 					nsMath::CMatrix mWorldViewProj;
+					//std::vector<nsMath::CMatrix> mBones;
 				};
 
 #pragma pack(1)
@@ -112,11 +114,38 @@ namespace nsYMEngine
 				};
 #pragma pack()
 
+				struct SBoneNode
+				{
+					int boneIdx;
+					nsMath::CVector3 startPos;
+					nsMath::CVector3 enePos;
+					std::vector<SBoneNode*> children;
+				};
+
+				struct SVMDMotion
+				{
+					char boneName[15];
+					unsigned int frameNo;
+					nsMath::CVector3 location;
+					nsMath::CQuaternion rotation;
+					unsigned char bezier[64];	// [4][4][4]のベジェ補完パラメータ
+				};
+
+				struct SKeyFrame
+				{
+					unsigned int frameNo;
+					nsMath::CQuaternion rotation;
+					nsMath::CVector2 p1;	// ベジェ曲線のコントロールポイント1
+					nsMath::CVector2 p2;	// ベジェ曲線のコントロールポイント2
+					SKeyFrame(unsigned int fNo, const nsMath::CQuaternion& rot,
+						const nsMath::CVector2& ip1, const nsMath::CVector2& ip2)
+						:frameNo(fNo), rotation(rot), p1(ip1), p2(ip2) {};
+				};
 
 
 
 			public:
-				CPMDRenderer(const char* filePath);
+				CPMDRenderer(const char* filePath, const char* animFilePath = nullptr);
 				~CPMDRenderer();
 
 				void Update();
@@ -128,8 +157,10 @@ namespace nsYMEngine
 					m_debugPosX = x;
 				}
 
+				void PlayAnimation();
+
 			private:
-				void Init(const char* filePath);
+				void Init(const char* filePath, const char* animFilePath = nullptr);
 				void Terminate();
 
 				void LoadPMDModel(const char* filePath);
@@ -165,13 +196,21 @@ namespace nsYMEngine
 					unsigned int pmdMaterialNum
 				);
 
+				void RecursiveMatrixMultiply(SBoneNode* node, const nsMath::CMatrix& mat);
+
+				void LoadVMDAnimation(const char* filePath);
+
+				void UpdateAnimation();
+
+				float GetYFromXOnBezier(
+					float x, const nsMath::CVector2& a, const nsMath::CVector2& b, uint8_t n);
+
+
 			private:
 				std::vector<SMaterial> m_materials;
 				std::vector<CTexture*> m_textures;
 				std::vector<CTexture*> m_sphTextures;
 				std::vector<CTexture*> m_spaTextures;
-				// XMMATRIXは16バイトアライメントが強制されるため、newすると危険。
-				// そのため、XMFLOAT4X4を使用する。
 				nsMath::CMatrix m_mWorld;
 				ID3D12Resource* m_vertexBuff = nullptr;
 				D3D12_VERTEX_BUFFER_VIEW m_vertexBuffView = {};
@@ -179,9 +218,17 @@ namespace nsYMEngine
 				D3D12_INDEX_BUFFER_VIEW m_indexBuffView = {};
 				ID3D12Resource* m_constantBuff = nullptr;
 				ID3D12DescriptorHeap* m_cbDescriptorHeap = nullptr;
-				SConstantBuff* m_mappedConstantBuff = nullptr;
+				//SConstantBuff* m_mappedConstantBuff = nullptr;
+				nsMath::CMatrix* m_mappedConstantBuff = nullptr;
 				ID3D12Resource* m_materialBuff = nullptr;
 				ID3D12DescriptorHeap* m_mbDescriptorHeap = nullptr;
+
+				std::vector<nsMath::CMatrix> m_boneMatrices;
+				std::unordered_map<std::string, SBoneNode> m_boneNodeTable;
+
+				std::unordered_map<std::string, std::vector<SKeyFrame>> m_motionData;
+				float m_playAnimTime = 0.0f;
+				unsigned int m_maxFrameNo = 0;
 
 				float m_debugPosX = 0.0f;
 				float m_debugRotY= 0.0f;

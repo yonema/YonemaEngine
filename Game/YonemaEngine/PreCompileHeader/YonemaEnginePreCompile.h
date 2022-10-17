@@ -15,6 +15,7 @@
 #include <map>
 #include <unordered_map>
 #include <memory>
+#include <algorithm>
 
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")

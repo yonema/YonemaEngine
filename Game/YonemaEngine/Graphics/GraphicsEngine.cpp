@@ -118,12 +118,12 @@ namespace nsYMEngine
 			m_whiteTexture->Init("Assets/Models/white.jpg");
 			m_blackTexture->Init("Assets/Models/black.jpg");
 
-			m_cameraPos = {0.0f, 10.0f, -15.0f};
+			m_cameraPos = {0.0f, 10.0f, -25.0f};
 			m_targetPos = { 0.0f, 10.0f, 0.0f };
 			m_upDir = { 0.0f, 1.0f, 0.0f };
 			m_mView.MakeViewMatrix(m_cameraPos, m_targetPos, m_upDir);
 			m_mProj.MakeProjectionMatrix(
-				nsMath::YM_PIDIV2,
+				nsMath::DegToRad(60.0f),
 				static_cast<float>(kWindowWidth) / static_cast<float>(kWindowHeight),
 				1.0f,
 				100.0f

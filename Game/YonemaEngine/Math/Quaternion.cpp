@@ -7,14 +7,14 @@ namespace nsYMEngine
 	{
 		const CQuaternion CQuaternion::m_kIdentity = { 0.0f,  0.0f, 0.0f, 1.0f };
 
-		void CQuaternion::SetRotation(const CMatrix& mat)
+		void CQuaternion::SetRotation(const CMatrix& mat) noexcept
 		{
-			//auto xmv = DirectX::XMQuaternionRotationMatrix(mat);
-			//DirectX::XMStoreFloat4(&m_xmfVec, xmv);
+			auto xmv = DirectX::XMQuaternionRotationMatrix(mat);
+			DirectX::XMStoreFloat4(&m_xmf4Vec, xmv);
 			return;
 		}
 
-		void CQuaternion::SetRotation(const CVector3& fromVec, const CVector3& toVec)
+		void CQuaternion::SetRotation(const CVector3& fromVec, const CVector3& toVec) noexcept
 		{
 			// fromベクトルとtoベクトルの間の角度を求めて、
 			// 回転軸を探して、求めた角度分回転させる。

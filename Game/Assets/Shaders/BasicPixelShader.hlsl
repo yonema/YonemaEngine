@@ -1,6 +1,6 @@
 #include "BasicShaderHeader.hlsli"
 
-float4 BasicPS(SOutput input) : SV_TARGET
+float4 BasicPS(SPSInput input) : SV_TARGET
 {
 	// ƒ‰ƒCƒgî•ñ
 	float3 lightDir = normalize(float3(1.0f,-1.0f,1.0f));

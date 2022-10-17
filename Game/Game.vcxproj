@@ -150,6 +150,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="YonemaEngine\Time\GameTime.cpp" />
     <ClCompile Include="YonemaEngine\Math\Quaternion.cpp" />
     <ClCompile Include="YonemaEngine\Math\Vector2.cpp" />
     <ClCompile Include="YonemaEngine\Math\Vector3.cpp" />
@@ -195,6 +196,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
+    <ClInclude Include="YonemaEngine\Time\GameTime.h" />
     <ClInclude Include="YonemaEngine\Math\Math.h" />
     <ClInclude Include="YonemaEngine\Math\Quaternion.h" />
     <ClInclude Include="YonemaEngine\Math\Vector2.h" />
@@ -205,6 +207,7 @@
     <ClInclude Include="YonemaEngine\Graphics\PMDModels\PMDRenderer.h" />
     <ClInclude Include="YonemaEngine\Graphics\Texture.h" />
     <ClInclude Include="YonemaEngine\GameWindow\MessageBox.h" />
+    <ClInclude Include="YonemaEngine\Time\Timer.h" />
     <ClInclude Include="YonemaEngine\Utils\AlignmentedSize.h" />
     <ClInclude Include="YonemaEngine\Utils\StringManipulation.h" />
     <ClInclude Include="YonemaEngine\Utils\Noncopyable.h" />

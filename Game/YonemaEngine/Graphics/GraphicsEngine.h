@@ -104,7 +104,7 @@ namespace nsYMEngine
 				return m_fence;
 			}
 
-			inline UINT64* GetFenceVal()
+			inline short int* GetFenceVal()
 			{
 				return &m_fenceVal;
 			}
@@ -168,7 +168,8 @@ namespace nsYMEngine
 			ID3D12DescriptorHeap* m_dsvHeap = nullptr;
 			ID3D12Resource* m_depthStencilBuffer = nullptr;
 			ID3D12Fence* m_fence = nullptr;
-			UINT64 m_fenceVal = 0;
+			//UINT64 m_fenceVal = 0;
+			short int m_fenceVal = 0;
 			D3D12_VIEWPORT m_viewport;
 			D3D12_RECT m_scissorRect;
 
