@@ -74,7 +74,7 @@ namespace nsYMEngine
 				return false;
 			}
 
-			if (CreateDescriptorHeapForRTV() != true)
+			if (CreateRTVDescriptorHeapForFrameBuffer() != true)
 			{
 				return false;
 			}
@@ -84,7 +84,7 @@ namespace nsYMEngine
 				return false;
 			}
 
-			if (CreateDescriptorHeapForDSV() != true)
+			if (CreateDSVDescriptorHeapForFrameBuffer() != true)
 			{
 				return false;
 			}
@@ -99,13 +99,47 @@ namespace nsYMEngine
 				return false;
 			}
 
+			if (CreatePeraRenderTarget() != true)
+			{
+				return false;
+			}
+			if (CreateRTVDescriptorHeapForPeraRenderTarget() != true)
+			{
+				return false;
+			}
+			if (CreateRTVForPeraRenderTarget() != true)
+			{
+				return false;
+			}
+			if (CreateSRVDescriptorHeapForPeraRenderTarget() != true)
+			{
+				return false;
+			}
+			if (CreateSRVForPeraRenderTarget() != true)
+			{
+				return false;
+			}
+			if (CreateVertexBufferForPeraRenderTarget() != true)
+			{
+				return false;
+			}
+			if (CreateRootSignatureForPeraRenderTaraget() != true)
+			{
+				return false;
+			}
+			if (CreatePipelineStateForPeraRenderTarget() != true)
+			{
+				return false;
+			}
+			
+
 			// 初期化が終わったら、DXGIFactoryはもういらないため破棄する。
 			dxgiFactory->Release();
 
 			const auto kWindowWidth = CApplication::GetInstance()->GetWindowWidth();
 			const auto kWindowHeight = CApplication::GetInstance()->GetWindowHeight();
 
-			m_viewport = CD3DX12_VIEWPORT(m_renderTargets[0]);
+			m_viewport = CD3DX12_VIEWPORT(m_frameBuffers[0]);
 			m_scissorRect = CD3DX12_RECT(
 				0,
 				0,
@@ -159,6 +193,30 @@ namespace nsYMEngine
 			{
 				m_sceneDataConstantBuff->Release();
 			}
+			if (m_pipelineStateForPeraRT)
+			{
+				m_pipelineStateForPeraRT->Release();
+			}
+			if (m_rootSignatureForPeraRT)
+			{
+				m_rootSignatureForPeraRT->Release();
+			}
+			if (m_vertexBuffForPeraRT)
+			{
+				m_vertexBuffForPeraRT->Release();
+			}
+			if (m_srvDescHeapForPeraRT)
+			{
+				m_srvDescHeapForPeraRT->Release();
+			}
+			if (m_rtvDescHeapForPeraRT)
+			{
+				m_rtvDescHeapForPeraRT->Release();
+			}
+			if (m_peraRenderTarget)
+			{
+				m_peraRenderTarget->Release();
+			}
 			if (m_fence)
 			{
 				m_fence->Release();
@@ -167,20 +225,20 @@ namespace nsYMEngine
 			{
 				m_depthStencilBuffer->Release();
 			}
-			if (m_dsvHeap)
+			if (m_dsvDescHeapForFrameBuff)
 			{
-				m_dsvHeap->Release();
+				m_dsvDescHeapForFrameBuff->Release();
 			}
-			for (auto& renderTarget : m_renderTargets)
+			for (auto& renderTarget : m_frameBuffers)
 			{
 				if (renderTarget)
 				{
 					renderTarget->Release();
 				}
 			}
-			if (m_rtvHeap)
+			if (m_rtvDescHeapForFrameBuff)
 			{
-				m_rtvHeap->Release();
+				m_rtvDescHeapForFrameBuff->Release();
 			}
 			if (m_swapChain)
 			{
@@ -222,24 +280,35 @@ namespace nsYMEngine
 			auto result = m_commandAllocator->Reset();
 			result = m_commandList->Reset(m_commandAllocator, nullptr);
 
-			auto bbIdx = m_swapChain->GetCurrentBackBufferIndex();
+			//auto bbIdx = m_swapChain->GetCurrentBackBufferIndex();
 
-			// ○リソースバリア
-			D3D12_RESOURCE_BARRIER barrierDesc =
+			//// ○リソースバリア
+			//D3D12_RESOURCE_BARRIER barrierDesc =
+			//	CD3DX12_RESOURCE_BARRIER::Transition(
+			//		m_frameBuffers[bbIdx],
+			//		D3D12_RESOURCE_STATE_PRESENT,
+			//		D3D12_RESOURCE_STATE_RENDER_TARGET
+			//	);
+			//m_commandList->ResourceBarrier(1, &barrierDesc);
+
+			D3D12_RESOURCE_BARRIER barrierForPeraRT =
 				CD3DX12_RESOURCE_BARRIER::Transition(
-					m_renderTargets[bbIdx],
-					D3D12_RESOURCE_STATE_PRESENT,
+					m_peraRenderTarget,
+					D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
 					D3D12_RESOURCE_STATE_RENDER_TARGET
 				);
-			m_commandList->ResourceBarrier(1, &barrierDesc);
+
+			m_commandList->ResourceBarrier(1, &barrierForPeraRT);
 
 			// ○RTVとDSVのセットとクリア
-			auto rtvH = m_rtvHeap->GetCPUDescriptorHandleForHeapStart();
-			rtvH.ptr += static_cast<long long unsigned int>(bbIdx) *
-				m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-			auto dsvH = m_dsvHeap->GetCPUDescriptorHandleForHeapStart();
+			//auto rtvH = m_rtvDescHeapForFrameBuff->GetCPUDescriptorHandleForHeapStart();
+			//rtvH.ptr += static_cast<long long unsigned int>(bbIdx) *
+			//	m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+			auto rtvH = m_rtvDescHeapForPeraRT->GetCPUDescriptorHandleForHeapStart();
+			auto dsvH = m_dsvDescHeapForFrameBuff->GetCPUDescriptorHandleForHeapStart();
 
-			m_commandList->OMSetRenderTargets(1, &rtvH, true, &dsvH);
+			//m_commandList->OMSetRenderTargets(1, &rtvH, true, &dsvH);
+			m_commandList->OMSetRenderTargets(1, &rtvH, false, &dsvH);
 
 			m_commandList->ClearRenderTargetView(rtvH, m_kRTVClearColor, 0, nullptr);
 			m_commandList->ClearDepthStencilView(dsvH, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
@@ -265,11 +334,54 @@ namespace nsYMEngine
 
 		void CGraphicsEngine::EndDraw()
 		{
-			auto bbIdx = m_swapChain->GetCurrentBackBufferIndex();
 
+
+
+			D3D12_RESOURCE_BARRIER barrierForPeraRT = 
+				CD3DX12_RESOURCE_BARRIER::Transition(
+				m_peraRenderTarget,
+				D3D12_RESOURCE_STATE_RENDER_TARGET,
+				D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE
+			);
+			m_commandList->ResourceBarrier(1, &barrierForPeraRT);
+
+
+
+			auto bbIdx = m_swapChain->GetCurrentBackBufferIndex();
+			// ○リソースバリア
 			D3D12_RESOURCE_BARRIER barrierDesc =
 				CD3DX12_RESOURCE_BARRIER::Transition(
-					m_renderTargets[bbIdx],
+					m_frameBuffers[bbIdx],
+					D3D12_RESOURCE_STATE_PRESENT,
+					D3D12_RESOURCE_STATE_RENDER_TARGET
+				);
+			m_commandList->ResourceBarrier(1, &barrierDesc);
+
+			auto rtvH = m_rtvDescHeapForFrameBuff->GetCPUDescriptorHandleForHeapStart();
+			rtvH.ptr += static_cast<long long unsigned int>(bbIdx) *
+				m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+			auto dsvH = m_dsvDescHeapForFrameBuff->GetCPUDescriptorHandleForHeapStart();
+
+			m_commandList->OMSetRenderTargets(1, &rtvH, false, &dsvH);
+
+			m_commandList->ClearRenderTargetView(rtvH, m_kRTVClearColor, 0, nullptr);
+			m_commandList->ClearDepthStencilView(dsvH, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+
+			m_commandList->SetGraphicsRootSignature(m_rootSignatureForPeraRT);
+			m_commandList->SetPipelineState(m_pipelineStateForPeraRT);
+			m_commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+			m_commandList->IASetVertexBuffers(0, 1, &m_vertexBuffViewForPeraRT);
+
+			m_commandList->SetDescriptorHeaps(1, &m_srvDescHeapForPeraRT);
+			auto heapHandle = m_srvDescHeapForPeraRT->GetGPUDescriptorHandleForHeapStart();
+			m_commandList->SetGraphicsRootDescriptorTable(0, heapHandle);
+
+			m_commandList->DrawInstanced(4, 1, 0, 0);
+
+
+			/*D3D12_RESOURCE_BARRIER*/ barrierDesc =
+				CD3DX12_RESOURCE_BARRIER::Transition(
+					m_frameBuffers[bbIdx],
 					D3D12_RESOURCE_STATE_RENDER_TARGET,
 					D3D12_RESOURCE_STATE_PRESENT
 				);
@@ -566,19 +678,19 @@ namespace nsYMEngine
 			return true;
 		}
 
-		bool CGraphicsEngine::CreateDescriptorHeapForRTV()
+		bool CGraphicsEngine::CreateRTVDescriptorHeapForFrameBuffer()
 		{
-			D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {};
-			heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
-			heapDesc.NodeMask = 0;
-			heapDesc.NumDescriptors = m_kFrameBufferCount;
-			heapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+			D3D12_DESCRIPTOR_HEAP_DESC descHeapDesc = {};
+			descHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+			descHeapDesc.NodeMask = 0;
+			descHeapDesc.NumDescriptors = m_kFrameBufferCount;
+			descHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 
-			auto result = m_device->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&m_rtvHeap));
+			auto result = m_device->CreateDescriptorHeap(&descHeapDesc, IID_PPV_ARGS(&m_rtvDescHeapForFrameBuff));
 
 			if (FAILED(result))
 			{
-				nsGameWindow::MessageBoxError(L"RTV用のディスクリプタヒープの生成に失敗しました。");
+				nsGameWindow::MessageBoxError(L"フレームバッファ用のRTVディスクリプタヒープの生成に失敗しました。");
 				return false;
 			}
 
@@ -606,19 +718,20 @@ namespace nsYMEngine
 			//rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 			//rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 
-			D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = m_rtvHeap->GetCPUDescriptorHandleForHeapStart();
+			D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = 
+				m_rtvDescHeapForFrameBuff->GetCPUDescriptorHandleForHeapStart();
 
 			for (int i = 0; static_cast<unsigned int>(i) < m_kFrameBufferCount; i++)
 			{
-				auto result = m_swapChain->GetBuffer(i, IID_PPV_ARGS(&m_renderTargets[i]));
+				auto result = m_swapChain->GetBuffer(i, IID_PPV_ARGS(&m_frameBuffers[i]));
 				if (FAILED(result))
 				{
 					nsGameWindow::MessageBoxError(L"スワップチェイン内のバッファとビューを関連付けに失敗しました。");
 					return false;
 				}
 
-				m_device->CreateRenderTargetView(m_renderTargets[i], nullptr, rtvHandle);
-				m_renderTargets[i]->SetName(L"FrameBuffer::RenderTargetView");
+				m_device->CreateRenderTargetView(m_frameBuffers[i], nullptr, rtvHandle);
+				m_frameBuffers[i]->SetName(L"FrameBuffer::RenderTargetView");
 
 				rtvHandle.ptr +=
 					m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
@@ -627,16 +740,16 @@ namespace nsYMEngine
 			return true;
 		}
 
-		bool CGraphicsEngine::CreateDescriptorHeapForDSV()
+		bool CGraphicsEngine::CreateDSVDescriptorHeapForFrameBuffer()
 		{
-			D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {};
-			heapDesc.NumDescriptors = 1;
-			heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
-			auto result = m_device->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&m_dsvHeap));
+			D3D12_DESCRIPTOR_HEAP_DESC descHeapDesc = {};
+			descHeapDesc.NumDescriptors = 1;
+			descHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
+			auto result = m_device->CreateDescriptorHeap(&descHeapDesc, IID_PPV_ARGS(&m_dsvDescHeapForFrameBuff));
 
 			if (FAILED(result))
 			{
-				nsGameWindow::MessageBoxError(L"DSV用のディスクリプタヒープの生成に失敗しました。");
+				nsGameWindow::MessageBoxError(L"フレームバッファ用のDSVディスクリプタヒープの生成に失敗しました。");
 				return false;
 			}
 
@@ -688,7 +801,7 @@ namespace nsYMEngine
 			m_device->CreateDepthStencilView(
 				m_depthStencilBuffer,
 				nullptr,
-				m_dsvHeap->GetCPUDescriptorHandleForHeapStart()
+				m_dsvDescHeapForFrameBuff->GetCPUDescriptorHandleForHeapStart()
 			);
 
 			return true;
@@ -704,6 +817,380 @@ namespace nsYMEngine
 				nsGameWindow::MessageBoxError(L"フェンスの生成に失敗しました。");
 				return false;
 			}
+
+			return true;
+		}
+
+		bool CGraphicsEngine::CreatePeraRenderTarget()
+		{
+			auto rtvDescHeapDesc = m_rtvDescHeapForFrameBuff->GetDesc();
+			auto& frameBuff = m_frameBuffers[0];
+			auto frameBuffResDesc = frameBuff->GetDesc();
+
+			D3D12_HEAP_PROPERTIES heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
+			D3D12_CLEAR_VALUE clearValue = CD3DX12_CLEAR_VALUE(
+				DXGI_FORMAT_R8G8B8A8_UNORM, m_kRTVClearColor);
+
+			auto result = m_device->CreateCommittedResource(
+				&heapProp,
+				D3D12_HEAP_FLAG_NONE,
+				&frameBuffResDesc,
+				// D3D12_RESOURCE_STATE_RENDER_TARGETではない。
+				// 後でステートを切り替えるまでは、テクスチャとして扱う。
+				D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
+				&clearValue,
+				IID_PPV_ARGS(&m_peraRenderTarget)
+			);
+			
+
+			return true;
+		}
+
+		bool CGraphicsEngine::CreateRTVDescriptorHeapForPeraRenderTarget()
+		{
+			D3D12_DESCRIPTOR_HEAP_DESC descHeapDesc = {};
+			descHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+			descHeapDesc.NodeMask = 0;
+			descHeapDesc.NumDescriptors = 1;
+			descHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+
+			auto result = m_device->CreateDescriptorHeap(
+				&descHeapDesc, IID_PPV_ARGS(&m_rtvDescHeapForPeraRT));
+
+			if (FAILED(result))
+			{
+				nsGameWindow::MessageBoxError(L"ペラレンダーターゲット用のRTVディスクリプタヒープの生成に失敗しました。");
+				return false;
+			}
+			return true;
+		}
+
+		bool CGraphicsEngine::CreateRTVForPeraRenderTarget()
+		{
+			D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
+			rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+			rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+
+			D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle =
+				m_rtvDescHeapForPeraRT->GetCPUDescriptorHandleForHeapStart();
+
+			m_device->CreateRenderTargetView(m_peraRenderTarget, &rtvDesc, rtvHandle);
+			m_peraRenderTarget->SetName(L"PeraRenderTarget::RenderTargetView");
+
+			return true;
+		}
+
+		bool CGraphicsEngine::CreateSRVDescriptorHeapForPeraRenderTarget()
+		{
+			D3D12_DESCRIPTOR_HEAP_DESC descHeapDesc = {};
+			descHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+			descHeapDesc.NodeMask = 0;
+			descHeapDesc.NumDescriptors = 1;
+			descHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+
+			auto result = m_device->CreateDescriptorHeap(
+				&descHeapDesc, IID_PPV_ARGS(&m_srvDescHeapForPeraRT));
+
+			if (FAILED(result))
+			{
+				nsGameWindow::MessageBoxError(L"ペラレンダーターゲット用のSRVディスクリプタヒープの生成に失敗しました。");
+				return false;
+			}
+
+			return true;
+		}
+
+		bool CGraphicsEngine::CreateSRVForPeraRenderTarget()
+		{
+			D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+			srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+			srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+			srvDesc.Texture2D.MipLevels = 1;
+			srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+
+			D3D12_CPU_DESCRIPTOR_HANDLE srvHandle =
+				m_srvDescHeapForPeraRT->GetCPUDescriptorHandleForHeapStart();
+
+			m_device->CreateShaderResourceView(m_peraRenderTarget, &srvDesc, srvHandle);
+
+
+			return true;
+		}
+
+		bool CGraphicsEngine::CreateVertexBufferForPeraRenderTarget()
+		{
+			constexpr SPeraVertex peraVertices[4] =
+			{
+				{ { -1.0f, -1.0f, 0.1f }, { 0.0f, 1.0f } },	// 左下
+				{ { -1.0f,  1.0f, 0.1f }, { 0.0f, 0.0f } },	// 左上
+				{ {  1.0f, -1.0f, 0.1f }, { 1.0f, 1.0f } },	// 右下
+				{ {  1.0f,  1.0f, 0.1f }, { 1.0f, 0.0f } }	// 右上
+			};
+
+			D3D12_HEAP_PROPERTIES heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+			D3D12_RESOURCE_DESC resDesc = CD3DX12_RESOURCE_DESC::Buffer(sizeof(peraVertices));
+
+
+			// ○頂点バッファの作成
+			auto result = m_device->CreateCommittedResource(
+				&heapProp,
+				D3D12_HEAP_FLAG_NONE,
+				&resDesc,
+				D3D12_RESOURCE_STATE_GENERIC_READ,
+				nullptr,
+				IID_PPV_ARGS(&m_vertexBuffForPeraRT)
+			);
+
+			if (FAILED(result))
+			{
+				nsGameWindow::MessageBoxWarning(L"ペラレンダーターゲット用の頂点バッファの生成に失敗しました。");
+				return false;
+			}
+
+			// ○頂点バッファビューの作成
+			m_vertexBuffViewForPeraRT.BufferLocation = 
+				m_vertexBuffForPeraRT->GetGPUVirtualAddress();
+			m_vertexBuffViewForPeraRT.SizeInBytes = sizeof(peraVertices);
+			m_vertexBuffViewForPeraRT.StrideInBytes = sizeof(SPeraVertex);
+
+			// 〇頂点情報のコピー（マップ）
+			SPeraVertex* mappedPeraVertices = nullptr;
+			m_vertexBuffForPeraRT->Map(0, nullptr, reinterpret_cast<void**>(&mappedPeraVertices));
+			std::copy(std::begin(peraVertices), std::end(peraVertices), mappedPeraVertices);
+			m_vertexBuffForPeraRT->Unmap(0, nullptr);
+
+			return true;
+		}
+
+		bool CGraphicsEngine::CreateRootSignatureForPeraRenderTaraget()
+		{
+			constexpr int unsigned kNumDescTableRanges = 1;
+			constexpr int unsigned kNumRootParameters = 1;
+			constexpr int unsigned kNumSamplers = 1;
+
+			CD3DX12_DESCRIPTOR_RANGE1 descTableRanges[kNumDescTableRanges] = {};
+			descTableRanges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
+
+			CD3DX12_ROOT_PARAMETER1 rootParameters[kNumRootParameters] = {};
+			rootParameters[0].InitAsDescriptorTable(
+				kNumDescTableRanges, descTableRanges, D3D12_SHADER_VISIBILITY_PIXEL);
+
+			CD3DX12_STATIC_SAMPLER_DESC samplerDescs[kNumSamplers] = {};
+			samplerDescs[0].Init(
+				0,
+				D3D12_FILTER_ANISOTROPIC,
+				D3D12_TEXTURE_ADDRESS_MODE_WRAP,
+				D3D12_TEXTURE_ADDRESS_MODE_WRAP,
+				D3D12_TEXTURE_ADDRESS_MODE_WRAP,
+				0,
+				16,
+				D3D12_COMPARISON_FUNC_LESS_EQUAL,
+				D3D12_STATIC_BORDER_COLOR_OPAQUE_WHITE,
+				0.0f,
+				D3D12_FLOAT32_MAX,
+				D3D12_SHADER_VISIBILITY_PIXEL
+			);
+
+			CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDesc = {};
+			rootSignatureDesc.Init_1_1(
+				kNumRootParameters,
+				rootParameters,
+				kNumSamplers,
+				samplerDescs,
+				D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT
+			);
+
+
+			ID3DBlob* rootSignatureBlob = nullptr;
+			ID3DBlob* errorBlob = nullptr;
+
+			auto result = D3DX12SerializeVersionedRootSignature
+			(
+				&rootSignatureDesc,
+				D3D_ROOT_SIGNATURE_VERSION_1_1,
+				&rootSignatureBlob,
+				&errorBlob
+			);
+
+			if (FAILED(result))
+			{
+				nsGameWindow::MessageBoxWarning(L"ペラレンダーターゲット用のルートシグネチャのバイナリコードの生成に失敗しました。");
+				return false;
+			}
+
+			result = m_device->CreateRootSignature(
+				0,
+				rootSignatureBlob->GetBufferPointer(),
+				rootSignatureBlob->GetBufferSize(),
+				IID_PPV_ARGS(&m_rootSignatureForPeraRT)
+			);
+
+			if (FAILED(result))
+			{
+				nsGameWindow::MessageBoxWarning(L"ペラレンダーターゲット用のルートシグネチャの生成に失敗しました。");
+				return false;
+			}
+
+			if (errorBlob)
+			{
+				nsGameWindow::MessageBoxWarning(L"ペラレンダーターゲット用のルートシグネチャの生成に失敗しました。");
+				errorBlob->Release();
+				return false;
+			}
+
+			// 不要になったため解放。
+			rootSignatureBlob->Release();
+
+			return true;
+		}
+
+		bool CGraphicsEngine::CreatePipelineStateForPeraRenderTarget()
+		{
+			ID3DBlob* vsBlob = nullptr;
+			ID3DBlob* psBlob = nullptr;
+			ID3DBlob* errorBlob = nullptr;
+
+			auto result = D3DCompileFromFile
+			(
+				L"Assets/Shaders/PeraPolygonVertexShader.hlsl",
+				nullptr,
+				D3D_COMPILE_STANDARD_FILE_INCLUDE,
+				"VSMain",
+				"vs_5_0",
+				0,
+				0,
+				&vsBlob,
+				&errorBlob
+			);
+			if (FAILED(result))
+			{
+				nsGameWindow::MessageBoxError(L"ペラレンダーターゲット用の頂点シェーダーの生成に失敗しました。");
+
+				if (result == HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND))
+				{
+					::OutputDebugStringA("ファイルが見当たりません");
+				}
+				else
+				{
+					std::string errstr;
+					errstr.resize(errorBlob->GetBufferSize());
+					std::copy_n((char*)errorBlob->GetBufferPointer(), errorBlob->GetBufferSize(), errstr.begin());
+					errstr += "\n";
+					::OutputDebugStringA(errstr.c_str());
+				}
+
+				if (errorBlob)
+				{
+					errorBlob->Release();
+				}
+				return false;
+			}
+			else
+			{
+				if (errorBlob)
+				{
+					errorBlob->Release();
+				}
+			}
+		
+
+			result = D3DCompileFromFile
+			(
+				L"Assets/Shaders/PeraPolygonPixelShader.hlsl",
+				nullptr,
+				D3D_COMPILE_STANDARD_FILE_INCLUDE,
+				"PSMain",
+				"ps_5_0",
+				0,
+				0,
+				&psBlob,
+				&errorBlob
+			);
+
+			if (FAILED(result))
+			{
+				nsGameWindow::MessageBoxError(L"ペラレンダーターゲット用のピクセルシェーダーの生成に失敗しました。");
+
+				if (result == HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND))
+				{
+					::OutputDebugStringA("ファイルが見当たりません");
+				}
+				else
+				{
+					std::string errstr;
+					errstr.resize(errorBlob->GetBufferSize());
+					std::copy_n((char*)errorBlob->GetBufferPointer(), errorBlob->GetBufferSize(), errstr.begin());
+					errstr += "\n";
+					::OutputDebugStringA(errstr.c_str());
+				}
+
+				if (errorBlob)
+				{
+					errorBlob->Release();
+				}
+				return false;
+			}
+			else
+			{
+				if (errorBlob)
+				{
+					errorBlob->Release();
+				}
+			}
+
+
+			D3D12_INPUT_ELEMENT_DESC layout[] =
+			{
+				{
+					"POSITION",
+					0,
+					DXGI_FORMAT_R32G32B32_FLOAT,
+					0,
+					D3D12_APPEND_ALIGNED_ELEMENT,
+					D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
+					0
+				},
+				{
+					"TEXCOORD",
+					0,
+					DXGI_FORMAT_R32G32_FLOAT,
+					0,
+					D3D12_APPEND_ALIGNED_ELEMENT,
+					D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
+					0
+				}
+			};
+
+			D3D12_GRAPHICS_PIPELINE_STATE_DESC gPipelineStateDesc = {};
+			gPipelineStateDesc.InputLayout.NumElements = _countof(layout);
+			gPipelineStateDesc.InputLayout.pInputElementDescs = layout;
+
+			gPipelineStateDesc.VS = CD3DX12_SHADER_BYTECODE(vsBlob);
+			gPipelineStateDesc.PS = CD3DX12_SHADER_BYTECODE(psBlob);
+
+			gPipelineStateDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+			gPipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+			gPipelineStateDesc.NumRenderTargets = 1;
+			gPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+			gPipelineStateDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+			gPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
+			gPipelineStateDesc.SampleDesc.Count = 1;
+			gPipelineStateDesc.SampleDesc.Quality = 0;
+			gPipelineStateDesc.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
+			gPipelineStateDesc.pRootSignature = m_rootSignatureForPeraRT;
+
+			result = m_device->CreateGraphicsPipelineState(
+				&gPipelineStateDesc,
+				IID_PPV_ARGS(&m_pipelineStateForPeraRT)
+			);
+
+			if (FAILED(result))
+			{
+				nsGameWindow::MessageBoxWarning(L"ペラレンダーターゲット用のグラフィックスパイプラインステートの生成に失敗しました。");
+				return false;
+			}
+
+
 
 			return true;
 		}

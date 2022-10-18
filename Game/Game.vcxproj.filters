@@ -68,13 +68,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Assets\Shaders\BasicVertexShader.hlsl" />
-    <FxCompile Include="Assets\Shaders\BasicPixelShader.hlsl" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Assets\Shaders\BasicShaderHeader.hlsli" />
-  </ItemGroup>
-  <ItemGroup>
     <Image Include="Assets\Images\StarMan.png">
       <Filter>リソース ファイル</Filter>
     </Image>

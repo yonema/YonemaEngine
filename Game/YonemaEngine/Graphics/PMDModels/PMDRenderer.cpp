@@ -31,7 +31,6 @@ namespace nsYMEngine
 
 			void CPMDRenderer::Update()
 			{
-				
 				m_debugRotY += 0.01f;
 				nsMath::CMatrix mTrans;
 				mTrans.MakeTranslation(m_debugPosX, 0.0f, 0.0f);

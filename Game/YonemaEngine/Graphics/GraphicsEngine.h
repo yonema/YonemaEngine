@@ -40,6 +40,12 @@ namespace nsYMEngine
 				nsMath::CVector3 cameraPosWS;
 			};
 
+			struct SPeraVertex
+			{
+				nsMath::CVector3 pos;
+				nsMath::CVector2 uv;
+			};
+
 		private:
 			CGraphicsEngine() = default;
 			~CGraphicsEngine();
@@ -144,15 +150,31 @@ namespace nsYMEngine
 
 			bool CreateSwapChain(IDXGIFactory6* dxgiFactory);
 
-			bool CreateDescriptorHeapForRTV();
+			bool CreateRTVDescriptorHeapForFrameBuffer();
 
 			bool CreateRTVForFrameBuffer();
 
-			bool CreateDescriptorHeapForDSV();
+			bool CreateDSVDescriptorHeapForFrameBuffer();
 
 			bool CreateDSVForFrameBuffer();
 
 			bool CreateFence();
+
+			bool CreatePeraRenderTarget();
+
+			bool CreateRTVDescriptorHeapForPeraRenderTarget();
+
+			bool CreateRTVForPeraRenderTarget();
+
+			bool CreateSRVDescriptorHeapForPeraRenderTarget();
+
+			bool CreateSRVForPeraRenderTarget();
+
+			bool CreateVertexBufferForPeraRenderTarget();
+
+			bool CreateRootSignatureForPeraRenderTaraget();
+
+			bool CreatePipelineStateForPeraRenderTarget();
 
 			bool CreateSeceneConstantBuff();
 
@@ -163,12 +185,11 @@ namespace nsYMEngine
 			ID3D12GraphicsCommandList* m_commandList = nullptr;
 			ID3D12CommandQueue* m_commandQueue = nullptr;
 			IDXGISwapChain4* m_swapChain = nullptr;
-			ID3D12DescriptorHeap* m_rtvHeap = nullptr;
-			ID3D12Resource* m_renderTargets[m_kFrameBufferCount] = { nullptr };
-			ID3D12DescriptorHeap* m_dsvHeap = nullptr;
+			ID3D12DescriptorHeap* m_rtvDescHeapForFrameBuff = nullptr;
+			ID3D12Resource* m_frameBuffers[m_kFrameBufferCount] = { nullptr };
+			ID3D12DescriptorHeap* m_dsvDescHeapForFrameBuff = nullptr;
 			ID3D12Resource* m_depthStencilBuffer = nullptr;
 			ID3D12Fence* m_fence = nullptr;
-			//UINT64 m_fenceVal = 0;
 			short int m_fenceVal = 0;
 			D3D12_VIEWPORT m_viewport;
 			D3D12_RECT m_scissorRect;
@@ -187,6 +208,14 @@ namespace nsYMEngine
 			SSceneDataMatrix* m_mappedSceneDataMatrix = nullptr;
 
 			nsPMDModels::CPMDGenericRenderer* m_pmdGenericRenderer = nullptr;
+
+			ID3D12Resource* m_peraRenderTarget = nullptr;
+			ID3D12DescriptorHeap* m_rtvDescHeapForPeraRT = nullptr;
+			ID3D12DescriptorHeap* m_srvDescHeapForPeraRT = nullptr;
+			ID3D12Resource* m_vertexBuffForPeraRT = nullptr;
+			D3D12_VERTEX_BUFFER_VIEW m_vertexBuffViewForPeraRT = {};
+			ID3D12RootSignature* m_rootSignatureForPeraRT = nullptr;
+			ID3D12PipelineState* m_pipelineStateForPeraRT = nullptr;
 
 		};
 	}
