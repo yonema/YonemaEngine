@@ -5,7 +5,7 @@ namespace nsYMEngine
 {
 	namespace nsTime
 	{
-		class CTimer
+		class CTimer : private nsUtils::SNoncopyable
 		{
 		public:
 			constexpr CTimer() = default;

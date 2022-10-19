@@ -5,7 +5,7 @@ namespace nsYMEngine
 {
 	namespace nsTime
 	{
-		class CGameTime
+		class CGameTime : private nsUtils::SNoncopyable
 		{
 		private:
 			static const float m_kLatestDeltaTime;

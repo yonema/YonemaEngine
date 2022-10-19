@@ -3,7 +3,10 @@ namespace nsYMEngine
 {
 	namespace nsGraphics
 	{
-		class CTexture;
+		namespace nsDx12Wrappers
+		{
+			class CTexture;
+		}
 	}
 }
 
@@ -208,9 +211,9 @@ namespace nsYMEngine
 
 			private:
 				std::vector<SMaterial> m_materials;
-				std::vector<CTexture*> m_textures;
-				std::vector<CTexture*> m_sphTextures;
-				std::vector<CTexture*> m_spaTextures;
+				std::vector<nsDx12Wrappers::CTexture*> m_textures;
+				std::vector<nsDx12Wrappers::CTexture*> m_sphTextures;
+				std::vector<nsDx12Wrappers::CTexture*> m_spaTextures;
 				nsMath::CMatrix m_mWorld;
 				ID3D12Resource* m_vertexBuff = nullptr;
 				D3D12_VERTEX_BUFFER_VIEW m_vertexBuffView = {};

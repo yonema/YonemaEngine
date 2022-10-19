@@ -2,7 +2,7 @@
 #include "../GameWindow/MessageBox.h"
 #include "../GameWindow/GameWindow.h"
 #include "../../Application.h"
-#include "Texture.h"
+#include "Dx12Wrappers/Texture.h"
 #include "PMDModels/PMDGenericRenderer.h"
 
 namespace nsYMEngine
@@ -147,22 +147,15 @@ namespace nsYMEngine
 				0 + kWindowHeight
 			);
 
-			m_whiteTexture = new CTexture();
-			m_blackTexture = new CTexture();
+			m_whiteTexture = new nsDx12Wrappers::CTexture();
+			m_blackTexture = new nsDx12Wrappers::CTexture();
 			m_whiteTexture->Init("Assets/Models/white.jpg");
 			m_blackTexture->Init("Assets/Models/black.jpg");
 
-			m_cameraPos = {0.0f, 10.0f, -25.0f};
-			m_targetPos = { 0.0f, 10.0f, 0.0f };
-			m_upDir = { 0.0f, 1.0f, 0.0f };
-			m_mView.MakeViewMatrix(m_cameraPos, m_targetPos, m_upDir);
-			m_mProj.MakeProjectionMatrix(
-				nsMath::DegToRad(60.0f),
-				static_cast<float>(kWindowWidth) / static_cast<float>(kWindowHeight),
-				1.0f,
-				100.0f
-			);
-
+			m_mainCamera.SetPosition({ 0.0f,10.0f,-25.0f });
+			m_mainCamera.SetTargetPosition({ 0.0f,10.0f,0.0f });
+			m_mainCamera.SetUpDirection(nsMath::CVector3::Up());
+			m_mainCamera.UpdateCameraParam();
 
 			CreateSeceneConstantBuff();
 
@@ -266,10 +259,11 @@ namespace nsYMEngine
 
 		void CGraphicsEngine::Update()
 		{
-			m_mView.MakeViewMatrix(m_cameraPos, m_targetPos, m_upDir);
-			m_mappedSceneDataMatrix->mView = m_mView;
-			m_mappedSceneDataMatrix->mProj = m_mProj;
-			m_mappedSceneDataMatrix->cameraPosWS = m_cameraPos;
+			m_mainCamera.UpdateCameraParam();
+
+			m_mappedSceneDataMatrix->mView = m_mainCamera.GetViewMatirx();;
+			m_mappedSceneDataMatrix->mProj = m_mainCamera.GetProjectionMatirx();
+			m_mappedSceneDataMatrix->cameraPosWS = m_mainCamera.GetPosition();
 
 			return;
 		}
@@ -1220,9 +1214,9 @@ namespace nsYMEngine
 			}
 
 			result = m_sceneDataConstantBuff->Map(0, nullptr, reinterpret_cast<void**>(&m_mappedSceneDataMatrix));	// ƒ}ƒbƒv
-			m_mappedSceneDataMatrix->mView = m_mView;
-			m_mappedSceneDataMatrix->mProj = m_mProj;
-			m_mappedSceneDataMatrix->cameraPosWS = m_cameraPos;
+			m_mappedSceneDataMatrix->mView = m_mainCamera.GetViewMatirx();
+			m_mappedSceneDataMatrix->mProj = m_mainCamera.GetViewMatirx();
+			m_mappedSceneDataMatrix->cameraPosWS = m_mainCamera.GetPosition();
 
 			D3D12_DESCRIPTOR_HEAP_DESC descHeapDesc = {};
 			descHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;

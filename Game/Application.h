@@ -36,16 +36,16 @@ namespace nsYMEngine
 				delete m_instance;
 			}
 		}
-		inline static CApplication* GetInstance()
+		constexpr static CApplication* GetInstance() noexcept
 		{
 			return m_instance;
 		}
 
-		inline static int GetWindowWidth()
+		constexpr static int GetWindowWidth() noexcept
 		{
 			return m_kWindowWidth;
 		}
-		inline static int GetWindowHeight()
+		constexpr static int GetWindowHeight() noexcept
 		{
 			return m_kWindowHeight;
 		}

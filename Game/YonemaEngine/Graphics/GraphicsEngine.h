@@ -1,9 +1,14 @@
 #pragma once
+#include "Camera.h"
+
 namespace nsYMEngine
 {
 	namespace nsGraphics
 	{
-		class CTexture;
+		namespace nsDx12Wrappers
+		{
+			class CTexture;
+		}
 		namespace nsPMDModels
 		{
 			class CPMDGenericRenderer;
@@ -115,19 +120,19 @@ namespace nsYMEngine
 				return &m_fenceVal;
 			}
 
-			inline CTexture* GetWhiteTexture()
+			inline nsDx12Wrappers::CTexture* GetWhiteTexture()
 			{
 				return m_whiteTexture;
 			}
 
-			inline CTexture* GetBlackTexture()
+			inline nsDx12Wrappers::CTexture* GetBlackTexture()
 			{
 				return m_blackTexture;
 			}
 
 			inline nsMath::CMatrix GetMatrixViewProj() const
 			{
-				return m_mView * m_mProj;
+				return m_mainCamera.GetViewProjectionMatirx();
 			}
 
 		private:
@@ -194,14 +199,10 @@ namespace nsYMEngine
 			D3D12_VIEWPORT m_viewport;
 			D3D12_RECT m_scissorRect;
 
-			CTexture* m_whiteTexture;
-			CTexture* m_blackTexture;
+			nsDx12Wrappers::CTexture* m_whiteTexture;
+			nsDx12Wrappers::CTexture* m_blackTexture;
 
-			nsMath::CVector3 m_cameraPos;
-			nsMath::CVector3 m_targetPos;
-			nsMath::CVector3 m_upDir;
-			nsMath::CMatrix m_mView;
-			nsMath::CMatrix m_mProj;
+			CCamera m_mainCamera;
 
 			ID3D12Resource* m_sceneDataConstantBuff = nullptr;
 			ID3D12DescriptorHeap* m_sceneDataDescriptorHeap = nullptr;

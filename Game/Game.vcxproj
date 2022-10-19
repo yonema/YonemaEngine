@@ -150,6 +150,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="YonemaEngine\Graphics\Camera.cpp" />
+    <ClCompile Include="YonemaEngine\Graphics\Dx12Wrappers\RenderTarget.cpp" />
     <ClCompile Include="YonemaEngine\Time\GameTime.cpp" />
     <ClCompile Include="YonemaEngine\Math\Quaternion.cpp" />
     <ClCompile Include="YonemaEngine\Math\Vector2.cpp" />
@@ -158,7 +160,7 @@
     <ClCompile Include="YonemaEngine\Math\Vector4.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\PMDModels\PMDGenericRenderer.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\PMDModels\PMDRenderer.cpp" />
-    <ClCompile Include="YonemaEngine\Graphics\Texture.cpp" />
+    <ClCompile Include="YonemaEngine\Graphics\Dx12Wrappers\Texture.cpp" />
     <ClCompile Include="YonemaEngine\GameWindow\MessageBox.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\GraphicsEngine.cpp" />
     <ClCompile Include="YonemaEngine\GameWindow\GameWindow.cpp" />
@@ -175,6 +177,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
+    <ClInclude Include="YonemaEngine\Graphics\Camera.h" />
+    <ClInclude Include="YonemaEngine\Graphics\Dx12Wrappers\RenderTarget.h" />
     <ClInclude Include="YonemaEngine\Time\GameTime.h" />
     <ClInclude Include="YonemaEngine\Math\Math.h" />
     <ClInclude Include="YonemaEngine\Math\Quaternion.h" />
@@ -184,7 +188,7 @@
     <ClInclude Include="YonemaEngine\Math\Vector4.h" />
     <ClInclude Include="YonemaEngine\Graphics\PMDModels\PMDGenericRenderer.h" />
     <ClInclude Include="YonemaEngine\Graphics\PMDModels\PMDRenderer.h" />
-    <ClInclude Include="YonemaEngine\Graphics\Texture.h" />
+    <ClInclude Include="YonemaEngine\Graphics\Dx12Wrappers\Texture.h" />
     <ClInclude Include="YonemaEngine\GameWindow\MessageBox.h" />
     <ClInclude Include="YonemaEngine\Time\Timer.h" />
     <ClInclude Include="YonemaEngine\Utils\AlignmentedSize.h" />

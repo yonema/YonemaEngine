@@ -1,7 +1,7 @@
 #include "PMDRenderer.h"
 #include "../../GameWindow/MessageBox.h"
 #include "../Utils/StringManipulation.h"
-#include "../Texture.h"
+#include "../Dx12Wrappers/Texture.h"
 #include "../GraphicsEngine.h"
 #include "../../YonemaEngine.h"
 
@@ -267,12 +267,12 @@ namespace nsYMEngine
 
 						if (nsUtils::GetExtension(otherTexFilePath) == "sph")
 						{
-							m_sphTextures[i] = new CTexture();
+							m_sphTextures[i] = new nsDx12Wrappers::CTexture();
 							m_sphTextures[i]->Init(otherTexFilePath.c_str());
 						}
 						else
 						{
-							m_spaTextures[i] = new CTexture();
+							m_spaTextures[i] = new nsDx12Wrappers::CTexture();
 							m_spaTextures[i]->Init(otherTexFilePath.c_str());
 						}
 					}
@@ -284,17 +284,17 @@ namespace nsYMEngine
 
 					if (nsUtils::GetExtension(texFilePath) == "sph")
 					{
-						m_sphTextures[i] = new CTexture();
+						m_sphTextures[i] = new nsDx12Wrappers::CTexture();
 						m_sphTextures[i]->Init(texFilePath.c_str());
 					}
 					else if (nsUtils::GetExtension(texFilePath) == "spa")
 					{
-						m_spaTextures[i] = new CTexture();
+						m_spaTextures[i] = new nsDx12Wrappers::CTexture();
 						m_spaTextures[i]->Init(texFilePath.c_str());
 					}
 					else
 					{
-						m_textures[i] = new CTexture();
+						m_textures[i] = new nsDx12Wrappers::CTexture();
 						m_textures[i]->Init(texFilePath.c_str());
 					}
 

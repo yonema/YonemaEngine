@@ -54,7 +54,7 @@ namespace nsYMEngine
 			inline void MakeScaling(float x, float y, float z) noexcept;
 
 			inline void MakeProjectionMatrix(
-				float fovAngleY, float aspectRatio, float nearZ, float farZ) noexcept;
+				float fovAngleY, float aspectRatio, float nearClip, float farClip) noexcept;
 			inline void MakeOrthoProjectionMatrix(
 				float viewWidth, float viewHeight, float nearZ, float farZ) noexcept;
 			inline void MakeViewMatrix(
@@ -255,10 +255,10 @@ namespace nsYMEngine
 
 
 		inline void CMatrix::MakeProjectionMatrix(
-			float fovAngleY, float aspectRatio, float nearZ, float farZ) noexcept
+			float fovAngleY, float aspectRatio, float nearClip, float farClip) noexcept
 		{
 			auto xmmProj =
-				DirectX::XMMatrixPerspectiveFovLH(fovAngleY, aspectRatio, nearZ, farZ);
+				DirectX::XMMatrixPerspectiveFovLH(fovAngleY, aspectRatio, nearClip, farClip);
 			DirectX::XMStoreFloat4x4(&m_xmf4x4Mat, xmmProj);
 			return;
 		}
