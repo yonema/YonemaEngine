@@ -39,9 +39,11 @@ namespace nsYMEngine
 				nsMath::CMatrix mScale;
 				mScale.MakeScaling(1.0f, 1.0f, 1.0f);
 				m_mWorld = mScale * mRot * mTrans;
-				m_mappedConstantBuff[0] = m_mWorld;
+				auto mappedCB = 
+					static_cast<nsMath::CMatrix*>(m_modelCB.GetMappedConstantBuffer());
+				mappedCB[0] = m_mWorld;
 				auto mViewProj = CGraphicsEngine::GetInstance()->GetMatrixViewProj();
-				m_mappedConstantBuff[1] = m_mWorld * mViewProj;
+				mappedCB[1] = m_mWorld * mViewProj;
 
 				UpdateAnimation();
 
@@ -58,22 +60,22 @@ namespace nsYMEngine
 				commandList->IASetIndexBuffer(&m_indexBuffView);
 
 				// ○定数バッファのディスクリプタヒープをセット
-				ID3D12DescriptorHeap* cbDescriptorHeaps[] = { m_cbDescriptorHeap };
+				ID3D12DescriptorHeap* cbDescriptorHeaps[] = { m_modelDH.Get() };
 				commandList->SetDescriptorHeaps(1, cbDescriptorHeaps);
-				auto descriptorHeapH = m_cbDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+				auto descriptorHeapH = m_modelDH.GetGPUHandle();
 				// 0番は、グラフィックスエンジンで、シーンデータ用に使用している。
 				// そのため1番からスタート。
 				commandList->SetGraphicsRootDescriptorTable(1, descriptorHeapH);
 
 				// ○マテリアルバッファのディスクリプタヒープをセット
-				ID3D12DescriptorHeap* mbDescriptorHeaps[] = { m_mbDescriptorHeap };
+				ID3D12DescriptorHeap* mbDescriptorHeaps[] = { m_materialDH.Get() };
 				commandList->SetDescriptorHeaps(1, mbDescriptorHeaps);
 
-				descriptorHeapH = m_mbDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+				descriptorHeapH = m_materialDH.GetGPUHandle();
 				unsigned int idxOffset = 0;
-				const auto cbvsrvIncSize =
-					device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)
-					* m_kNumMaterialDescriptors;
+				const auto cbvsrvIncSize = 
+					CGraphicsEngine::GetInstance()->GetDescriptorSizeOfCbvSrvUav() *
+					m_kNumMaterialDescriptors;
 
 				for (const auto& m : m_materials)
 				{
@@ -106,22 +108,10 @@ namespace nsYMEngine
 
 			void CPMDRenderer::Terminate()
 			{
-				if (m_mbDescriptorHeap)
-				{
-					m_mbDescriptorHeap->Release();
-				}
-				if (m_materialBuff)
-				{
-					m_materialBuff->Release();
-				}
-				if (m_cbDescriptorHeap)
-				{
-					m_cbDescriptorHeap->Release();
-				}
-				if (m_constantBuff)
-				{
-					m_constantBuff->Release();
-				}
+				m_materialDH.Release();
+				m_materialCB.Release();
+				m_modelDH.Release();
+				m_modelCB.Release();
 				if (m_indexBuff)
 				{
 					m_indexBuff->Release();
@@ -457,52 +447,24 @@ namespace nsYMEngine
 
 			void CPMDRenderer::CreateConstantBuff(ID3D12Device5* const device)
 			{
-				D3D12_HEAP_PROPERTIES constBuffHeapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-				// mWorld + mWorldViewProj + mBones
-				UINT64 constBuffSize = sizeof(nsMath::CMatrix) * (2 + m_boneMatrices.size());
-				constBuffSize = (constBuffSize + 0xff) & ~0xff;
-				D3D12_RESOURCE_DESC constBuffResDesc = CD3DX12_RESOURCE_DESC::Buffer(constBuffSize);
-				auto result = device->CreateCommittedResource(
-					&constBuffHeapProp,
-					D3D12_HEAP_FLAG_NONE,
-					&constBuffResDesc,
-					D3D12_RESOURCE_STATE_GENERIC_READ,
-					nullptr,
-					IID_PPV_ARGS(&m_constantBuff)
-				);
+				// 〇定数バッファ作成
+				auto cbSize = sizeof(nsMath::CMatrix) * (2 + m_boneMatrices.size());
+				m_modelCB.Init(static_cast<unsigned int>(cbSize));
 
-				if (FAILED(result))
-				{
-					nsGameWindow::MessageBoxError(L"定数バッファの生成に失敗しました。");
-					return;
-				}
-
-				result = m_constantBuff->Map(0, nullptr, reinterpret_cast<void**>(&m_mappedConstantBuff));
-				m_mappedConstantBuff[0] = m_mWorld;
+				// 〇マップされたデータにデータをコピー
+				auto mappedCb = 
+					static_cast<nsMath::CMatrix*>(m_modelCB.GetMappedConstantBuffer());
+				mappedCb[0] = m_mWorld;
 				auto mViewProj = CGraphicsEngine::GetInstance()->GetMatrixViewProj();
-				m_mappedConstantBuff[1] = m_mWorld * mViewProj;
-				copy(m_boneMatrices.begin(), m_boneMatrices.end(), m_mappedConstantBuff + 2);
+				mappedCb[1] = m_mWorld * mViewProj;
+				copy(m_boneMatrices.begin(), m_boneMatrices.end(), mappedCb + 2);
 
-				D3D12_DESCRIPTOR_HEAP_DESC descHeapDesc = {};
-				descHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-				descHeapDesc.NodeMask = 0;
-				descHeapDesc.NumDescriptors = 1;
-				descHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+				// 〇ディスクリプタヒープ作成
+				constexpr unsigned int numDescHeaps = 1;
+				m_modelDH.InitAsCbvSrvUav(numDescHeaps);
 
-				result = device->CreateDescriptorHeap(&descHeapDesc, IID_PPV_ARGS(&m_cbDescriptorHeap));
-				if (FAILED(result))
-				{
-					nsGameWindow::MessageBoxError(L"定数バッファのディスクリプタヒープの生成に失敗しました。");
-					return;
-				}
-
-				auto heapHandle = m_cbDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-
-				D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
-				cbvDesc.BufferLocation = m_constantBuff->GetGPUVirtualAddress();
-				cbvDesc.SizeInBytes = static_cast<UINT>(m_constantBuff->GetDesc().Width);
-
-				device->CreateConstantBufferView(&cbvDesc, heapHandle);
+				// 〇定数バッファビュー作成
+				m_modelCB.CreateConstantBufferView(m_modelDH.GetCPUHandle());
 
 				return;
 
@@ -516,58 +478,26 @@ namespace nsYMEngine
 				unsigned int pmdMaterialNum
 			)
 			{
-				// 〇マテリアルバッファの作成
-				UINT materialBuffSize = sizeof(SMaterialForHlsl);
-				// @todo マテリアルバッファのサイズに無駄な領域ができてしまっている。あとで別の方法を検証。
-				// 無駄な領域は生じるが、バッファサイズを256アライメントにする
-				materialBuffSize = (materialBuffSize + 0xff) & ~0xff;
+				// 〇定数バッファ作成
+				auto cbSize = static_cast<unsigned int>(sizeof(SMaterialForHlsl));
+				m_materialCB.Init(cbSize, pmdMaterialNum);
+				cbSize = m_materialCB.GetSizeInByte();
 
-				resDesc.Width =
-					static_cast<UINT64>(materialBuffSize) * static_cast<UINT64>(pmdMaterialNum);
-
-				auto result = device->CreateCommittedResource(
-					&heapProp,
-					D3D12_HEAP_FLAG_NONE,
-					&resDesc,
-					D3D12_RESOURCE_STATE_GENERIC_READ,
-					nullptr,
-					IID_PPV_ARGS(&m_materialBuff)
-				);
-
-				// マップマテリアルにコピー
-				char* mapMaterial = nullptr;
-				result = m_materialBuff->Map(0, nullptr, reinterpret_cast<void**>(&mapMaterial));
+				// 〇マップされたデータにデータをコピー
+				char* mapMaterial = static_cast<char*>(m_materialCB.GetMappedConstantBuffer());
 				for (auto& m : m_materials)
 				{
 					// データのコピー
 					*reinterpret_cast<SMaterialForHlsl*>(mapMaterial) = m.matForHlsl;
 					// 次のアライメント位置まで進める。（256の倍数）
-					mapMaterial += materialBuffSize;
+					mapMaterial += cbSize;
 				}
-				m_materialBuff->Unmap(0, nullptr);
+				m_materialCB.Unmap();
 
-				// マテリアル用ディスクリプタヒープとビューの作成
-				D3D12_DESCRIPTOR_HEAP_DESC matDescHeapDesc = {};
-				matDescHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-				matDescHeapDesc.NodeMask = 0;
-				// マテリアルデータとテクスチャ*3の4つ分。
-				matDescHeapDesc.NumDescriptors = pmdMaterialNum * m_kNumMaterialDescriptors;
-				matDescHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 
-				result = device->CreateDescriptorHeap(
-					&matDescHeapDesc,
-					IID_PPV_ARGS(&m_mbDescriptorHeap)
-				);
-
-				if (FAILED(result))
-				{
-					// マテリアル用のディスクリプタヒープの生成失敗。
-					nsGameWindow::MessageBoxWarning(L"マテリアル用のディスクリプタヒープの生成に失敗しました。");
-				}
-
-				D3D12_CONSTANT_BUFFER_VIEW_DESC matCBVDesc = {};
-				matCBVDesc.BufferLocation = m_materialBuff->GetGPUVirtualAddress();
-				matCBVDesc.SizeInBytes = materialBuffSize;
+				// 〇ディスクリプタヒープの作成
+				const auto numDescHeaps = pmdMaterialNum * m_kNumMaterialDescriptors;
+				m_materialDH.InitAsCbvSrvUav(numDescHeaps);
 
 				D3D12_SHADER_RESOURCE_VIEW_DESC matSRVDesc = {};
 				matSRVDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -576,9 +506,8 @@ namespace nsYMEngine
 				matSRVDesc.Texture2D.MipLevels = 1;
 
 				// 先頭を記録
-				auto matDescHeapH = m_mbDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-				const auto inc =
-					device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+				auto matDescHeapH = m_materialDH.GetCPUHandle();
+				const auto inc = CGraphicsEngine::GetInstance()->GetDescriptorSizeOfCbvSrvUav();
 
 				auto whiteTex = CGraphicsEngine::GetInstance()->GetWhiteTexture();
 				auto blackTex = CGraphicsEngine::GetInstance()->GetBlackTexture();
@@ -586,10 +515,9 @@ namespace nsYMEngine
 				for (int i = 0; i < static_cast<int>(pmdMaterialNum); i++)
 				{
 					// マテリアルデータ用定数バッファビュー。
-					device->CreateConstantBufferView(&matCBVDesc, matDescHeapH);
+					m_materialCB.CreateConstantBufferView(matDescHeapH);
 
 					matDescHeapH.ptr += inc;
-					matCBVDesc.BufferLocation += materialBuffSize;
 
 					// テクスチャ用シェーダーリソースビュー。
 					if (m_textures[i] != nullptr)
@@ -790,14 +718,14 @@ namespace nsYMEngine
 				}
 
 				RecursiveMatrixMultiply(&m_boneNodeTable["センター"], nsMath::CMatrix::Identity());
-
-				copy(m_boneMatrices.begin(), m_boneMatrices.end(), m_mappedConstantBuff + 2);
+				auto mappedCB = static_cast<nsMath::CMatrix*>(m_modelCB.GetMappedConstantBuffer());
+				copy(m_boneMatrices.begin(), m_boneMatrices.end(), mappedCB + 2);
 
 				return;
 			}
 
 			float CPMDRenderer::GetYFromXOnBezier(
-				float x, const nsMath::CVector2& a, const nsMath::CVector2& b, uint8_t n)
+				float x, const nsMath::CVector2& a, const nsMath::CVector2& b, uint8_t n) noexcept
 			{
 				if (a.x == a.y && b.x == b.y)
 				{

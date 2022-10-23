@@ -9,14 +9,14 @@ namespace nsYMEngine
 		 * @param[in] filePath 対象のファイルパス
 		 * @return 拡張子。拡張子がない場合はファイルパスをそのまま返す。
 		*/
-		std::string GetExtension(const std::string& filePath);
+		std::string GetExtension(const std::string& filePath) noexcept;
 
 		/**
 		 * @brief ファイルパスから拡張子を取得する。
 		 * @param[in] filePath 対象のファイルパス
 		 * @return 拡張子。拡張子がない場合はファイルパスをそのまま返す。
 		*/
-		const char* GetExtension(const char* filePath);
+		const char* GetExtension(const char* filePath) noexcept;
 
 
 		/**
@@ -24,14 +24,14 @@ namespace nsYMEngine
 		 * @param[in] str 変換するchar文字列
 		 * @return 変換されたwstr文字列
 		*/
-		std::wstring GetWideStringFromString(const char* str);
+		std::wstring GetWideStringFromString(const char* str) noexcept;
 
 		/**
 		 * @brief strからwstrinに変換する
 		 * @param[in] str 変換するstr文字列
 		 * @return 変換されたwstr文字列
 		*/
-		std::wstring GetWideStringFromString(const std::string& str);
+		std::wstring GetWideStringFromString(const std::string& str) noexcept;
 
 
 		/**
@@ -43,7 +43,7 @@ namespace nsYMEngine
 		std::pair<std::string, std::string> SplitFilename(
 			const std::string& fileName,
 			const char spliter = '*'
-		);
+		) noexcept;
 
 		/**
 		 * @brief ファイル名をセパレータ文字で分離する
@@ -54,7 +54,7 @@ namespace nsYMEngine
 		std::pair<std::string, std::string> SplitFilename(
 			const char* fileName,
 			const char spliter = '*'
-		);
+		) noexcept;
 
 		/**
 		 * @brief モデルのパスとテクスチャのパスから合成パスを得る
@@ -65,7 +65,7 @@ namespace nsYMEngine
 		std::string GetTexturePathFromModelAndTexPath(
 			const std::string& modelPath,
 			const char* const texPath
-		);
+		) noexcept;
 
 
 	}

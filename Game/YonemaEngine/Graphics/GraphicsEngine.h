@@ -34,9 +34,6 @@ namespace nsYMEngine
 			static const wchar_t* m_kGPUAdapterNames[EnGPUAdapterType::NumGPUAdapterType];
 			static const unsigned int m_kNumFeatureLevel = 4;
 			static const D3D_FEATURE_LEVEL m_kFeatureLevels[m_kNumFeatureLevel];
-			static const unsigned int m_kFrameBufferCount = 2;
-			static const DXGI_FORMAT m_kDepthFormat;
-			static const float m_kRTVClearColor[4];
 
 			struct SSceneDataMatrix
 			{
@@ -73,7 +70,7 @@ namespace nsYMEngine
 					delete m_instance;
 				}
 			}
-			inline static CGraphicsEngine* GetInstance()
+			constexpr static CGraphicsEngine* GetInstance() noexcept
 			{
 				return m_instance;
 			}
@@ -90,49 +87,59 @@ namespace nsYMEngine
 
 			void EndDraw();
 
-			inline ID3D12Device5* GetDevice()
+			constexpr auto GetDevice() noexcept
 			{
 				return m_device;
 			}
 
-			inline ID3D12CommandAllocator* GetCommandAllocator()
+			constexpr auto GetCommandAllocator() noexcept
 			{
 				return m_commandAllocator;
 			}
 
-			inline ID3D12GraphicsCommandList* GetCommandList()
+			constexpr auto GetCommandList() noexcept
 			{
 				return m_commandList;
 			}
 
-			inline ID3D12CommandQueue* GetCommandQueue()
+			constexpr auto GetCommandQueue() noexcept
 			{
 				return m_commandQueue;
 			}
 
-			inline ID3D12Fence* GetFence()
+			constexpr auto GetFence() noexcept
 			{
 				return m_fence;
 			}
 
-			inline short int* GetFenceVal()
+			constexpr auto GetFenceVal() noexcept
 			{
 				return &m_fenceVal;
 			}
 
-			inline nsDx12Wrappers::CTexture* GetWhiteTexture()
+			constexpr nsDx12Wrappers::CTexture* GetWhiteTexture() noexcept
 			{
 				return m_whiteTexture;
 			}
 
-			inline nsDx12Wrappers::CTexture* GetBlackTexture()
+			constexpr nsDx12Wrappers::CTexture* GetBlackTexture() noexcept
 			{
 				return m_blackTexture;
 			}
 
-			inline nsMath::CMatrix GetMatrixViewProj() const
+			constexpr nsMath::CMatrix GetMatrixViewProj() const noexcept
 			{
 				return m_mainCamera.GetViewProjectionMatirx();
+			}
+
+			constexpr auto GetDescriptorSizeOfCbvSrvUav() const noexcept
+			{
+				return m_descriptorSizeOfCbvSrvUav;
+			}
+
+			constexpr auto GetDescriptorSizeOfRtv() const noexcept
+			{
+				return m_descriptorSizeOfRtv;
 			}
 
 		private:
@@ -152,16 +159,6 @@ namespace nsYMEngine
 			bool CreateCommandList(D3D12_COMMAND_LIST_TYPE commandListType);
 
 			bool CreateCommandQueue(D3D12_COMMAND_LIST_TYPE commandListType);
-
-			bool CreateSwapChain(IDXGIFactory6* dxgiFactory);
-
-			bool CreateRTVDescriptorHeapForFrameBuffer();
-
-			bool CreateRTVForFrameBuffer();
-
-			bool CreateDSVDescriptorHeapForFrameBuffer();
-
-			bool CreateDSVForFrameBuffer();
 
 			bool CreateFence();
 
@@ -189,25 +186,27 @@ namespace nsYMEngine
 			ID3D12CommandAllocator* m_commandAllocator = nullptr;
 			ID3D12GraphicsCommandList* m_commandList = nullptr;
 			ID3D12CommandQueue* m_commandQueue = nullptr;
-			IDXGISwapChain4* m_swapChain = nullptr;
-			ID3D12DescriptorHeap* m_rtvDescHeapForFrameBuff = nullptr;
-			ID3D12Resource* m_frameBuffers[m_kFrameBufferCount] = { nullptr };
-			ID3D12DescriptorHeap* m_dsvDescHeapForFrameBuff = nullptr;
-			ID3D12Resource* m_depthStencilBuffer = nullptr;
+			//IDXGISwapChain4* m_swapChain = nullptr;
+			//ID3D12DescriptorHeap* m_rtvDescHeapForFrameBuff = nullptr;
+			//ID3D12Resource* m_frameBuffers[m_kFrameBufferCount] = { nullptr };
+			//ID3D12DescriptorHeap* m_dsvDescHeapForFrameBuff = nullptr;
+			//ID3D12Resource* m_depthStencilBuffer = nullptr;
 			ID3D12Fence* m_fence = nullptr;
 			short int m_fenceVal = 0;
-			D3D12_VIEWPORT m_viewport;
-			D3D12_RECT m_scissorRect;
+			//D3D12_VIEWPORT m_viewport;
+			//D3D12_RECT m_scissorRect;
 
+			unsigned int m_descriptorSizeOfCbvSrvUav = 0;
+			unsigned int m_descriptorSizeOfRtv = 0;
+			nsDx12Wrappers::CFrameBuffer m_frameBuffer;
 			nsDx12Wrappers::CTexture* m_whiteTexture;
 			nsDx12Wrappers::CTexture* m_blackTexture;
+			nsDx12Wrappers::CConstantBuffer m_sceneDataCB;
+			nsDx12Wrappers::CDescriptorHeap m_sceneDataDH;
+
+
 
 			CCamera m_mainCamera;
-
-			ID3D12Resource* m_sceneDataConstantBuff = nullptr;
-			ID3D12DescriptorHeap* m_sceneDataDescriptorHeap = nullptr;
-			SSceneDataMatrix* m_mappedSceneDataMatrix = nullptr;
-
 			nsPMDModels::CPMDGenericRenderer* m_pmdGenericRenderer = nullptr;
 
 			ID3D12Resource* m_peraRenderTarget = nullptr;

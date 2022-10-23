@@ -26,7 +26,6 @@ Texture2D<float4> g_sphTexture : register(t1);
 Texture2D<float4> g_spaTexture : register(t2);
 SamplerState g_sampler : register(s0);	// 0番スロットに設定されたサンプラ
 
-// 定数バッファ
 cbuffer SceneDataCB : register(b0)
 {
 	float4x4 g_mView;
@@ -34,7 +33,7 @@ cbuffer SceneDataCB : register(b0)
 	float3 g_cameraPosWS;
 }
 
-cbuffer TransformCB : register(b1) 
+cbuffer ModelCB : register(b1) 
 {
 	float4x4 g_mWorld;
 	float4x4 g_mWorldViewProj;

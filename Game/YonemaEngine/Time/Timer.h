@@ -17,7 +17,7 @@ namespace nsYMEngine
 
 			inline void EndTimer() noexcept;
 
-			inline auto GetNanoSeconds() const noexcept
+			constexpr auto GetNanoSeconds() const noexcept
 			{
 				return m_nanoSeconds;
 			}

@@ -4,12 +4,12 @@ namespace nsYMEngine
 	namespace nsUtils
 	{
 		/**
-		 * @brief アライメントにそろえたサイズを返す。
+		 * @brief データサイズをアライメントする
 		 * @param[in] size 元のサイズ
 		 * @param[in] alignment アライメントサイズ
-		 * @return アライメントをそろえたサイズ
+		 * @return アライメントしたデータサイズ
 		*/
-		inline size_t AlignmentedSize(size_t size, size_t alignment)
+		constexpr size_t AlignSize(size_t size, size_t alignment) noexcept
 		{
 			return size + alignment - size % alignment;
 		}

@@ -2,7 +2,7 @@ namespace nsYMEngine
 {
 	namespace nsUtils
 	{
-		std::string GetExtension(const std::string& filePath)
+		std::string GetExtension(const std::string& filePath) noexcept
 		{
 			int idx = static_cast<int>(filePath.rfind('.'));
 
@@ -11,7 +11,7 @@ namespace nsYMEngine
 			return filePath.substr(idx, filePath.length() - idx);
 		}
 
-		const char* GetExtension(const char* filePath)
+		const char* GetExtension(const char* filePath) noexcept
 		{
 			auto cp = std::strrchr(filePath, '.');
 			if (cp != nullptr)
@@ -25,7 +25,7 @@ namespace nsYMEngine
 			return cp;
 		}
 
-		std::wstring GetWideStringFromString(const char* str)
+		std::wstring GetWideStringFromString(const char* str) noexcept
 		{
 			// 呼び出し1回目
 			// 文字数を得るため。
@@ -59,7 +59,7 @@ namespace nsYMEngine
 			return wstr;
 		}
 
-		std::wstring GetWideStringFromString(const std::string& str)
+		std::wstring GetWideStringFromString(const std::string& str) noexcept
 		{
 			return GetWideStringFromString(str.c_str());
 		}
@@ -67,7 +67,7 @@ namespace nsYMEngine
 		std::pair<std::string, std::string> SplitFilename(
 			const std::string& fileName,
 			const char spliter = '*'
-		)
+		) noexcept
 		{
 			int idx = static_cast<int>(fileName.find(spliter));
 
@@ -83,7 +83,7 @@ namespace nsYMEngine
 		std::pair<std::string, std::string> SplitFilename(
 			const char* fileName,
 			const char spliter = '*'
-		)
+		) noexcept
 		{
 			std::string str = fileName;
 			int idx = static_cast<int>(str.find(spliter));
@@ -100,7 +100,7 @@ namespace nsYMEngine
 		std::string GetTexturePathFromModelAndTexPath(
 			const std::string& modelPath,
 			const char* const texPath
-		)
+		) noexcept
 		{
 			// rfind()が、戻り値site_tのくせにsize_tで受け取ると、
 			// 文字が見つからなかったときに-1（負の数）で受け取れない。

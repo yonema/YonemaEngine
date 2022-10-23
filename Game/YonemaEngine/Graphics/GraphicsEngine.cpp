@@ -27,8 +27,6 @@ namespace nsYMEngine
 			D3D_FEATURE_LEVEL_11_0
 		};
 
-		const DXGI_FORMAT CGraphicsEngine::m_kDepthFormat = DXGI_FORMAT_D32_FLOAT;
-		const float CGraphicsEngine::m_kRTVClearColor[4] = { 0.5f,0.5f,0.5f,1.0f };
 
 		CGraphicsEngine::~CGraphicsEngine()
 		{
@@ -51,6 +49,12 @@ namespace nsYMEngine
 				return false;
 			}
 
+			// デバイスを作ったらすぐに設定。
+			m_descriptorSizeOfCbvSrvUav = m_device->GetDescriptorHandleIncrementSize(
+				D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+			m_descriptorSizeOfRtv = m_device->GetDescriptorHandleIncrementSize(
+				D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+
 			if (CreateCommandAllocator() != true)
 			{
 				return false;
@@ -69,27 +73,13 @@ namespace nsYMEngine
 				}
 			}
 
-			if (CreateSwapChain(dxgiFactory) != true)
-			{
-				return false;
-			}
+			auto hwnd = nsGameWindow::CGameWindow::GetInstance()->GetHWND();
+			const auto kWindowWidth = CApplication::GetInstance()->GetWindowWidth();
+			const auto kWindowHeight = CApplication::GetInstance()->GetWindowHeight();
 
-			if (CreateRTVDescriptorHeapForFrameBuffer() != true)
-			{
-				return false;
-			}
-
-			if (CreateRTVForFrameBuffer() != true)
-			{
-				return false;
-			}
-
-			if (CreateDSVDescriptorHeapForFrameBuffer() != true)
-			{
-				return false;
-			}
-
-			if (CreateDSVForFrameBuffer() != true)
+			if (m_frameBuffer.Init(
+				m_device, dxgiFactory, m_commandQueue, hwnd, kWindowWidth, kWindowHeight)
+				 != true)
 			{
 				return false;
 			}
@@ -136,16 +126,6 @@ namespace nsYMEngine
 			// 初期化が終わったら、DXGIFactoryはもういらないため破棄する。
 			dxgiFactory->Release();
 
-			const auto kWindowWidth = CApplication::GetInstance()->GetWindowWidth();
-			const auto kWindowHeight = CApplication::GetInstance()->GetWindowHeight();
-
-			m_viewport = CD3DX12_VIEWPORT(m_frameBuffers[0]);
-			m_scissorRect = CD3DX12_RECT(
-				0,
-				0,
-				0 + kWindowWidth,
-				0 + kWindowHeight
-			);
 
 			m_whiteTexture = new nsDx12Wrappers::CTexture();
 			m_blackTexture = new nsDx12Wrappers::CTexture();
@@ -178,14 +158,8 @@ namespace nsYMEngine
 			{
 				delete m_blackTexture;
 			}
-			if (m_sceneDataDescriptorHeap)
-			{
-				m_sceneDataDescriptorHeap->Release();
-			}
-			if (m_sceneDataConstantBuff)
-			{
-				m_sceneDataConstantBuff->Release();
-			}
+			m_sceneDataDH.Release();
+			m_sceneDataCB.Release();
 			if (m_pipelineStateForPeraRT)
 			{
 				m_pipelineStateForPeraRT->Release();
@@ -214,29 +188,7 @@ namespace nsYMEngine
 			{
 				m_fence->Release();
 			}
-			if (m_depthStencilBuffer)
-			{
-				m_depthStencilBuffer->Release();
-			}
-			if (m_dsvDescHeapForFrameBuff)
-			{
-				m_dsvDescHeapForFrameBuff->Release();
-			}
-			for (auto& renderTarget : m_frameBuffers)
-			{
-				if (renderTarget)
-				{
-					renderTarget->Release();
-				}
-			}
-			if (m_rtvDescHeapForFrameBuff)
-			{
-				m_rtvDescHeapForFrameBuff->Release();
-			}
-			if (m_swapChain)
-			{
-				m_swapChain->Release();
-			}
+			m_frameBuffer.Release();
 			if (m_commandQueue)
 			{
 				m_commandQueue->Release();
@@ -261,9 +213,11 @@ namespace nsYMEngine
 		{
 			m_mainCamera.UpdateCameraParam();
 
-			m_mappedSceneDataMatrix->mView = m_mainCamera.GetViewMatirx();;
-			m_mappedSceneDataMatrix->mProj = m_mainCamera.GetProjectionMatirx();
-			m_mappedSceneDataMatrix->cameraPosWS = m_mainCamera.GetPosition();
+			auto mappedSceneData = 
+				static_cast<SSceneDataMatrix*>(m_sceneDataCB.GetMappedConstantBuffer());
+			mappedSceneData->mView = m_mainCamera.GetViewMatirx();;
+			mappedSceneData->mProj = m_mainCamera.GetProjectionMatirx();
+			mappedSceneData->cameraPosWS = m_mainCamera.GetPosition();
 
 			return;
 		}
@@ -297,19 +251,20 @@ namespace nsYMEngine
 			// ○RTVとDSVのセットとクリア
 			//auto rtvH = m_rtvDescHeapForFrameBuff->GetCPUDescriptorHandleForHeapStart();
 			//rtvH.ptr += static_cast<long long unsigned int>(bbIdx) *
-			//	m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+			//	CGraphicsEngine::GetInstance()->GetDescriptorSizeOfRtv();
 			auto rtvH = m_rtvDescHeapForPeraRT->GetCPUDescriptorHandleForHeapStart();
-			auto dsvH = m_dsvDescHeapForFrameBuff->GetCPUDescriptorHandleForHeapStart();
+			auto dsvH = m_frameBuffer.GetDsvCpuDescriptorHandle();
+
 
 			//m_commandList->OMSetRenderTargets(1, &rtvH, true, &dsvH);
 			m_commandList->OMSetRenderTargets(1, &rtvH, false, &dsvH);
 
-			m_commandList->ClearRenderTargetView(rtvH, m_kRTVClearColor, 0, nullptr);
+			m_commandList->ClearRenderTargetView(
+				rtvH, m_frameBuffer.GetRtvClearColor(), 0, nullptr);
 			m_commandList->ClearDepthStencilView(dsvH, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
 			// ○ビューポートとシザー矩形のセット
-			m_commandList->RSSetViewports(1, &m_viewport);
-			m_commandList->RSSetScissorRects(1, &m_scissorRect);
+			m_frameBuffer.SetViewportAndScissorRect(m_commandList);
 
 			// ○描画するモデルに合わせたルートシグネチャとパイプラインステートをセット
 			m_commandList->SetGraphicsRootSignature(m_pmdGenericRenderer->GetRootSignature());
@@ -319,8 +274,9 @@ namespace nsYMEngine
 			m_commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 			// ○シーンデータをセット
-			m_commandList->SetDescriptorHeaps(1, &m_sceneDataDescriptorHeap);
-			auto heapHandle = m_sceneDataDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+			ID3D12DescriptorHeap* sceneDataDescriptorHeaps[] = { m_sceneDataDH.Get() };
+			m_commandList->SetDescriptorHeaps(1, sceneDataDescriptorHeaps);
+			auto heapHandle = m_sceneDataDH.GetGPUHandle();
 			m_commandList->SetGraphicsRootDescriptorTable(0, heapHandle);
 
 			return;
@@ -340,26 +296,11 @@ namespace nsYMEngine
 			m_commandList->ResourceBarrier(1, &barrierForPeraRT);
 
 
-
-			auto bbIdx = m_swapChain->GetCurrentBackBufferIndex();
-			// ○リソースバリア
-			D3D12_RESOURCE_BARRIER barrierDesc =
-				CD3DX12_RESOURCE_BARRIER::Transition(
-					m_frameBuffers[bbIdx],
-					D3D12_RESOURCE_STATE_PRESENT,
-					D3D12_RESOURCE_STATE_RENDER_TARGET
-				);
-			m_commandList->ResourceBarrier(1, &barrierDesc);
-
-			auto rtvH = m_rtvDescHeapForFrameBuff->GetCPUDescriptorHandleForHeapStart();
-			rtvH.ptr += static_cast<long long unsigned int>(bbIdx) *
-				m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-			auto dsvH = m_dsvDescHeapForFrameBuff->GetCPUDescriptorHandleForHeapStart();
-
-			m_commandList->OMSetRenderTargets(1, &rtvH, false, &dsvH);
-
-			m_commandList->ClearRenderTargetView(rtvH, m_kRTVClearColor, 0, nullptr);
-			m_commandList->ClearDepthStencilView(dsvH, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+			m_frameBuffer.SwapBackBuffer();
+			m_frameBuffer.TransitionFromPresentToRenderTarget(m_commandList);
+			m_frameBuffer.SetRenderTarget(m_commandList);
+			m_frameBuffer.ClearRenderTargetView(m_commandList);
+			m_frameBuffer.ClearDepthStencilView(m_commandList);
 
 			m_commandList->SetGraphicsRootSignature(m_rootSignatureForPeraRT);
 			m_commandList->SetPipelineState(m_pipelineStateForPeraRT);
@@ -372,14 +313,7 @@ namespace nsYMEngine
 
 			m_commandList->DrawInstanced(4, 1, 0, 0);
 
-
-			/*D3D12_RESOURCE_BARRIER*/ barrierDesc =
-				CD3DX12_RESOURCE_BARRIER::Transition(
-					m_frameBuffers[bbIdx],
-					D3D12_RESOURCE_STATE_RENDER_TARGET,
-					D3D12_RESOURCE_STATE_PRESENT
-				);
-			m_commandList->ResourceBarrier(1, &barrierDesc);
+			m_frameBuffer.TransitionFromRenderTargetToPresent(m_commandList);
 
 			// 命令の実行前に、必ずコマンドリストのクローズを行う。
 			m_commandList->Close();
@@ -396,7 +330,7 @@ namespace nsYMEngine
 				CloseHandle(eventH);
 			}
 
-			m_swapChain->Present(1, 0);
+			m_frameBuffer.Present();
 
 			return;
 		}
@@ -626,180 +560,6 @@ namespace nsYMEngine
 			return true;
 		}
 
-		bool CGraphicsEngine::CreateSwapChain(IDXGIFactory6* dxgiFactory)
-		{
-			DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
-			swapChainDesc.Width = CApplication::GetInstance()->GetWindowWidth();
-			swapChainDesc.Height = CApplication::GetInstance()->GetWindowHeight();
-			swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-			swapChainDesc.Stereo = false;
-			swapChainDesc.SampleDesc.Count = 1;
-			swapChainDesc.SampleDesc.Quality = 0;
-			swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-			swapChainDesc.BufferCount = m_kFrameBufferCount;
-			swapChainDesc.Scaling = DXGI_SCALING_STRETCH;
-			swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
-			swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
-			//swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
-
-			//DXGI_SWAP_CHAIN_FULLSCREEN_DESC fullScreenDesc = {};
-			//fullScreenDesc.RefreshRate.Denominator = 1;
-			//fullScreenDesc.RefreshRate.Numerator = 60;
-			//fullScreenDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-			//fullScreenDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-			//fullScreenDesc.Windowed = true;
-
-			IDXGISwapChain1* swapChain;
-			auto result = dxgiFactory->CreateSwapChainForHwnd(
-				m_commandQueue,
-				nsGameWindow::CGameWindow::GetInstance()->GetHWND(),
-				&swapChainDesc,
-				nullptr,
-				//&fullScreenDesc,
-				nullptr,
-				&swapChain
-			);
-
-			swapChain->QueryInterface(IID_PPV_ARGS(&m_swapChain));
-			swapChain->Release();
-
-			if (FAILED(result))
-			{
-				nsGameWindow::MessageBoxError(L"スワップチェーンの生成に失敗しました。");
-				return false;
-			}
-
-			return true;
-		}
-
-		bool CGraphicsEngine::CreateRTVDescriptorHeapForFrameBuffer()
-		{
-			D3D12_DESCRIPTOR_HEAP_DESC descHeapDesc = {};
-			descHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
-			descHeapDesc.NodeMask = 0;
-			descHeapDesc.NumDescriptors = m_kFrameBufferCount;
-			descHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-
-			auto result = m_device->CreateDescriptorHeap(&descHeapDesc, IID_PPV_ARGS(&m_rtvDescHeapForFrameBuff));
-
-			if (FAILED(result))
-			{
-				nsGameWindow::MessageBoxError(L"フレームバッファ用のRTVディスクリプタヒープの生成に失敗しました。");
-				return false;
-			}
-
-			return true;
-		}
-
-		bool CGraphicsEngine::CreateRTVForFrameBuffer()
-		{
-			// フレームバッファの数を定数で定義してるから、スワップチェインのディスクリプタを
-			// 取得する必要なし。
-			//DXGI_SWAP_CHAIN_DESC swcDesc = {};
-			//auto result = m_swapChain->GetDesc(&swcDesc);
-			//if (FAILED(result))
-			//{
-			//	nsGameWindow::MessageBoxError(L"スワップチェーンの取得に失敗しました。");
-			//	return false;
-			//}
-
-			// @todo RTVのディスクリプタがnullptr（デフォルト指定）でよいのか調べる。
-			// RTVのフォーマットを指定するためにいると思うんだけど、
-			// nullptrでデフォルト設定にしている人が多い気がする。
-			//D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
-			////rtvDesc.Format = swcDesc.BufferDesc.Format;
-			////rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-			//rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-			//rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
-
-			D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = 
-				m_rtvDescHeapForFrameBuff->GetCPUDescriptorHandleForHeapStart();
-
-			for (int i = 0; static_cast<unsigned int>(i) < m_kFrameBufferCount; i++)
-			{
-				auto result = m_swapChain->GetBuffer(i, IID_PPV_ARGS(&m_frameBuffers[i]));
-				if (FAILED(result))
-				{
-					nsGameWindow::MessageBoxError(L"スワップチェイン内のバッファとビューを関連付けに失敗しました。");
-					return false;
-				}
-
-				m_device->CreateRenderTargetView(m_frameBuffers[i], nullptr, rtvHandle);
-				m_frameBuffers[i]->SetName(L"FrameBuffer::RenderTargetView");
-
-				rtvHandle.ptr +=
-					m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-			}
-
-			return true;
-		}
-
-		bool CGraphicsEngine::CreateDSVDescriptorHeapForFrameBuffer()
-		{
-			D3D12_DESCRIPTOR_HEAP_DESC descHeapDesc = {};
-			descHeapDesc.NumDescriptors = 1;
-			descHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
-			auto result = m_device->CreateDescriptorHeap(&descHeapDesc, IID_PPV_ARGS(&m_dsvDescHeapForFrameBuff));
-
-			if (FAILED(result))
-			{
-				nsGameWindow::MessageBoxError(L"フレームバッファ用のDSVディスクリプタヒープの生成に失敗しました。");
-				return false;
-			}
-
-			return true;
-		}
-
-		bool CGraphicsEngine::CreateDSVForFrameBuffer()
-		{
-			D3D12_RESOURCE_DESC resDesc = {};
-			resDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-			resDesc.Width = CApplication::GetInstance()->GetWindowWidth();
-			resDesc.Height = CApplication::GetInstance()->GetWindowHeight();
-			resDesc.DepthOrArraySize = 1;
-			resDesc.Format = m_kDepthFormat;
-			resDesc.SampleDesc.Count = 1;
-			resDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
-
-			auto heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
-
-			auto depthClearValue = CD3DX12_CLEAR_VALUE(
-				m_kDepthFormat,
-				1.0f,
-				0
-			);
-
-			auto result = m_device->CreateCommittedResource(
-				&heapProp,
-				D3D12_HEAP_FLAG_NONE,
-				&resDesc,
-				D3D12_RESOURCE_STATE_DEPTH_WRITE,
-				&depthClearValue,
-				IID_PPV_ARGS(&m_depthStencilBuffer)
-			);
-
-			if (FAILED(result))
-			{
-				nsGameWindow::MessageBoxError(L"デプスステンシルバッファの生成に失敗しました。");
-				return false;
-			}
-
-			// @todo DSVのディスクリプタがnullptr（デフォルト指定）でよいのか調べる。
-			// DSVのフォーマットを指定するためにいると思うんだけど、
-			// nullptrでデフォルト設定にしている人が多い気がする。
-			//D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
-			//dsvDesc.Format = m_kDepthFormat;
-			//dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
-			//dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
-
-			m_device->CreateDepthStencilView(
-				m_depthStencilBuffer,
-				nullptr,
-				m_dsvDescHeapForFrameBuff->GetCPUDescriptorHandleForHeapStart()
-			);
-
-			return true;
-		}
 
 		bool CGraphicsEngine::CreateFence()
 		{
@@ -817,13 +577,11 @@ namespace nsYMEngine
 
 		bool CGraphicsEngine::CreatePeraRenderTarget()
 		{
-			auto rtvDescHeapDesc = m_rtvDescHeapForFrameBuff->GetDesc();
-			auto& frameBuff = m_frameBuffers[0];
-			auto frameBuffResDesc = frameBuff->GetDesc();
+			auto frameBuffResDesc = m_frameBuffer.GetResourceDesc();
 
 			D3D12_HEAP_PROPERTIES heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
 			D3D12_CLEAR_VALUE clearValue = CD3DX12_CLEAR_VALUE(
-				DXGI_FORMAT_R8G8B8A8_UNORM, m_kRTVClearColor);
+				DXGI_FORMAT_R8G8B8A8_UNORM, m_frameBuffer.GetRtvClearColor());
 
 			auto result = m_device->CreateCommittedResource(
 				&heapProp,
@@ -1191,53 +949,23 @@ namespace nsYMEngine
 
 		bool CGraphicsEngine::CreateSeceneConstantBuff()
 		{
-			D3D12_HEAP_PROPERTIES constBuffHeapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-			// 必要なバイト数を256でアライメントしたバイト数が必要。
-			// 0xff = 255
-			// 最初に0xffを足して256以上にしてから、ビット反転した0xffとAND演算することで、
-			// sizeを超えた最小の256の倍数を計算する。
-			UINT64 constBuffSize = (sizeof(SSceneDataMatrix) + 0xff) & ~0xff;
-			D3D12_RESOURCE_DESC constBuffResDesc = CD3DX12_RESOURCE_DESC::Buffer(constBuffSize);
-			auto result = m_device->CreateCommittedResource(
-				&constBuffHeapProp,
-				D3D12_HEAP_FLAG_NONE,
-				&constBuffResDesc,
-				D3D12_RESOURCE_STATE_GENERIC_READ,
-				nullptr,
-				IID_PPV_ARGS(&m_sceneDataConstantBuff)
-			);
+			// 〇定数バッファの作成
+			m_sceneDataCB.Init(sizeof(SSceneDataMatrix));
 
-			if (FAILED(result))
-			{
-				nsGameWindow::MessageBoxError(L"シーンデータ用の定数バッファの生成に失敗しました。");
-				return false;
-			}
+			// 〇マップされたデータにデータをコピー
+			auto mappedSceneData = 
+				static_cast<SSceneDataMatrix*>(m_sceneDataCB.GetMappedConstantBuffer());
+			mappedSceneData->mView = m_mainCamera.GetViewMatirx();
+			mappedSceneData->mProj = m_mainCamera.GetViewMatirx();
+			mappedSceneData->cameraPosWS = m_mainCamera.GetPosition();
 
-			result = m_sceneDataConstantBuff->Map(0, nullptr, reinterpret_cast<void**>(&m_mappedSceneDataMatrix));	// マップ
-			m_mappedSceneDataMatrix->mView = m_mainCamera.GetViewMatirx();
-			m_mappedSceneDataMatrix->mProj = m_mainCamera.GetViewMatirx();
-			m_mappedSceneDataMatrix->cameraPosWS = m_mainCamera.GetPosition();
+			// 〇ディスクリプタヒープの作成
+			constexpr unsigned int numDescHeaps = 1;
+			m_sceneDataDH.InitAsCbvSrvUav(numDescHeaps);
 
-			D3D12_DESCRIPTOR_HEAP_DESC descHeapDesc = {};
-			descHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-			descHeapDesc.NodeMask = 0;
-			descHeapDesc.NumDescriptors = 1;
-			descHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-
-			result = m_device->CreateDescriptorHeap(&descHeapDesc, IID_PPV_ARGS(&m_sceneDataDescriptorHeap));
-			if (FAILED(result))
-			{
-				nsGameWindow::MessageBoxError(L"シーンデータ用の定数バッファのディスクリプタヒープの生成に失敗しました。");
-				return false;
-			}
-
-			auto heapHandle = m_sceneDataDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-
-			D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
-			cbvDesc.BufferLocation = m_sceneDataConstantBuff->GetGPUVirtualAddress();
-			cbvDesc.SizeInBytes = static_cast<UINT>(m_sceneDataConstantBuff->GetDesc().Width);
-
-			m_device->CreateConstantBufferView(&cbvDesc, heapHandle);
+			// 〇定数バッファビューの作成
+			auto heapHandle = m_sceneDataDH.GetCPUHandle();
+			m_sceneDataCB.CreateConstantBufferView(heapHandle);
 
 			return true;
 		}

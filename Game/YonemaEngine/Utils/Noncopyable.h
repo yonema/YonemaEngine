@@ -5,10 +5,10 @@ namespace nsYMEngine
 	{
 		struct SNoncopyable
 		{
-			SNoncopyable() = default;
+			constexpr SNoncopyable() = default;
 			~SNoncopyable() = default;
-			SNoncopyable(const SNoncopyable&) = delete;
-			SNoncopyable& operator=(const SNoncopyable&) = delete;
+			constexpr SNoncopyable(const SNoncopyable&) = delete;
+			constexpr SNoncopyable& operator=(const SNoncopyable&) = delete;
 		};
 	}
 }

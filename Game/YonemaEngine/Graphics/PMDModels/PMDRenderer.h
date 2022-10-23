@@ -1,4 +1,5 @@
 #pragma once
+
 namespace nsYMEngine
 {
 	namespace nsGraphics
@@ -155,7 +156,7 @@ namespace nsYMEngine
 
 				void Draw();
 
-				inline void DebugSetPosition(float x)
+				inline void DebugSetPosition(float x) noexcept
 				{
 					m_debugPosX = x;
 				}
@@ -206,7 +207,7 @@ namespace nsYMEngine
 				void UpdateAnimation();
 
 				float GetYFromXOnBezier(
-					float x, const nsMath::CVector2& a, const nsMath::CVector2& b, uint8_t n);
+					float x, const nsMath::CVector2& a, const nsMath::CVector2& b, uint8_t n) noexcept;
 
 
 			private:
@@ -219,12 +220,10 @@ namespace nsYMEngine
 				D3D12_VERTEX_BUFFER_VIEW m_vertexBuffView = {};
 				ID3D12Resource* m_indexBuff = nullptr;
 				D3D12_INDEX_BUFFER_VIEW m_indexBuffView = {};
-				ID3D12Resource* m_constantBuff = nullptr;
-				ID3D12DescriptorHeap* m_cbDescriptorHeap = nullptr;
-				//SConstantBuff* m_mappedConstantBuff = nullptr;
-				nsMath::CMatrix* m_mappedConstantBuff = nullptr;
-				ID3D12Resource* m_materialBuff = nullptr;
-				ID3D12DescriptorHeap* m_mbDescriptorHeap = nullptr;
+				nsDx12Wrappers::CConstantBuffer m_modelCB;
+				nsDx12Wrappers::CDescriptorHeap m_modelDH;
+				nsDx12Wrappers::CConstantBuffer m_materialCB;
+				nsDx12Wrappers::CDescriptorHeap m_materialDH;
 
 				std::vector<nsMath::CMatrix> m_boneMatrices;
 				std::unordered_map<std::string, SBoneNode> m_boneNodeTable;

@@ -292,7 +292,7 @@ namespace nsYMEngine
 
 
 
-			bool CPMDGenericRenderer::CheckShaderCompileResult(HRESULT result, ID3DBlob* error) 
+			bool CPMDGenericRenderer::CheckShaderCompileResult(HRESULT result, ID3DBlob* error)  noexcept
 			{
 				if (FAILED(result)) 
 				{

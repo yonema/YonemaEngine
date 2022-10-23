@@ -16,12 +16,12 @@ namespace nsYMEngine
 				CPMDGenericRenderer();
 				~CPMDGenericRenderer();
 
-				ID3D12RootSignature* GetRootSignature()
+				constexpr ID3D12RootSignature* GetRootSignature() noexcept
 				{
 					return m_rootSignature;
 				}
 
-				ID3D12PipelineState* GetPipelineState()
+				constexpr ID3D12PipelineState* GetPipelineState() noexcept
 				{
 					return m_pipelineState;
 				}
@@ -33,7 +33,7 @@ namespace nsYMEngine
 				void CreatePipelineState(ID3D12Device5* device);
 				bool LoadShader(ID3DBlob** pVsBlob, ID3DBlob** pPsBlob);
 
-				bool CheckShaderCompileResult(HRESULT result, ID3DBlob* error = nullptr);
+				bool CheckShaderCompileResult(HRESULT result, ID3DBlob* error = nullptr) noexcept;
 
 
 			private:

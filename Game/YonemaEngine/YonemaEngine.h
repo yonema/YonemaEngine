@@ -39,7 +39,7 @@ namespace nsYMEngine
 				delete m_instance;
 			}
 		}
-		inline static CYonemaEngine* GetInstance()
+		constexpr static CYonemaEngine* GetInstance() noexcept
 		{
 			return m_instance;
 		}

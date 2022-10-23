@@ -1,7 +1,7 @@
 #include "Texture.h"
 #include "../GraphicsEngine.h"
 #include "../../Utils/StringManipulation.h"
-#include "../../Utils/AlignmentedSize.h"
+#include "../../Utils/AlignSize.h"
 #include "../../GameWindow/MessageBox.h"
 
 namespace nsYMEngine
@@ -67,15 +67,15 @@ namespace nsYMEngine
 				auto image = scratchImage.GetImage(0, 0, 0);	// 生データ抽出
 
 				// バッファ用256の倍数でアライメントされたrowPitch。
-				const auto alignmentedRowPitch =
-					nsUtils::AlignmentedSize(image->rowPitch, D3D12_TEXTURE_DATA_PITCH_ALIGNMENT);
+				const auto alignedRowPitch =
+					nsUtils::AlignSize(image->rowPitch, D3D12_TEXTURE_DATA_PITCH_ALIGNMENT);
 
 				// 1.中間バッファとしての、アップロードリソースを作成
 				ID3D12Resource* uploadBuff = nullptr;
 				if (CreateUploadBuff(
 					graphicsEngine->GetDevice(),
 					&uploadBuff,
-					alignmentedRowPitch,
+					alignedRowPitch,
 					image->height
 				) != true)
 				{
@@ -97,7 +97,7 @@ namespace nsYMEngine
 
 				// 3.アップロード用リソースへテクスチャデータをMap()でコピー
 
-				if (CopyToUploadBuffFromImage(uploadBuff, alignmentedRowPitch, image) != true)
+				if (CopyToUploadBuffFromImage(uploadBuff, alignedRowPitch, image) != true)
 				{
 					uploadBuff->Release();
 					textureBuff->Release();
@@ -113,7 +113,7 @@ namespace nsYMEngine
 					uploadBuff,
 					metadata,
 					image,
-					alignmentedRowPitch,
+					alignedRowPitch,
 					graphicsEngine
 				);
 
@@ -197,14 +197,14 @@ namespace nsYMEngine
 			bool CTexture::CreateUploadBuff(
 				ID3D12Device5* device,
 				ID3D12Resource** pUploadBuff,
-				const size_t alignmentedRowPitch,
+				const size_t alignedRowPitch,
 				const size_t imageHeight
 			)
 			{
 				D3D12_HEAP_PROPERTIES uploadHeapProp =
 					CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
 
-				UINT64 resDescWidth = static_cast<UINT64>(alignmentedRowPitch * imageHeight);
+				UINT64 resDescWidth = static_cast<UINT64>(alignedRowPitch * imageHeight);
 				D3D12_RESOURCE_DESC resDesc = CD3DX12_RESOURCE_DESC::Buffer(resDescWidth);
 
 				auto result = device->CreateCommittedResource(
@@ -265,7 +265,7 @@ namespace nsYMEngine
 
 			bool CTexture::CopyToUploadBuffFromImage(
 				ID3D12Resource* uploadBuff,
-				const size_t alignmentedRowPitch,
+				const size_t alignedRowPitch,
 				const DirectX::Image* image
 			)
 			{
@@ -288,10 +288,10 @@ namespace nsYMEngine
 				for (int y = 0; y < image->height; y++)
 				{
 					// 1行ずつコピーする。
-					std::copy_n(srcAddress, alignmentedRowPitch, mapforImg);
+					std::copy_n(srcAddress, alignedRowPitch, mapforImg);
 					// 行頭を合わせる。
 					srcAddress += image->rowPitch;	// 元データは実際のrowPitch分だけ進める
-					mapforImg += alignmentedRowPitch;	// バッファはアライメントされたrowPitch分だけ進める
+					mapforImg += alignedRowPitch;	// バッファはアライメントされたrowPitch分だけ進める
 				}
 
 				uploadBuff->Unmap(0, nullptr);
@@ -304,7 +304,7 @@ namespace nsYMEngine
 				ID3D12Resource* uploadBuff,
 				const DirectX::TexMetadata& metadata,
 				const DirectX::Image* image,
-				const size_t alignmentedRowPitch,
+				const size_t alignedRowPitch,
 				CGraphicsEngine* graphicsEngine)
 			{
 				// グラフィックボード上のコピー元アドレス。
@@ -318,7 +318,7 @@ namespace nsYMEngine
 				src.PlacedFootprint.Footprint.Height = static_cast<UINT>(metadata.height);
 				src.PlacedFootprint.Footprint.Depth = static_cast<UINT>(metadata.depth);
 				// RowPitchは256の倍数でなければならない。
-				src.PlacedFootprint.Footprint.RowPitch = static_cast<UINT>(alignmentedRowPitch);
+				src.PlacedFootprint.Footprint.RowPitch = static_cast<UINT>(alignedRowPitch);
 				src.PlacedFootprint.Footprint.Format = image->format;
 
 				// グラフィックボード上のコピー先アドレス。

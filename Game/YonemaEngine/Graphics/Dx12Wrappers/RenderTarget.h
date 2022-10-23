@@ -3,18 +3,25 @@ namespace nsYMEngine
 {
 	namespace nsGraphics
 	{
-
-		class CRenderTarget : private nsUtils::SNoncopyable
+		namespace nsDx12Wrappers
 		{
-		public:
-			CRenderTarget() = default;
-			~CRenderTarget() = default;
+			class CRenderTarget : private nsUtils::SNoncopyable
+			{
+			public:
+				constexpr CRenderTarget() = default;
+				~CRenderTarget() = default;
 
-		private:
-			ID3D12Resource* m_renderTarget = nullptr;
-			ID3D12DescriptorHeap* m_rtvDescHeap = nullptr;
-			ID3D12DescriptorHeap* m_srvDescHeap = nullptr;
-		};
+				void Init();
 
+				void Release();
+
+			private:
+				ID3D12Resource* m_renderTarget = nullptr;
+				ID3D12Resource* m_depthStencilBuffer = nullptr;
+				CDescriptorHeap m_rtvDescriptorHeap;
+				CDescriptorHeap m_dsvDescriptorHeap;
+			};
+
+		}
 	}
 }

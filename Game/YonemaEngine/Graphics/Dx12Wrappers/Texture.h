@@ -21,17 +21,17 @@ namespace nsYMEngine
 				static const char* m_kDDSFileExtension;
 
 			public:
-				CTexture() = default;
+				constexpr CTexture() = default;
 				~CTexture();
 
 				void Init(const char* filePath);
 
-				inline bool IsValid() const
+				constexpr bool IsValid() const noexcept
 				{
 					return m_texture != nullptr;
 				}
 
-				ID3D12Resource* GetResource()
+				constexpr ID3D12Resource* GetResource() noexcept
 				{
 					return m_texture;
 				}
@@ -51,7 +51,7 @@ namespace nsYMEngine
 				bool CreateUploadBuff(
 					ID3D12Device5* device,
 					ID3D12Resource** pUploadBuff,
-					const size_t alignmentedRowPitch,
+					const size_t alignedRowPitch,
 					const size_t imageHeight
 				);
 
@@ -63,7 +63,7 @@ namespace nsYMEngine
 
 				bool CopyToUploadBuffFromImage(
 					ID3D12Resource* uploadBuff,
-					const size_t alignmentedRowPitch,
+					const size_t alignedRowPitch,
 					const DirectX::Image* image
 				);
 
@@ -72,7 +72,7 @@ namespace nsYMEngine
 					ID3D12Resource* uploadBuff,
 					const DirectX::TexMetadata& metadata,
 					const DirectX::Image* image,
-					const size_t alignmentedRowPitch,
+					const size_t alignedRowPitch,
 					CGraphicsEngine* graphicsEngine
 				);
 
