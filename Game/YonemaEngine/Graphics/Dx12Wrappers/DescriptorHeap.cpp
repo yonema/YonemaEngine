@@ -8,6 +8,8 @@ namespace nsYMEngine
 	{
 		namespace nsDx12Wrappers
 		{
+			const wchar_t* const CDescriptorHeap::m_kNamePrefix = L"DescriptorHeap: ";
+
 			CDescriptorHeap::~CDescriptorHeap()
 			{
 				Terminate();
@@ -35,14 +37,17 @@ namespace nsYMEngine
 
 			bool CDescriptorHeap::Init(
 				D3D12_DESCRIPTOR_HEAP_TYPE type,
-				UINT numDescHeaps,
-				D3D12_DESCRIPTOR_HEAP_FLAGS flags
+				UINT numDescriptors,
+				D3D12_DESCRIPTOR_HEAP_FLAGS flags,
+				const wchar_t* objectName
 			)
 			{
+				Release();
+
 				auto device = CGraphicsEngine::GetInstance()->GetDevice();
 				D3D12_DESCRIPTOR_HEAP_DESC descHeapDesc = {};
 				descHeapDesc.Type = type;
-				descHeapDesc.NumDescriptors = numDescHeaps;
+				descHeapDesc.NumDescriptors = numDescriptors;
 				descHeapDesc.Flags = flags;
 				descHeapDesc.NodeMask = 0;
 
@@ -54,22 +59,40 @@ namespace nsYMEngine
 					return false;
 				}
 
+				SetName(objectName);
+
 				return true;
 			}
 
 			bool CDescriptorHeap::InitAsCbvSrvUav(
-				UINT numDescHeaps, D3D12_DESCRIPTOR_HEAP_FLAGS flags)
+				UINT numDescriptors, const wchar_t* objectName, D3D12_DESCRIPTOR_HEAP_FLAGS flags)
 			{
-				return Init(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, numDescHeaps, flags);
+				return Init(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, numDescriptors, flags, objectName);
 			}
-			bool CDescriptorHeap::InitAsRTV(UINT numDescHeaps)
+			bool CDescriptorHeap::InitAsRTV(UINT numDescriptors, const wchar_t* objectName)
 			{
-				return Init(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, numDescHeaps, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
+				return Init(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, numDescriptors, D3D12_DESCRIPTOR_HEAP_FLAG_NONE, objectName);
 			}
-			bool CDescriptorHeap::InitAsDSV()
+			bool CDescriptorHeap::InitAsDSV(const wchar_t* objectName)
 			{
-				return Init(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
+				return Init(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, D3D12_DESCRIPTOR_HEAP_FLAG_NONE, objectName);
 			}
+
+			void CDescriptorHeap::SetName(const wchar_t* objectName)
+			{
+#ifdef _DEBUG
+				if (m_descriptorHeap == nullptr || objectName == nullptr)
+				{
+					return;
+				}
+				std::wstring wstr(m_kNamePrefix);
+				wstr += objectName;
+				m_descriptorHeap->SetName(wstr.c_str());
+#endif
+
+				return;
+			}
+
 
 		}
 	}

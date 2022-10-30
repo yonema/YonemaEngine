@@ -42,6 +42,12 @@ namespace nsYMEngine
 			static inline CMatrix RotationY(float radAngle) noexcept;
 			static inline CMatrix RotationZ(float radAngle) noexcept;
 			static inline CMatrix RotationFromQuaternion(nsMath::CQuaternion& q) noexcept;
+			static inline CMatrix ProjectionMatrix(
+				float fovAngleY, float aspectRatio, float nearClip, float farClip) noexcept;
+			static inline CMatrix OrthoProjectionMatrix(
+				float viewWidth, float viewHeight, float nearClip, float farClip) noexcept;
+			static inline CMatrix ViewMatrix(
+				const CVector3& eyePos, const CVector3& targetPos, const CVector3& upDir) noexcept;
 
 			inline void MakeTranslation(const CVector3& offset) noexcept;
 			inline void MakeTranslation(float x, float y, float z) noexcept;
@@ -56,7 +62,7 @@ namespace nsYMEngine
 			inline void MakeProjectionMatrix(
 				float fovAngleY, float aspectRatio, float nearClip, float farClip) noexcept;
 			inline void MakeOrthoProjectionMatrix(
-				float viewWidth, float viewHeight, float nearZ, float farZ) noexcept;
+				float viewWidth, float viewHeight, float nearClip, float farClip) noexcept;
 			inline void MakeViewMatrix(
 				const CVector3& eyePos, const CVector3& targetPos, const CVector3& upDir) noexcept;
 
@@ -199,6 +205,27 @@ namespace nsYMEngine
 			mat.MakeRotationFromQuaternion(q);
 			return mat;
 		}
+		inline CMatrix CMatrix::ProjectionMatrix(
+			float fovAngleY, float aspectRatio, float nearClip, float farClip) noexcept
+		{
+			CMatrix mat;
+			mat.MakeProjectionMatrix(fovAngleY, aspectRatio, nearClip, farClip);
+			return mat;
+		}
+		inline CMatrix CMatrix::OrthoProjectionMatrix(
+			float viewWidth, float viewHeight, float nearClip, float farClip) noexcept
+		{
+			CMatrix mat;
+			mat.MakeOrthoProjectionMatrix(viewWidth, viewHeight, nearClip, farClip);
+			return mat;
+		}
+		inline CMatrix CMatrix::ViewMatrix(
+			const CVector3& eyePos, const CVector3& targetPos, const CVector3& upDir) noexcept
+		{
+			CMatrix mat;
+			mat.MakeViewMatrix(eyePos, targetPos, upDir);
+			return mat;
+		}
 
 		inline void CMatrix::MakeTranslation(const CVector3& offset) noexcept
 		{
@@ -263,10 +290,10 @@ namespace nsYMEngine
 			return;
 		}
 		inline void CMatrix::MakeOrthoProjectionMatrix(
-			float viewWidth, float viewHeight, float nearZ, float farZ) noexcept
+			float viewWidth, float viewHeight, float nearClip, float farClip) noexcept
 		{
 			auto xmmProj =
-				DirectX::XMMatrixOrthographicLH(viewWidth, viewHeight, nearZ, farZ);
+				DirectX::XMMatrixOrthographicLH(viewWidth, viewHeight, nearClip, farClip);
 			DirectX::XMStoreFloat4x4(&m_xmf4x4Mat, xmmProj);
 			return;
 		}

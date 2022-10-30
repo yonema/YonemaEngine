@@ -22,6 +22,7 @@ namespace nsYMEngine
 			{
 			private:
 				static const size_t m_kPmdVertexSize;
+				static const size_t m_kAlignedPmdVertexSize;
 				static const int m_kNumMaterialDescriptors;
 				static const int m_kNumCalculationsOnBezier;
 
@@ -216,10 +217,8 @@ namespace nsYMEngine
 				std::vector<nsDx12Wrappers::CTexture*> m_sphTextures;
 				std::vector<nsDx12Wrappers::CTexture*> m_spaTextures;
 				nsMath::CMatrix m_mWorld;
-				ID3D12Resource* m_vertexBuff = nullptr;
-				D3D12_VERTEX_BUFFER_VIEW m_vertexBuffView = {};
-				ID3D12Resource* m_indexBuff = nullptr;
-				D3D12_INDEX_BUFFER_VIEW m_indexBuffView = {};
+				nsDx12Wrappers::CIndexBuffer m_indexBuffer;
+				nsDx12Wrappers::CVertexBuffer m_vertexBuffer;
 				nsDx12Wrappers::CConstantBuffer m_modelCB;
 				nsDx12Wrappers::CDescriptorHeap m_modelDH;
 				nsDx12Wrappers::CConstantBuffer m_materialCB;

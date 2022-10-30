@@ -12,6 +12,7 @@ namespace nsYMEngine
 		namespace nsPMDModels
 		{
 			const size_t CPMDRenderer::m_kPmdVertexSize = 38;
+			const size_t CPMDRenderer::m_kAlignedPmdVertexSize = 40;
 			const int CPMDRenderer::m_kNumMaterialDescriptors = 4;
 			const int CPMDRenderer::m_kNumCalculationsOnBezier = 12;
 
@@ -53,23 +54,22 @@ namespace nsYMEngine
 			void CPMDRenderer::Draw()
 			{
 				static auto commandList = CGraphicsEngine::GetInstance()->GetCommandList();
-				static auto device = CGraphicsEngine::GetInstance()->GetDevice();
 
 				// ○頂点バッファとインデックスバッファをセット
-				commandList->IASetVertexBuffers(0, 1, &m_vertexBuffView);
-				commandList->IASetIndexBuffer(&m_indexBuffView);
+				commandList->SetVertexBuffer(m_vertexBuffer);
+				commandList->SetIndexBuffer(m_indexBuffer);
 
 				// ○定数バッファのディスクリプタヒープをセット
-				ID3D12DescriptorHeap* cbDescriptorHeaps[] = { m_modelDH.Get() };
-				commandList->SetDescriptorHeaps(1, cbDescriptorHeaps);
+				ID3D12DescriptorHeap* modelDescHeaps[] = { m_modelDH.Get() };
+				commandList->SetDescriptorHeaps(1, modelDescHeaps);
 				auto descriptorHeapH = m_modelDH.GetGPUHandle();
 				// 0番は、グラフィックスエンジンで、シーンデータ用に使用している。
 				// そのため1番からスタート。
 				commandList->SetGraphicsRootDescriptorTable(1, descriptorHeapH);
 
 				// ○マテリアルバッファのディスクリプタヒープをセット
-				ID3D12DescriptorHeap* mbDescriptorHeaps[] = { m_materialDH.Get() };
-				commandList->SetDescriptorHeaps(1, mbDescriptorHeaps);
+				ID3D12DescriptorHeap* materialDescHeaps[] = { m_materialDH.Get() };
+				commandList->SetDescriptorHeaps(1, materialDescHeaps);
 
 				descriptorHeapH = m_materialDH.GetGPUHandle();
 				unsigned int idxOffset = 0;
@@ -80,7 +80,7 @@ namespace nsYMEngine
 				for (const auto& m : m_materials)
 				{
 					commandList->SetGraphicsRootDescriptorTable(2, descriptorHeapH);
-					commandList->DrawIndexedInstanced(m.indicesNum, 1, idxOffset, 0, 0);
+					commandList->DrawInstanced(m.indicesNum, 1, idxOffset);
 					descriptorHeapH.ptr += cbvsrvIncSize;
 					idxOffset += m.indicesNum;
 				}
@@ -112,14 +112,8 @@ namespace nsYMEngine
 				m_materialCB.Release();
 				m_modelDH.Release();
 				m_modelCB.Release();
-				if (m_indexBuff)
-				{
-					m_indexBuff->Release();
-				}
-				if (m_vertexBuff)
-				{
-					m_vertexBuff->Release();
-				}
+				m_indexBuffer.Release();
+				m_vertexBuffer.Release();
 
 				for (int i = 0; i < m_textures.size(); i++)
 				{
@@ -162,8 +156,22 @@ namespace nsYMEngine
 					fread_s(&pmdVertNum, sizeof(pmdVertNum), sizeof(pmdVertNum), 1, fileStream);
 
 					// 頂点データの読み込み
-					pmdVertices.resize(pmdVertNum * m_kPmdVertexSize);
-					fread_s(pmdVertices.data(), pmdVertices.size(), pmdVertices.size(), 1, fileStream);
+					//アライメント無視の読み込み
+					//pmdVertices.resize(m_kPmdVertexSize * pmdVertNum);
+					//fread_s(pmdVertices.data(), pmdVertices.size(), pmdVertices.size(), 1, fileStream);
+
+					// アライメントを考慮した読み込み
+					pmdVertices.resize(m_kAlignedPmdVertexSize * pmdVertNum);
+					for (unsigned int i = 0; i < pmdVertNum; i++)
+					{
+						fread_s(
+							&pmdVertices[i * m_kAlignedPmdVertexSize],
+							m_kPmdVertexSize,
+							m_kPmdVertexSize,
+							1,
+							fileStream
+						);
+					}
 
 					// インデックス数の読み込み
 					fread_s(&pmdIndicesNum, sizeof(pmdIndicesNum), sizeof(pmdIndicesNum), 1, fileStream);
@@ -355,6 +363,7 @@ namespace nsYMEngine
 
 				static auto device = CGraphicsEngine::GetInstance()->GetDevice();
 
+				
 				CreateVertexBuff(device, heapProp, resDesc, pmdVertices);
 
 				CreateIndexBuff(device, heapProp, resDesc, pmdIndices, pmdIndicesSize);
@@ -376,31 +385,14 @@ namespace nsYMEngine
 				std::vector<unsigned char>& pmdVertices
 			)
 			{
-				// ○頂点バッファの生成
-				auto result = device->CreateCommittedResource(
-					&heapProp,
-					D3D12_HEAP_FLAG_NONE,
-					&resDesc,
-					D3D12_RESOURCE_STATE_GENERIC_READ,
-					nullptr,
-					IID_PPV_ARGS(&m_vertexBuff)
+				m_vertexBuffer.Init(
+					static_cast<unsigned int>(pmdVertices.size()),
+					//m_kPmdVertexSize,	// アライメント無視
+					m_kAlignedPmdVertexSize,	// アライメント考慮
+					static_cast<void*>(&pmdVertices[0]),
+					L"PMDModel"
 				);
 
-				if (FAILED(result))
-				{
-					nsGameWindow::MessageBoxWarning(L"頂点バッファの生成に失敗しました。");
-				}
-
-				// 〇頂点情報のコピー（マップ）
-				unsigned char* vertMap = nullptr;
-				result = m_vertexBuff->Map(0, nullptr, reinterpret_cast<void**>(&vertMap));
-				std::copy(std::begin(pmdVertices), std::end(pmdVertices), vertMap);
-				m_vertexBuff->Unmap(0, nullptr);
-
-				// 〇頂点バッファビューの作成
-				m_vertexBuffView.BufferLocation = m_vertexBuff->GetGPUVirtualAddress();
-				m_vertexBuffView.SizeInBytes = static_cast<UINT>(pmdVertices.size());
-				m_vertexBuffView.StrideInBytes = static_cast<UINT>(m_kPmdVertexSize);
 
 				return;
 			}
@@ -413,34 +405,11 @@ namespace nsYMEngine
 				size_t pmdIndicesSize
 			)
 			{
-				resDesc.Width = pmdIndicesSize;
-
-				// ○インデックスバッファの生成
-				auto result = device->CreateCommittedResource(
-					&heapProp,
-					D3D12_HEAP_FLAG_NONE,
-					&resDesc,
-					D3D12_RESOURCE_STATE_GENERIC_READ,
-					nullptr,
-					IID_PPV_ARGS(&m_indexBuff)
+				m_indexBuffer.Init(
+					static_cast<unsigned int>(pmdIndicesSize),
+					static_cast<void*>(&pmdIndices[0]),
+					L"PMDModel"
 				);
-
-				if (FAILED(result))
-				{
-					nsGameWindow::MessageBoxWarning(L"インデックスバッファの生成に失敗しました。");
-				}
-
-				// 〇インデックス情報のコピー（マップ）
-				unsigned short* mappedIdx = nullptr;
-				m_indexBuff->Map(0, nullptr, reinterpret_cast<void**>(&mappedIdx));
-				std::copy(std::begin(pmdIndices), std::end(pmdIndices), mappedIdx);
-				m_indexBuff->Unmap(0, nullptr);
-
-				// 〇インデックスバッファビューの作成
-				m_indexBuffView.BufferLocation = m_indexBuff->GetGPUVirtualAddress();
-				// unsigned int でインデックス配列を使用しているため、DXGI_FORMAT_R16_UINTを使用。
-				m_indexBuffView.Format = DXGI_FORMAT_R16_UINT;
-				m_indexBuffView.SizeInBytes = static_cast<UINT>(pmdIndicesSize);
 
 				return;
 			}
@@ -449,7 +418,7 @@ namespace nsYMEngine
 			{
 				// 〇定数バッファ作成
 				auto cbSize = sizeof(nsMath::CMatrix) * (2 + m_boneMatrices.size());
-				m_modelCB.Init(static_cast<unsigned int>(cbSize));
+				m_modelCB.Init(static_cast<unsigned int>(cbSize), L"PMDModel");
 
 				// 〇マップされたデータにデータをコピー
 				auto mappedCb = 
@@ -461,7 +430,7 @@ namespace nsYMEngine
 
 				// 〇ディスクリプタヒープ作成
 				constexpr unsigned int numDescHeaps = 1;
-				m_modelDH.InitAsCbvSrvUav(numDescHeaps);
+				m_modelDH.InitAsCbvSrvUav(numDescHeaps, L"PMDModel");
 
 				// 〇定数バッファビュー作成
 				m_modelCB.CreateConstantBufferView(m_modelDH.GetCPUHandle());
@@ -480,7 +449,7 @@ namespace nsYMEngine
 			{
 				// 〇定数バッファ作成
 				auto cbSize = static_cast<unsigned int>(sizeof(SMaterialForHlsl));
-				m_materialCB.Init(cbSize, pmdMaterialNum);
+				m_materialCB.Init(cbSize, L"PMDMaterial", pmdMaterialNum);
 				cbSize = m_materialCB.GetSizeInByte();
 
 				// 〇マップされたデータにデータをコピー
@@ -497,7 +466,7 @@ namespace nsYMEngine
 
 				// 〇ディスクリプタヒープの作成
 				const auto numDescHeaps = pmdMaterialNum * m_kNumMaterialDescriptors;
-				m_materialDH.InitAsCbvSrvUav(numDescHeaps);
+				m_materialDH.InitAsCbvSrvUav(numDescHeaps, L"PMDMaterial");
 
 				D3D12_SHADER_RESOURCE_VIEW_DESC matSRVDesc = {};
 				matSRVDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -587,7 +556,6 @@ namespace nsYMEngine
 					matDescHeapH.ptr += inc;
 
 				}
-
 
 				return;
 			}

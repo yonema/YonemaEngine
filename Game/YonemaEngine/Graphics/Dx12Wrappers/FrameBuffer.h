@@ -10,7 +10,8 @@ namespace nsYMEngine
 			private:
 				static const unsigned int m_kFrameBufferCount = 2;
 				static const DXGI_FORMAT m_kDepthFormat;
-				static const float m_kRTVClearColor[4];
+				static const nsMath::CVector4 m_kRTVClearColor;
+				static const float m_kDsvClearValue;
 
 
 			public:
@@ -28,28 +29,50 @@ namespace nsYMEngine
 
 				void Release();
 
-				constexpr auto GetRtvCpuDescriptorHandle() noexcept
+				constexpr auto GetFrameBufferCount() const noexcept
 				{
-					return m_rtvCpuDescriptorHandle;
+					return m_kFrameBufferCount;
 				}
-				constexpr auto GetDsvCpuDescriptorHandle() noexcept
+
+				constexpr auto GetCurrentRenerTarget() const noexcept
+				{
+					return m_renderTargets[m_backBufferIndex];
+				}
+				constexpr auto GetCurrentRtvCpuDescriptorHandle() const noexcept
+				{
+					return m_currentRtvCpuDescriptorHandle;
+				}
+				constexpr auto GetDsvCpuDescriptorHandle() const noexcept
 				{
 					return m_dsvCpuDescriptorHandle;
 				}
 
-				constexpr auto GetCurrentBackBufferIndex() noexcept
+				constexpr auto GetCurrentBackBufferIndex() const noexcept
 				{
 					return  m_backBufferIndex;
 				}
 
-				constexpr auto GetRtvClearColor() noexcept
+				constexpr const auto& GetRtvClearColor() const noexcept
 				{
 					return m_kRTVClearColor;
 				}
+				constexpr const float GetDsvClearValue() const noexcept
+				{
+					return m_kDsvClearValue;
+				}
 
-				auto GetResourceDesc() noexcept
+				auto GetResourceDesc() const noexcept
 				{
 					return m_renderTargets[0]->GetDesc();
+				}
+
+				constexpr const auto& GetViewport() const noexcept
+				{
+					return m_viewport;
+				}
+				constexpr const auto& GetScissorRect() const noexcept
+				{
+					return m_scissorRect;
 				}
 
 				void SwapBackBuffer();
@@ -99,7 +122,7 @@ namespace nsYMEngine
 				ID3D12Resource* m_depthStencilBuffer = nullptr;
 				CDescriptorHeap m_rtvDescriptorHeap;
 				CDescriptorHeap m_dsvDescriptorHeap;
-				D3D12_CPU_DESCRIPTOR_HANDLE m_rtvCpuDescriptorHandle = {};
+				D3D12_CPU_DESCRIPTOR_HANDLE m_currentRtvCpuDescriptorHandle = {};
 				D3D12_CPU_DESCRIPTOR_HANDLE m_dsvCpuDescriptorHandle = {};
 				D3D12_VIEWPORT m_viewport = {};
 				D3D12_RECT m_scissorRect = {};

@@ -19,6 +19,7 @@ namespace nsYMEngine
 				static const char* m_kWICFileExtensions[m_kNumWICFileExtensions];
 				static const char* m_kTGAFileExtension;
 				static const char* m_kDDSFileExtension;
+				static const wchar_t* const m_kNamePrefix;
 
 			public:
 				constexpr CTexture() = default;
@@ -26,14 +27,53 @@ namespace nsYMEngine
 
 				void Init(const char* filePath);
 
+				void InitFromD3DResource(ID3D12Resource* texture);
+
+				void InitFromTexture(CTexture* texture);
+
+
+				void Release();
+
 				constexpr bool IsValid() const noexcept
 				{
 					return m_texture != nullptr;
 				}
 
+				constexpr bool IsCubemap() const noexcept
+				{
+					return m_isCubemap;
+				}
+				constexpr const auto& GetTextureSize() const noexcept
+				{
+					return m_textureSize;
+				}
+
+				constexpr auto GetMipLevels() const noexcept
+				{
+					return m_mipLevels;
+				}
+
+				constexpr auto GetFormat() const noexcept
+				{
+					return m_format;
+				}
+
 				constexpr ID3D12Resource* GetResource() noexcept
 				{
 					return m_texture;
+				}
+
+				inline void SetName(const wchar_t* objectName)
+				{
+#ifdef _DEBUG
+					if (m_texture == nullptr || objectName == nullptr)
+					{
+						return;
+					}
+					std::wstring wstr(m_kNamePrefix);
+					wstr += objectName;
+					m_texture->SetName(wstr.c_str());
+#endif
 				}
 
 			private:
@@ -76,8 +116,17 @@ namespace nsYMEngine
 					CGraphicsEngine* graphicsEngine
 				);
 
+				void CopyTextureParam(ID3D12Resource* texture);
+
+				void SetDefaultName(const char* filePath);
+
+
 			private:
 				ID3D12Resource* m_texture = nullptr;
+				bool m_isCubemap = false;
+				UINT16 m_mipLevels = 0;
+				DXGI_FORMAT m_format = DXGI_FORMAT_UNKNOWN;
+				nsMath::CVector2 m_textureSize = nsMath::CVector2::Zero();
 			};
 		}
 	}

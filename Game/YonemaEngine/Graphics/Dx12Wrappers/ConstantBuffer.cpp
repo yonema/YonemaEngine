@@ -8,6 +8,8 @@ namespace nsYMEngine
 	{
 		namespace nsDx12Wrappers
 		{
+			const wchar_t* const CConstantBuffer::m_kNamePrefix = L"ConstantBuffer: ";
+
 			CConstantBuffer::~CConstantBuffer()
 			{
 				Terminate();
@@ -36,10 +38,13 @@ namespace nsYMEngine
 
 			bool CConstantBuffer::Init(
 				unsigned int size,
+				const wchar_t* objectName,
 				unsigned int numCBVs,
 				const void* srcData
 			)
 			{
+				Release();
+
 				auto device = CGraphicsEngine::GetInstance()->GetDevice();
 
 				D3D12_HEAP_PROPERTIES heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
@@ -70,12 +75,17 @@ namespace nsYMEngine
 					// intend to read from this resource on the CPU.
 					// (訳)CPUのこのリソースから読み出すことを意図している
 					CD3DX12_RANGE readRange(0, 0);
-					result = m_constantBuffer->Map(0, nullptr, reinterpret_cast<void**>(&m_mappedConstantBuffer));
+					result = m_constantBuffer->Map(0, &readRange, reinterpret_cast<void**>(&m_mappedConstantBuffer));
 				}
 
 				if (srcData)
 				{
 					CopyToMappedConstantBuffer(srcData);
+				}
+
+				if (objectName)
+				{
+					SetName(objectName);
 				}
 
 				return true;
@@ -105,6 +115,21 @@ namespace nsYMEngine
 
 				memcpy(m_mappedConstantBuffer, data, bufferSize);
 
+				return;
+			}
+
+
+			void CConstantBuffer::SetName(const wchar_t* objectName)
+			{
+#ifdef _DEBUG
+				if (m_constantBuffer == nullptr || objectName == nullptr)
+				{
+					return;
+				}
+				std::wstring wstr(m_kNamePrefix);
+				wstr += objectName;
+				m_constantBuffer->SetName(wstr.c_str());
+#endif
 				return;
 			}
 

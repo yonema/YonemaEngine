@@ -20,6 +20,8 @@ namespace nsYMEngine
 			};
 			const char* CTexture::m_kTGAFileExtension = "tga";
 			const char* CTexture::m_kDDSFileExtension = "dds";
+			const wchar_t* const CTexture::m_kNamePrefix = L"Texture: ";
+
 
 			CTexture::~CTexture()
 			{
@@ -28,24 +30,49 @@ namespace nsYMEngine
 				return;
 			}
 
-
-			void CTexture::Init(const char* filePath)
+			void CTexture::Release()
 			{
 				if (m_texture)
 				{
 					m_texture->Release();
+					m_texture = nullptr;
 				}
+				return;
+			}
+
+
+			void CTexture::Init(const char* filePath)
+			{
+				Release();
 				m_texture = LoadTextureFromFile(filePath);
+
+				SetDefaultName(filePath);
 
 				return;
 			}
 
+			void CTexture::InitFromD3DResource(ID3D12Resource* texture)
+			{
+				Release();
+				CopyTextureParam(texture);
+
+				return;
+			}
+
+			void CTexture::InitFromTexture(CTexture* texture)
+			{
+				Release();
+				CopyTextureParam(texture->GetResource());
+				m_isCubemap = texture->IsCubemap();
+
+
+				return;
+			}
+
+
 			void CTexture::Terminate()
 			{
-				if (m_texture)
-				{
-					m_texture->Release();
-				}
+				Release();
 
 				return;
 			}
@@ -63,6 +90,12 @@ namespace nsYMEngine
 				{
 					return nullptr;
 				}
+
+				m_isCubemap = metadata.IsCubemap();
+				m_textureSize.x = static_cast<float>(metadata.width);
+				m_textureSize.y = static_cast<float>(metadata.height);
+				m_format = metadata.format;
+				m_mipLevels = static_cast<UINT16>(metadata.mipLevels);
 
 				auto image = scratchImage.GetImage(0, 0, 0);	// 生データ抽出
 
@@ -330,7 +363,7 @@ namespace nsYMEngine
 				dst.SubresourceIndex = 0;
 
 				auto commandAllocator = graphicsEngine->GetCommandAllocator();
-				auto commandList = graphicsEngine->GetCommandList();
+				auto commandList = graphicsEngine->GetCommandList()->Get();
 				auto commandQueue = graphicsEngine->GetCommandQueue();
 				auto fence = graphicsEngine->GetFence();
 				auto fenceVal = graphicsEngine->GetFenceVal();
@@ -363,6 +396,31 @@ namespace nsYMEngine
 				}
 
 
+				return;
+			}
+
+			void CTexture::CopyTextureParam(ID3D12Resource* texture)
+			{
+				m_texture = texture;
+				m_texture->AddRef();
+				const auto& desc = m_texture->GetDesc();
+				m_mipLevels = desc.MipLevels;
+				m_format = desc.Format;
+				m_textureSize =
+				{ static_cast<float>(desc.Width), static_cast<float>(desc.Height) };
+
+				return;
+			}
+
+
+
+			void CTexture::SetDefaultName(const char* filePath)
+			{
+#ifdef _DEBUG
+				std::wstring wstr(nsUtils::GetWideStringFromString(filePath));
+
+				SetName(wstr.c_str());
+#endif
 				return;
 			}
 

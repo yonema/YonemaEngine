@@ -1,44 +1,52 @@
 #pragma once
+#include "../GenericRenderer.h"
+
 namespace nsYMEngine
 {
 	namespace nsGraphics
 	{
 		namespace nsPMDModels
 		{
-			class CPMDGenericRenderer : private nsUtils::SNoncopyable
+			class CPMDGenericRenderer : public IGenericRenderer
 			{
 			private:
-				static const unsigned int m_kNumDescTableRanges;
-				static const unsigned int m_kNumRootParameters;
-				static const unsigned int m_kNumSamplers;
+				enum class EnDescRangeType : unsigned int
+				{
+					enCbvForSceneData,
+					enCbvForModelData,
+					enCbvForMaterialData,
+					enSrvForMaterialData,
+					enNumDescRangeTypes
+				};
+				enum class EnRootParameterType : unsigned int
+				{
+					enSceneData,
+					enModelData,
+					enMaterialData,
+					enNumRootParamerterTypes
+				};
+				enum class EnSamplerType : unsigned int
+				{
+					enNormal,
+					enNumSamplerTypes
+				};
+
+				static const wchar_t* const m_kVsFilePath;
+				static const char* const m_kVsEntryFuncName;
+				static const wchar_t* const m_kPsFilePath;
+				static const char* const m_kPsEntryFuncName;
 
 			public:
-				CPMDGenericRenderer();
-				~CPMDGenericRenderer();
-
-				constexpr ID3D12RootSignature* GetRootSignature() noexcept
-				{
-					return m_rootSignature;
-				}
-
-				constexpr ID3D12PipelineState* GetPipelineState() noexcept
-				{
-					return m_pipelineState;
-				}
+				constexpr CPMDGenericRenderer() = default;
+				~CPMDGenericRenderer() = default;
+				bool Init() override;
 
 			private:
-				void Init();
-				void Terminate();
-				void CreateRootSignature(ID3D12Device5* device);
-				void CreatePipelineState(ID3D12Device5* device);
-				bool LoadShader(ID3DBlob** pVsBlob, ID3DBlob** pPsBlob);
-
-				bool CheckShaderCompileResult(HRESULT result, ID3DBlob* error = nullptr) noexcept;
-
+				bool CreateRootSignature(ID3D12Device5* device) override;
+				bool CreatePipelineState(ID3D12Device5* device) override;
 
 			private:
-				ID3D12RootSignature* m_rootSignature = nullptr;
-				ID3D12PipelineState* m_pipelineState = nullptr;
+
 			};
 
 		}

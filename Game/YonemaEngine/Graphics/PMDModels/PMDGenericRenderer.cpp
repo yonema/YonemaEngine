@@ -8,75 +8,88 @@ namespace nsYMEngine
 	{
 		namespace nsPMDModels
 		{
-			const unsigned int CPMDGenericRenderer::m_kNumDescTableRanges = 4;
-			const unsigned int CPMDGenericRenderer::m_kNumRootParameters = 3;
-			const unsigned int CPMDGenericRenderer::m_kNumSamplers = 1;
+			const wchar_t* const CPMDGenericRenderer::m_kVsFilePath =
+				L"Assets/Shaders/BasicVertexShader.hlsl";
+			const char* const CPMDGenericRenderer::m_kVsEntryFuncName = "BasicVS";
+			const wchar_t* const CPMDGenericRenderer::m_kPsFilePath = 
+				L"Assets/Shaders/BasicPixelShader.hlsl";
+			const char* const CPMDGenericRenderer::m_kPsEntryFuncName = "BasicPS";
 
-			CPMDGenericRenderer::CPMDGenericRenderer()
-			{
-				Init();
-
-				return;
-			}
-			CPMDGenericRenderer::~CPMDGenericRenderer()
-			{
-				Terminate();
-
-				return;
-			}
-
-			void CPMDGenericRenderer::Init()
+			bool CPMDGenericRenderer::Init()
 			{
 				auto device = CGraphicsEngine::GetInstance()->GetDevice();
-				CreateRootSignature(device);
-				CreatePipelineState(device);
-
-				return;
-			}
-
-			void CPMDGenericRenderer::Terminate()
-			{
-				if (m_pipelineState)
+				if (CreateRootSignature(device) != true)
 				{
-					m_pipelineState->Release();
+					return false;
 				}
-				if (m_rootSignature)
+				if (CreatePipelineState(device) != true)
 				{
-					m_rootSignature->Release();
+					return false;
 				}
 
-				return;
+				return true;
 			}
 
-			void CPMDGenericRenderer::CreateRootSignature(ID3D12Device5* device)
+
+			bool CPMDGenericRenderer::CreateRootSignature(ID3D12Device5* device)
 			{
-				CD3DX12_DESCRIPTOR_RANGE1 descTblRanges[m_kNumDescTableRanges] = {};
+				int numCBVs = 0;
+				int numSRVs = 0;
+
+				constexpr unsigned int kNumDescTblRanges = 
+					static_cast<unsigned int>(EnDescRangeType::enNumDescRangeTypes);
+				constexpr unsigned int kCbvForSceneDataDescRangeNo =
+					static_cast<unsigned int>(EnDescRangeType::enCbvForSceneData);
+				constexpr unsigned int kCbvForModelDataDescRangeNo =
+					static_cast<unsigned int>(EnDescRangeType::enCbvForModelData);
+				constexpr unsigned int kCbvForMaterialDataDescRangeNo =
+					static_cast<unsigned int>(EnDescRangeType::enCbvForMaterialData);
+				constexpr unsigned int kSrvForMaterialDataDescRangeNo =
+					static_cast<unsigned int>(EnDescRangeType::enSrvForMaterialData);
+
+				CD3DX12_DESCRIPTOR_RANGE1 descTblRanges[kNumDescTblRanges] = {};
 				// 定数[b0]（ビュープロジェクション用）
-				descTblRanges[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
+				descTblRanges[kCbvForSceneDataDescRangeNo].Init(
+					D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, numCBVs++);
 				// 定数[b1]（ワールド、ボーン用）
-				descTblRanges[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1);
+				descTblRanges[kCbvForModelDataDescRangeNo].Init(
+					D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, numCBVs++);
 				// 定数[b2]（マテリアル用）
 				// ディスクリプタヒープは複数あるが、一度に使うのは一つ。
-				descTblRanges[2].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 2);
+				descTblRanges[kCbvForMaterialDataDescRangeNo].Init(
+					D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, numCBVs++);
 				//テクスチャ[t0]（テクスチャ3つ（基本とsphとspa））
-				descTblRanges[3].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 3, 0);
+				descTblRanges[kSrvForMaterialDataDescRangeNo].Init(
+					D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 3, numSRVs++);
 
 
-				CD3DX12_ROOT_PARAMETER1 rootParameters[m_kNumRootParameters] = {};
+				constexpr unsigned int kNumRootParameters =
+					static_cast<unsigned int>(EnRootParameterType::enNumRootParamerterTypes);
+				constexpr unsigned int kSceneDataRootParamNo =
+					static_cast<unsigned int>(EnRootParameterType::enSceneData);
+				constexpr unsigned int kModelDataRootParamNo =
+					static_cast<unsigned int>(EnRootParameterType::enModelData);
+				constexpr unsigned int kMaterialDataRootParamNo =
+					static_cast<unsigned int>(EnRootParameterType::enMaterialData);
+
+				CD3DX12_ROOT_PARAMETER1 rootParameters[kNumRootParameters] = {};
 				// ビュープロジェクション変換
-				rootParameters[0].InitAsDescriptorTable(
-					1, &descTblRanges[0], D3D12_SHADER_VISIBILITY_VERTEX);
+				rootParameters[kSceneDataRootParamNo].InitAsDescriptorTable(
+					1, &descTblRanges[kCbvForSceneDataDescRangeNo], D3D12_SHADER_VISIBILITY_VERTEX);
 				// ワールド・ボーン変換
-				rootParameters[1].InitAsDescriptorTable(
-					1, &descTblRanges[1], D3D12_SHADER_VISIBILITY_VERTEX);
-					//1, &descTblRanges[1], D3D12_SHADER_VISIBILITY_ALL);
+				rootParameters[kModelDataRootParamNo].InitAsDescriptorTable(
+					1, &descTblRanges[kCbvForModelDataDescRangeNo], D3D12_SHADER_VISIBILITY_VERTEX);
 				// マテリアル周り
-				rootParameters[2].InitAsDescriptorTable(
-					2, &descTblRanges[2], D3D12_SHADER_VISIBILITY_PIXEL);
+				rootParameters[kMaterialDataRootParamNo].InitAsDescriptorTable(
+					2, &descTblRanges[kCbvForMaterialDataDescRangeNo], D3D12_SHADER_VISIBILITY_PIXEL);
 
+				constexpr unsigned int kNumSamplers =
+					static_cast<unsigned int>(EnSamplerType::enNumSamplerTypes);
+				constexpr unsigned int kNormalSamplerNo =
+					static_cast<unsigned int>(EnSamplerType::enNormal);
 
-				CD3DX12_STATIC_SAMPLER_DESC samplerDescs[m_kNumSamplers] = {};
-				samplerDescs[0].Init(
+				CD3DX12_STATIC_SAMPLER_DESC samplerDescs[kNumSamplers] = {};
+				samplerDescs[kNormalSamplerNo].Init(
 					0,
 					D3D12_FILTER_ANISOTROPIC,
 					D3D12_TEXTURE_ADDRESS_MODE_WRAP,
@@ -90,62 +103,40 @@ namespace nsYMEngine
 					D3D12_FLOAT32_MAX,
 					D3D12_SHADER_VISIBILITY_PIXEL
 				);
-				
 
-				CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDesc = {};
-				rootSignatureDesc.Init_1_1(
-					m_kNumRootParameters,
+				auto res = GetRootSignature()->Init(
+					kNumRootParameters,
 					rootParameters,
-					m_kNumSamplers,
+					kNumSamplers,
 					samplerDescs,
 					// 頂点情報（入力アセンブラ）がある。
 					D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
-					D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS | 
-					D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS | 
-					D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS
+					D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |
+					D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS |
+					D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS,
+					L"PMDModel"
 				);
 
-				ID3DBlob* rootSignatureBlob = nullptr;
-				ID3DBlob* errorBlob = nullptr;
-
-				auto result = D3DX12SerializeVersionedRootSignature(
-					&rootSignatureDesc,
-					D3D_ROOT_SIGNATURE_VERSION_1_1,
-					&rootSignatureBlob,
-					&errorBlob
-				);
-
-				if (FAILED(result))
-				{
-					nsGameWindow::MessageBoxWarning(L"ルートシグネチャのバイナリコードの生成に失敗しました。");
-				}
-
-				result = device->CreateRootSignature(
-					0,
-					rootSignatureBlob->GetBufferPointer(),
-					rootSignatureBlob->GetBufferSize(),
-					IID_PPV_ARGS(&m_rootSignature)
-				);
-
-				if (FAILED(result))
-				{
-					nsGameWindow::MessageBoxWarning(L"ルートシグネチャの生成に失敗しました。");
-				}
-
-				CheckShaderCompileResult(result, errorBlob);
-
-				// 不要になったため解放。
-				rootSignatureBlob->Release();
-
-				return;
+				return res;
 			}
 
-			void CPMDGenericRenderer::CreatePipelineState(ID3D12Device5* device)
+			bool CPMDGenericRenderer::CreatePipelineState(ID3D12Device5* device)
 			{
-				ID3DBlob* vsBlob = nullptr;
-				ID3DBlob* psBlob = nullptr;
+				nsDx12Wrappers::CBlob vsBlob;
+				nsDx12Wrappers::CBlob psBlob;
 
-				LoadShader(&vsBlob, &psBlob);
+				auto res = LoadShader(
+					m_kVsFilePath,
+					m_kVsEntryFuncName,
+					&vsBlob,
+					m_kPsFilePath,
+					m_kPsEntryFuncName,
+					&psBlob
+				);
+				if (res != true)
+				{
+					return false;
+				}
 
 				constexpr D3D12_INPUT_ELEMENT_DESC inputLayout[] =
 				{
@@ -206,9 +197,9 @@ namespace nsYMEngine
 				};
 
 				D3D12_GRAPHICS_PIPELINE_STATE_DESC pipelineDesc = {};
-				pipelineDesc.pRootSignature = m_rootSignature;
-				pipelineDesc.VS = CD3DX12_SHADER_BYTECODE(vsBlob);
-				pipelineDesc.PS = CD3DX12_SHADER_BYTECODE(psBlob);
+				pipelineDesc.pRootSignature = GetRootSignature()->Get();
+				pipelineDesc.VS = CD3DX12_SHADER_BYTECODE(vsBlob.Get());
+				pipelineDesc.PS = CD3DX12_SHADER_BYTECODE(psBlob.Get());
 				pipelineDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 
 				pipelineDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
@@ -236,94 +227,11 @@ namespace nsYMEngine
 				pipelineDesc.SampleDesc.Quality = 0;
 
 				pipelineDesc.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
+				res = GetPipelineState()->InitAsGraphicsPipelineState(pipelineDesc, L"PMDModel");
 
-				auto result = device->CreateGraphicsPipelineState(
-					&pipelineDesc,
-					IID_PPV_ARGS(&m_pipelineState)
-				);
-
-				if (FAILED(result))
-				{
-					nsGameWindow::MessageBoxWarning(L"グラフィックスパイプラインステートの生成に失敗しました。");
-				}
-
-
-				return;
+				return res;
 			}
 
-			bool CPMDGenericRenderer::LoadShader(ID3DBlob** pVsBlob, ID3DBlob** pPsBlob)
-			{
-				ID3DBlob* errorBlob = nullptr;
-
-				auto result = D3DCompileFromFile(
-					L"Assets/Shaders/BasicVertexShader.hlsl",
-					nullptr,
-					D3D_COMPILE_STANDARD_FILE_INCLUDE,	// インクルード可能にしておく
-					"BasicVS",
-					"vs_5_0",
-					// @todo シェーダーのフラグがデバッグ用および最適化なしになってるからあとで直す。
-					D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION,	// デバック用および最適化なし
-					0,
-					pVsBlob,
-					&errorBlob
-				);
-				if (CheckShaderCompileResult(result, errorBlob) != true)
-				{
-					return false;
-				}
-				result = D3DCompileFromFile(
-					L"Assets/Shaders/BasicPixelShader.hlsl",
-					nullptr,
-					D3D_COMPILE_STANDARD_FILE_INCLUDE,	// インクルード可能にしておく
-					"BasicPS",
-					"ps_5_0",
-					D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION,	// デバック用および最適化なし
-					0,
-					pPsBlob,
-					&errorBlob
-				);
-				if (CheckShaderCompileResult(result, errorBlob) != true)
-				{
-					return false;
-				}
-
-				return true;
-			}
-
-
-
-			bool CPMDGenericRenderer::CheckShaderCompileResult(HRESULT result, ID3DBlob* error)  noexcept
-			{
-				if (FAILED(result)) 
-				{
-					if (result == HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND)) 
-					{
-						::OutputDebugStringA("ファイルが見当たりません");
-					}
-					else 
-					{
-						std::string errstr;
-						errstr.resize(error->GetBufferSize());
-						std::copy_n((char*)error->GetBufferPointer(), error->GetBufferSize(), errstr.begin());
-						errstr += "\n";
-						::OutputDebugStringA(errstr.c_str());
-					}
-
-					if (error)
-					{
-						error->Release();
-					}
-					return false;
-				}
-				else 
-				{
-					if (error)
-					{
-						error->Release();
-					}
-					return true;
-				}
-			}
 
 
 

@@ -1,5 +1,4 @@
 #pragma once
-#include "DescriptorHeap.h"
 
 namespace nsYMEngine
 {
@@ -10,6 +9,9 @@ namespace nsYMEngine
 
 			class CConstantBuffer : private nsUtils::SNoncopyable
 			{
+			private:
+				static const wchar_t* const m_kNamePrefix;
+
 			public:
 				constexpr CConstantBuffer() = default;
 				~CConstantBuffer();
@@ -19,12 +21,14 @@ namespace nsYMEngine
 				 * CreateConstantBufferView()関数で、定数バッファビューを作成してください。
 				 * 値を変更する必要がないなら、Unmap()関数で、アンマップしてください。
 				 * @param size データのサイズ
+				 * @param objectName デバック用のオブジェクトネーム
 				 * @param numCBVs 定数バッファビューの数
 				 * @param srcData データ
 				 * @return 定数バッファを作成できたか？
 				*/
 				bool Init(
 					unsigned int size,
+					const wchar_t* objectName = nullptr,
 					unsigned int numCBVs = 1,
 					const void* srcData = nullptr
 				);
@@ -32,6 +36,11 @@ namespace nsYMEngine
 
 				void CreateConstantBufferView(D3D12_CPU_DESCRIPTOR_HANDLE cpuDescHeapHandle);
 
+				/**
+				 * @brief マップされたデータにコピーする。
+				 * マップ、アンマップはこの関数内では行われません。
+				 * @param data コピー元のデータ
+				*/
 				void CopyToMappedConstantBuffer(const void* data);
 
 				constexpr auto GetMappedConstantBuffer() noexcept
@@ -50,6 +59,8 @@ namespace nsYMEngine
 					m_constantBuffer->Unmap(0, nullptr);
 					return;
 				}
+
+				void SetName(const wchar_t* objectName);
 
 			private:
 				void Terminate();

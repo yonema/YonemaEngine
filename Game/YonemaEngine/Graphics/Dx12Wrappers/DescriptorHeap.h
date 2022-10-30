@@ -7,39 +7,46 @@ namespace nsYMEngine
 		{
 			class CDescriptorHeap : private nsUtils::SNoncopyable
 			{
+			private:
+				static const wchar_t* const m_kNamePrefix;
+
 			public:
 				constexpr CDescriptorHeap() = default;
 				~CDescriptorHeap();
 
 				bool Init(
-					D3D12_DESCRIPTOR_HEAP_TYPE type, 
-					UINT numDescHeaps, 
-					D3D12_DESCRIPTOR_HEAP_FLAGS flags
+					D3D12_DESCRIPTOR_HEAP_TYPE type,
+					UINT numDescriptors,
+					D3D12_DESCRIPTOR_HEAP_FLAGS flags,
+					const wchar_t* objectName = nullptr
 				);
 
 				bool InitAsCbvSrvUav(
-					UINT numDescHeaps,
+					UINT numDescriptors,
+					const wchar_t* objectName = nullptr,
 					D3D12_DESCRIPTOR_HEAP_FLAGS flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE
 				);
-				bool InitAsRTV(UINT numDescHeaps = 1);
-				bool InitAsDSV();
+				bool InitAsRTV(UINT numDescriptors = 1, const wchar_t* objectName = nullptr);
+				bool InitAsDSV(const wchar_t* objectName = nullptr);
 
 				void Release();
 
-				inline auto GetCPUHandle()
+				inline auto GetCPUHandle() const
 				{
 					return m_descriptorHeap->GetCPUDescriptorHandleForHeapStart();
 				}
 
-				inline auto GetGPUHandle()
+				inline auto GetGPUHandle() const
 				{
 					return m_descriptorHeap->GetGPUDescriptorHandleForHeapStart();
 				}
 
-				constexpr auto Get() noexcept
+				constexpr auto Get() const noexcept
 				{
 					return m_descriptorHeap;
 				}
+
+				void SetName(const wchar_t* objectName);
 				
 
 			private:

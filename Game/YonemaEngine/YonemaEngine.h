@@ -6,6 +6,10 @@ namespace nsYMEngine
 	namespace nsGraphics
 	{
 		class CGraphicsEngine; 
+		namespace ns2D
+		{
+			class CSprite;
+		}
 		namespace nsPMDModels
 		{
 			class CPMDRenderer;
@@ -65,6 +69,7 @@ namespace nsYMEngine
 		nsGraphics::nsPMDModels::CPMDRenderer* m_mikuPmdR = nullptr;
 		nsGraphics::nsPMDModels::CPMDRenderer* m_mikuMetalPmdR = nullptr;
 		nsGraphics::nsPMDModels::CPMDRenderer* m_rukaPmdR = nullptr;
+		nsGraphics::ns2D::CSprite* sprite = nullptr;
 	};
 }
 

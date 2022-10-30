@@ -10,7 +10,9 @@ namespace nsYMEngine
 		{
 
 			const DXGI_FORMAT CFrameBuffer::m_kDepthFormat = DXGI_FORMAT_D32_FLOAT;
-			const float CFrameBuffer::m_kRTVClearColor[4] = { 0.5f,0.5f,0.5f,1.0f };
+			const nsMath::CVector4 CFrameBuffer::m_kRTVClearColor = nsMath::CVector4::Gray();
+			const float CFrameBuffer::m_kDsvClearValue = 1.0f;
+
 
 
 			CFrameBuffer::~CFrameBuffer()
@@ -153,11 +155,13 @@ namespace nsYMEngine
 
 			bool CFrameBuffer::CreateDescriptorHeap()
 			{
-				if (m_rtvDescriptorHeap.InitAsRTV(m_kFrameBufferCount) != true)
+				if (m_rtvDescriptorHeap.InitAsRTV(m_kFrameBufferCount, L"FrameBuffer::RenderTargetView")
+					!= true)
 				{
 					return false;
 				}
-				if (m_dsvDescriptorHeap.InitAsDSV() != true)
+				if (m_dsvDescriptorHeap.InitAsDSV(L"FrameBuffer::DepthStencilBuffer")
+					!= true)
 				{
 					return false;
 				}
@@ -194,7 +198,8 @@ namespace nsYMEngine
 					}
 
 					device->CreateRenderTargetView(m_renderTargets[i], &rtvDesc, descHeapHandle);
-					m_renderTargets[i]->SetName(L"FrameBuffer::RenderTargetView");
+					//m_renderTargets[i]->SetName(L"FrameBuffer::RenderTargetView");
+					m_renderTargets[i]->SetName(L"RenderTarget : FrameBuffer::RenderTargetView");
 
 					descHeapHandle.ptr += descSizeOfRtv;
 
@@ -219,7 +224,7 @@ namespace nsYMEngine
 
 				auto depthClearValue = CD3DX12_CLEAR_VALUE(
 					m_kDepthFormat,
-					1.0f,
+					m_kDsvClearValue,
 					0
 				);
 
@@ -266,8 +271,8 @@ namespace nsYMEngine
 			void CFrameBuffer::SwapBackBuffer()
 			{
 				m_backBufferIndex =  m_swapChain->GetCurrentBackBufferIndex();
-				m_rtvCpuDescriptorHandle = m_rtvDescriptorHeap.GetCPUHandle();
-				m_rtvCpuDescriptorHandle.ptr += m_backBufferIndex * 
+				m_currentRtvCpuDescriptorHandle = m_rtvDescriptorHeap.GetCPUHandle();
+				m_currentRtvCpuDescriptorHandle.ptr += m_backBufferIndex *
 					CGraphicsEngine::GetInstance()->GetDescriptorSizeOfRtv();
 
 				return;
@@ -309,7 +314,7 @@ namespace nsYMEngine
 			void CFrameBuffer::ClearRenderTargetView(ID3D12GraphicsCommandList* commandList)
 			{
 				commandList->ClearRenderTargetView(
-					m_rtvCpuDescriptorHandle, m_kRTVClearColor, 0, nullptr);
+					m_currentRtvCpuDescriptorHandle, m_kRTVClearColor.m_fVec, 0, nullptr);
 
 				return;
 			}
@@ -317,7 +322,7 @@ namespace nsYMEngine
 			void CFrameBuffer::ClearDepthStencilView(ID3D12GraphicsCommandList* commandList)
 			{
 				commandList->ClearDepthStencilView(
-					m_dsvCpuDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+					m_dsvCpuDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH, m_kDsvClearValue, 0, 0, nullptr);
 
 				return;
 			}
@@ -338,7 +343,12 @@ namespace nsYMEngine
 
 			void CFrameBuffer::Present()
 			{
+				// ‚’¼“¯Šú‚ ‚è
 				m_swapChain->Present(1, 0);
+
+				// ‚’¼“¯Šú‚È‚µ
+				//m_swapChain->Present(0, 0);
+
 				return;
 			}
 

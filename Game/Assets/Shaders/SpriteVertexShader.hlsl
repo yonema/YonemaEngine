@@ -1,4 +1,4 @@
-#include "PeraPolygonHeader.hlsli"
+#include "SpriteHeader.hlsli"
 
 SPSIn VSMain(SVSIn vsInput)
 {

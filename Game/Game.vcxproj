@@ -124,7 +124,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../ExLibrary/DirectXTex-main\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../ExLibrary/DirectXTex-main\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug;../ExLibrary\DirectXTex-main\DirectXTex\Bin\Desktop_2019\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -145,11 +145,23 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../ExLibrary/DirectXTex-main\DirectXTex\Bin\Desktop_2019_Win10\x64\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../ExLibrary/DirectXTex-main\DirectXTex\Bin\Desktop_2019_Win10\x64\Release;../ExLibrary\DirectXTex-main\DirectXTex\Bin\Desktop_2019\x64\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="YonemaEngine\Graphics\2D\TransSpriteGenericRenderer.cpp" />
+    <ClCompile Include="YonemaEngine\Graphics\2D\SpriteGenericRenderer.cpp" />
+    <ClCompile Include="YonemaEngine\Graphics\SimplePostEffectGenericRenderer.cpp" />
+    <ClCompile Include="YonemaEngine\Graphics\GenericRenderer.cpp" />
+    <ClCompile Include="YonemaEngine\Graphics\2D\Sprite.cpp" />
+    <ClCompile Include="YonemaEngine\Graphics\Dx12Wrappers\CommandList.cpp" />
+    <ClCompile Include="YonemaEngine\Graphics\Dx12Wrappers\Shader.cpp" />
+    <ClCompile Include="YonemaEngine\Graphics\Dx12Wrappers\PipelineState.cpp" />
+    <ClCompile Include="YonemaEngine\Graphics\Dx12Wrappers\Blob.cpp" />
+    <ClCompile Include="YonemaEngine\Graphics\Dx12Wrappers\RootSignature.cpp" />
+    <ClCompile Include="YonemaEngine\Graphics\Dx12Wrappers\IndexBuffer.cpp" />
+    <ClCompile Include="YonemaEngine\Graphics\Dx12Wrappers\VertexBuffer.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\Dx12Wrappers\FrameBuffer.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\Dx12Wrappers\DescriptorHeap.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\Dx12Wrappers\ConstantBuffer.cpp" />
@@ -180,6 +192,19 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
+    <ClInclude Include="YonemaEngine\Graphics\2D\TransSpriteGenericRenderer.h" />
+    <ClInclude Include="YonemaEngine\Graphics\2D\SpriteGenericRenderer.h" />
+    <ClInclude Include="YonemaEngine\Graphics\SimplePostEffectGenericRenderer.h" />
+    <ClInclude Include="YonemaEngine\Graphics\GenericRenderer.h" />
+    <ClInclude Include="YonemaEngine\Graphics\2D\Sprite.h" />
+    <ClInclude Include="YonemaEngine\Graphics\Dx12Wrappers\CommandList.h" />
+    <ClInclude Include="YonemaEngine\Graphics\Dx12Wrappers\CommandList_Inline.h" />
+    <ClInclude Include="YonemaEngine\Graphics\Dx12Wrappers\Shader.h" />
+    <ClInclude Include="YonemaEngine\Graphics\Dx12Wrappers\PipelineState.h" />
+    <ClInclude Include="YonemaEngine\Graphics\Dx12Wrappers\Blob.h" />
+    <ClInclude Include="YonemaEngine\Graphics\Dx12Wrappers\RootSignature.h" />
+    <ClInclude Include="YonemaEngine\Graphics\Dx12Wrappers\IndexBuffer.h" />
+    <ClInclude Include="YonemaEngine\Graphics\Dx12Wrappers\VertexBuffer.h" />
     <ClInclude Include="YonemaEngine\Graphics\Dx12Wrappers\Dx12Wrappers_Include.h" />
     <ClInclude Include="YonemaEngine\Graphics\Dx12Wrappers\FrameBuffer.h" />
     <ClInclude Include="YonemaEngine\Graphics\Dx12Wrappers\DescriptorHeap.h" />
@@ -206,6 +231,48 @@
     <ClInclude Include="YonemaEngine\Memory\ResourceBank.h" />
     <ClInclude Include="YonemaEngine\YonemaEngine.h" />
     <ClInclude Include="YonemaEngine\PreCompileHeader\YonemaEnginePreCompile.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Assets\Shaders\BasicHeader.hlsli">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </None>
+    <None Include="Assets\Shaders\PeraPolygonHeader.hlsli">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </None>
+    <None Include="Assets\Shaders\SimplePostEffectHeader.hlsli">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </None>
+    <None Include="Assets\Shaders\SpriteHeader.hlsli">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Assets\Shaders\BasicPixelShader.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Assets\Shaders\BasicVertexShader.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Assets\Shaders\PeraPolygonPixelShader.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Assets\Shaders\PeraPolygonVertexShader.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Assets\Shaders\SpritePixelShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Assets\Shaders\SpriteVertexShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

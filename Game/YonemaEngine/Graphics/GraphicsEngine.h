@@ -1,5 +1,6 @@
 #pragma once
 #include "Camera.h"
+#include "2D/Sprite.h"
 
 namespace nsYMEngine
 {
@@ -13,6 +14,12 @@ namespace nsYMEngine
 		{
 			class CPMDGenericRenderer;
 		}
+		namespace ns2D
+		{
+			class CSpriteGenericRenderer;
+			class CTransSpriteGenericRenderer;
+		}
+		class CSimplePostEffectGenericRenderer;
 	}
 }
 
@@ -85,6 +92,12 @@ namespace nsYMEngine
 			*/
 			void BeginDraw();
 
+			void DrawToMainRenderTarget();
+
+			void DrawWithSimplePostEffect();
+
+			void Draw2D();
+
 			void EndDraw();
 
 			constexpr auto GetDevice() noexcept
@@ -99,7 +112,7 @@ namespace nsYMEngine
 
 			constexpr auto GetCommandList() noexcept
 			{
-				return m_commandList;
+				return &m_commandList;
 			}
 
 			constexpr auto GetCommandQueue() noexcept
@@ -130,6 +143,11 @@ namespace nsYMEngine
 			constexpr nsMath::CMatrix GetMatrixViewProj() const noexcept
 			{
 				return m_mainCamera.GetViewProjectionMatirx();
+			}
+
+			constexpr CCamera* GetMainCamera() noexcept
+			{
+				return &m_mainCamera;
 			}
 
 			constexpr auto GetDescriptorSizeOfCbvSrvUav() const noexcept
@@ -164,58 +182,37 @@ namespace nsYMEngine
 
 			bool CreatePeraRenderTarget();
 
-			bool CreateRTVDescriptorHeapForPeraRenderTarget();
-
-			bool CreateRTVForPeraRenderTarget();
-
-			bool CreateSRVDescriptorHeapForPeraRenderTarget();
-
-			bool CreateSRVForPeraRenderTarget();
-
-			bool CreateVertexBufferForPeraRenderTarget();
-
-			bool CreateRootSignatureForPeraRenderTaraget();
-
-			bool CreatePipelineStateForPeraRenderTarget();
-
 			bool CreateSeceneConstantBuff();
+
+			void WaitForCommandExecutionToComplete();
 
 		private:
 			static CGraphicsEngine* m_instance;
+
 			ID3D12Device5* m_device = nullptr;
 			ID3D12CommandAllocator* m_commandAllocator = nullptr;
-			ID3D12GraphicsCommandList* m_commandList = nullptr;
+			nsDx12Wrappers::CCommandList m_commandList;
 			ID3D12CommandQueue* m_commandQueue = nullptr;
-			//IDXGISwapChain4* m_swapChain = nullptr;
-			//ID3D12DescriptorHeap* m_rtvDescHeapForFrameBuff = nullptr;
-			//ID3D12Resource* m_frameBuffers[m_kFrameBufferCount] = { nullptr };
-			//ID3D12DescriptorHeap* m_dsvDescHeapForFrameBuff = nullptr;
-			//ID3D12Resource* m_depthStencilBuffer = nullptr;
+
 			ID3D12Fence* m_fence = nullptr;
 			short int m_fenceVal = 0;
-			//D3D12_VIEWPORT m_viewport;
-			//D3D12_RECT m_scissorRect;
 
-			unsigned int m_descriptorSizeOfCbvSrvUav = 0;
-			unsigned int m_descriptorSizeOfRtv = 0;
 			nsDx12Wrappers::CFrameBuffer m_frameBuffer;
-			nsDx12Wrappers::CTexture* m_whiteTexture;
-			nsDx12Wrappers::CTexture* m_blackTexture;
+			nsDx12Wrappers::CRenderTarget m_mainRenderTarget;
+			ns2D::CSprite m_mainRenderTargetSprite;
+			nsDx12Wrappers::CRenderTarget m_simplePostEffectRenderTarget;
+			ns2D::CSprite m_simplePostEffectRenderTargetSprite;
 			nsDx12Wrappers::CConstantBuffer m_sceneDataCB;
 			nsDx12Wrappers::CDescriptorHeap m_sceneDataDH;
-
-
-
-			CCamera m_mainCamera;
 			nsPMDModels::CPMDGenericRenderer* m_pmdGenericRenderer = nullptr;
-
-			ID3D12Resource* m_peraRenderTarget = nullptr;
-			ID3D12DescriptorHeap* m_rtvDescHeapForPeraRT = nullptr;
-			ID3D12DescriptorHeap* m_srvDescHeapForPeraRT = nullptr;
-			ID3D12Resource* m_vertexBuffForPeraRT = nullptr;
-			D3D12_VERTEX_BUFFER_VIEW m_vertexBuffViewForPeraRT = {};
-			ID3D12RootSignature* m_rootSignatureForPeraRT = nullptr;
-			ID3D12PipelineState* m_pipelineStateForPeraRT = nullptr;
+			CSimplePostEffectGenericRenderer* m_simplePostEffectGenericRenderer = nullptr;
+			ns2D::CSpriteGenericRenderer* m_spriteGenericRenderer = nullptr;
+			ns2D::CTransSpriteGenericRenderer* m_transSpriteGenericRenderer = nullptr;
+			CCamera m_mainCamera;
+			nsDx12Wrappers::CTexture* m_whiteTexture;
+			nsDx12Wrappers::CTexture* m_blackTexture;
+			unsigned int m_descriptorSizeOfCbvSrvUav = 0;
+			unsigned int m_descriptorSizeOfRtv = 0;
 
 		};
 	}
