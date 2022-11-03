@@ -18,6 +18,12 @@ namespace nsYMEngine
 		*/
 		const char* GetExtension(const char* filePath) noexcept;
 
+		/**
+		 * @brief ファイルパスからファイル名を取得する。
+		 * @param filePath ファイルパス
+		 * @return ファイル名
+		*/
+		std::string GetFileNameFromFilePath(const std::string& filePath) noexcept;
 
 		/**
 		 * @brief charからwstrinに変換する

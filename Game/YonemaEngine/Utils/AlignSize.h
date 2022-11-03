@@ -11,7 +11,7 @@ namespace nsYMEngine
 		*/
 		constexpr size_t AlignSize(size_t size, size_t alignment) noexcept
 		{
-			return size + alignment - size % alignment;
+			return (size % alignment == 0)? size : size + alignment - size % alignment;
 		}
 	}
 }

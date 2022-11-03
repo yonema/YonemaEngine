@@ -117,6 +117,12 @@
     <ClCompile Include="YonemaEngine\Graphics\2D\TransSpriteGenericRenderer.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="YonemaEngine\Graphics\FBXModels\FBXRenderer.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YonemaEngine\Graphics\FBXModels\FBXGenericRenderer.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Images\StarMan.png">
@@ -244,12 +250,19 @@
     <ClInclude Include="YonemaEngine\Graphics\2D\TransSpriteGenericRenderer.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="YonemaEngine\Graphics\FBXModels\FBXRenderer.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YonemaEngine\Graphics\FBXModels\FBXGenericRenderer.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\SpriteHeader.hlsli" />
     <None Include="Assets\Shaders\SimplePostEffectHeader.hlsli" />
     <None Include="Assets\Shaders\BasicHeader.hlsli" />
     <None Include="Assets\Shaders\PeraPolygonHeader.hlsli" />
+    <None Include="Assets\Shaders\FbxTestHeader.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Assets\Shaders\SpriteVertexShader.hlsl" />
@@ -258,5 +271,7 @@
     <FxCompile Include="Assets\Shaders\BasicVertexShader.hlsl" />
     <FxCompile Include="Assets\Shaders\PeraPolygonPixelShader.hlsl" />
     <FxCompile Include="Assets\Shaders\PeraPolygonVertexShader.hlsl" />
+    <FxCompile Include="Assets\Shaders\FbxTestPixelShader.hlsl" />
+    <FxCompile Include="Assets\Shaders\FbxTestVertexShader.hlsl" />
   </ItemGroup>
 </Project>

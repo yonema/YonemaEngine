@@ -4,9 +4,11 @@
 #include "../../Application.h"
 #include "Dx12Wrappers/Texture.h"
 #include "PMDModels/PMDGenericRenderer.h"
+#include "FBXModels/FBXGenericRenderer.h"
 #include "SimplePostEffectGenericRenderer.h"
 #include "2D/SpriteGenericRenderer.h"
 #include "2D/TransSpriteGenericRenderer.h"
+
 
 namespace nsYMEngine
 {
@@ -134,6 +136,8 @@ namespace nsYMEngine
 
 			m_pmdGenericRenderer = new nsPMDModels::CPMDGenericRenderer();
 			m_pmdGenericRenderer->Init();
+			m_fbxGenericRenderer = new nsFBXModels::CFBXGenericRenderer();
+			m_fbxGenericRenderer->Init();
 			m_simplePostEffectGenericRenderer = new CSimplePostEffectGenericRenderer();
 			m_simplePostEffectGenericRenderer->Init();
 			m_spriteGenericRenderer = new ns2D::CSpriteGenericRenderer();
@@ -148,7 +152,6 @@ namespace nsYMEngine
 		{
 			// 破棄する前に、コマンドの実行の完了を待つ。
 			WaitForCommandExecutionToComplete();
-
 			if (m_transSpriteGenericRenderer)
 			{
 				delete m_transSpriteGenericRenderer;
@@ -160,6 +163,10 @@ namespace nsYMEngine
 			if (m_simplePostEffectGenericRenderer)
 			{
 				delete m_simplePostEffectGenericRenderer;
+			}
+			if (m_fbxGenericRenderer)
+			{
+				delete m_fbxGenericRenderer;
 			}
 			if (m_pmdGenericRenderer)
 			{
@@ -262,6 +269,17 @@ namespace nsYMEngine
 
 			return;
 		}
+
+		void CGraphicsEngine::DrawFBXTest()
+		{
+
+			m_commandList.SetGraphicsRootSignatureAndPipelineState(
+				m_fbxGenericRenderer->GetRootSignature(), m_fbxGenericRenderer->GetPipelineState()
+			);
+
+			return;
+		}
+
 
 		void CGraphicsEngine::DrawWithSimplePostEffect()
 		{

@@ -116,7 +116,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../ExLibrary/DirectXTex-main\DirectXTex;YonemaEngine/PreCompileHeader;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../ExLibrary/DirectXTex-main\DirectXTex;YonemaEngine/PreCompileHeader;..\ExLibrary\Autodesk\FBX\FBX SDK\2020.3.2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>YonemaEnginePreCompile.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>YonemaEnginePreCompile.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
@@ -124,7 +124,8 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../ExLibrary/DirectXTex-main\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug;../ExLibrary\DirectXTex-main\DirectXTex\Bin\Desktop_2019\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../ExLibrary/DirectXTex-main\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug;../ExLibrary\DirectXTex-main\DirectXTex\Bin\Desktop_2019\x64\Debug;..\ExLibrary\Autodesk\FBX\FBX SDK\2020.3.2\lib\vs2019\x64\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libfbxsdk-md.lib;libxml2-md.lib;zlib-md.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -135,7 +136,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../ExLibrary/DirectXTex-main\DirectXTex;YonemaEngine/PreCompileHeader;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../ExLibrary/DirectXTex-main\DirectXTex;YonemaEngine/PreCompileHeader;..\ExLibrary\Autodesk\FBX\FBX SDK\2020.3.2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>YonemaEnginePreCompile.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>YonemaEnginePreCompile.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
@@ -145,11 +146,14 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../ExLibrary/DirectXTex-main\DirectXTex\Bin\Desktop_2019_Win10\x64\Release;../ExLibrary\DirectXTex-main\DirectXTex\Bin\Desktop_2019\x64\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../ExLibrary/DirectXTex-main\DirectXTex\Bin\Desktop_2019_Win10\x64\Release;../ExLibrary\DirectXTex-main\DirectXTex\Bin\Desktop_2019\x64\Release;..\ExLibrary\Autodesk\FBX\FBX SDK\2020.3.2\lib\vs2019\x64\release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libfbxsdk-md.lib;libxml2-md.lib;zlib-md.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="YonemaEngine\Graphics\FBXModels\FBXGenericRenderer.cpp" />
+    <ClCompile Include="YonemaEngine\Graphics\FBXModels\FBXRenderer.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\2D\TransSpriteGenericRenderer.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\2D\SpriteGenericRenderer.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\SimplePostEffectGenericRenderer.cpp" />
@@ -192,6 +196,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
+    <ClInclude Include="YonemaEngine\Graphics\FBXModels\FBXGenericRenderer.h" />
+    <ClInclude Include="YonemaEngine\Graphics\FBXModels\FBXRenderer.h" />
     <ClInclude Include="YonemaEngine\Graphics\2D\TransSpriteGenericRenderer.h" />
     <ClInclude Include="YonemaEngine\Graphics\2D\SpriteGenericRenderer.h" />
     <ClInclude Include="YonemaEngine\Graphics\SimplePostEffectGenericRenderer.h" />
@@ -236,6 +242,10 @@
     <None Include="Assets\Shaders\BasicHeader.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </None>
+    <None Include="Assets\Shaders\FbxTestHeader.hlsli">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
     <None Include="Assets\Shaders\PeraPolygonHeader.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </None>
@@ -252,6 +262,22 @@
     </FxCompile>
     <FxCompile Include="Assets\Shaders\BasicVertexShader.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Assets\Shaders\FbxTestPixelShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Assets\Shaders\FbxTestVertexShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="Assets\Shaders\PeraPolygonPixelShader.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

@@ -41,7 +41,7 @@ namespace nsYMEngine
 				 * マップ、アンマップはこの関数内では行われません。
 				 * @param data コピー元のデータ
 				*/
-				void CopyToMappedConstantBuffer(const void* data);
+				void CopyToMappedConstantBuffer(const void* data, size_t dataSize);
 
 				constexpr auto GetMappedConstantBuffer() noexcept
 				{

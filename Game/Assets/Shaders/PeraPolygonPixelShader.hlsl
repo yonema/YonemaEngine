@@ -5,7 +5,7 @@
 float4 PSMain(SPSIn psInput) : SV_TARGET
 {
 	float4 col = g_texture.Sample(g_sampler, psInput.uv);
-
+	//return col;
 	float Y = Grayscaling(col.rgb);
 	//return float4(Y, Y, Y,1.0f);
 
@@ -24,7 +24,8 @@ float4 PSMain(SPSIn psInput) : SV_TARGET
 	//return float4(Y, Y, Y,1.0f);
 
 	float4 sharpCol = Sharpness(psInput.uv);
-	return sharpCol;
+	//return sharpCol;
+	return col;
 
 
 }

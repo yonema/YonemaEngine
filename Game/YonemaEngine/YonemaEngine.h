@@ -14,6 +14,10 @@ namespace nsYMEngine
 		{
 			class CPMDRenderer;
 		}
+		namespace nsFBXModels
+		{
+			class CFBXRenderer;
+		}
 	}
 }
 
@@ -70,6 +74,7 @@ namespace nsYMEngine
 		nsGraphics::nsPMDModels::CPMDRenderer* m_mikuMetalPmdR = nullptr;
 		nsGraphics::nsPMDModels::CPMDRenderer* m_rukaPmdR = nullptr;
 		nsGraphics::ns2D::CSprite* sprite = nullptr;
+		nsGraphics::nsFBXModels::CFBXRenderer* m_boxFbxR = nullptr;
 	};
 }
 

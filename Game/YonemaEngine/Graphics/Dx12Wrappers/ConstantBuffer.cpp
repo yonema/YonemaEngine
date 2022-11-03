@@ -48,6 +48,7 @@ namespace nsYMEngine
 				auto device = CGraphicsEngine::GetInstance()->GetDevice();
 
 				D3D12_HEAP_PROPERTIES heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+				auto tmpSize = size;
 				// 無駄な領域は生じるが、バッファサイズを256アライメントにする
 				size = (size + 0xff) & ~0xff;
 				m_numCBVs = numCBVs;
@@ -80,7 +81,7 @@ namespace nsYMEngine
 
 				if (srcData)
 				{
-					CopyToMappedConstantBuffer(srcData);
+					CopyToMappedConstantBuffer(srcData, tmpSize);
 				}
 
 				if (objectName)
@@ -109,11 +110,11 @@ namespace nsYMEngine
 			}
 
 
-			void CConstantBuffer::CopyToMappedConstantBuffer(const void* data)
+			void CConstantBuffer::CopyToMappedConstantBuffer(const void* data, size_t dataSize)
 			{
-				unsigned int bufferSize = static_cast<unsigned int>(m_constantBuffer->GetDesc().Width);
+				//unsigned int bufferSize = static_cast<unsigned int>(m_constantBuffer->GetDesc().Width);
 
-				memcpy(m_mappedConstantBuffer, data, bufferSize);
+				memcpy(m_mappedConstantBuffer, data, dataSize);
 
 				return;
 			}

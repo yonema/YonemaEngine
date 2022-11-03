@@ -14,6 +14,10 @@ namespace nsYMEngine
 		{
 			class CPMDGenericRenderer;
 		}
+		namespace nsFBXModels
+		{
+			class CFBXGenericRenderer;
+		}
 		namespace ns2D
 		{
 			class CSpriteGenericRenderer;
@@ -93,6 +97,8 @@ namespace nsYMEngine
 			void BeginDraw();
 
 			void DrawToMainRenderTarget();
+
+			void DrawFBXTest();
 
 			void DrawWithSimplePostEffect();
 
@@ -205,6 +211,7 @@ namespace nsYMEngine
 			nsDx12Wrappers::CConstantBuffer m_sceneDataCB;
 			nsDx12Wrappers::CDescriptorHeap m_sceneDataDH;
 			nsPMDModels::CPMDGenericRenderer* m_pmdGenericRenderer = nullptr;
+			nsFBXModels::CFBXGenericRenderer* m_fbxGenericRenderer = nullptr;
 			CSimplePostEffectGenericRenderer* m_simplePostEffectGenericRenderer = nullptr;
 			ns2D::CSpriteGenericRenderer* m_spriteGenericRenderer = nullptr;
 			ns2D::CTransSpriteGenericRenderer* m_transSpriteGenericRenderer = nullptr;
@@ -213,6 +220,9 @@ namespace nsYMEngine
 			nsDx12Wrappers::CTexture* m_blackTexture;
 			unsigned int m_descriptorSizeOfCbvSrvUav = 0;
 			unsigned int m_descriptorSizeOfRtv = 0;
+
+
+
 
 		};
 	}

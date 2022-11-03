@@ -199,7 +199,7 @@ namespace nsYMEngine
 				m_constantBufferCPU.screenParam.z = viewport.Width;
 				m_constantBufferCPU.screenParam.w = viewport.Height;
 
-				m_constantBuffer.CopyToMappedConstantBuffer(&m_constantBufferCPU);
+				m_constantBuffer.CopyToMappedConstantBuffer(&m_constantBufferCPU, sizeof(m_constantBufferCPU));
 
 				commandList->SetVertexBuffer(m_vertexBuffer);
 				commandList->SetDescriptorHeap(m_cbvDescriptorHeap);

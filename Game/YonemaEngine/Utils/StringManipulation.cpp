@@ -25,6 +25,20 @@ namespace nsYMEngine
 			return cp;
 		}
 
+
+		std::string GetFileNameFromFilePath(const std::string& filePath) noexcept
+		{
+			int idx1 = static_cast<int>(filePath.rfind('/'));
+			int idx2 = static_cast<int>(filePath.rfind('\\'));
+
+			// '/'か'\\'のどちらか有効なほうを採用する。
+			auto idx = max(idx1, idx2);
+
+			// そのままだと'/'が入ってしまうから、一個進める。
+			idx++;
+			return filePath.substr(idx, filePath.length() - idx);
+		}
+
 		std::wstring GetWideStringFromString(const char* str) noexcept
 		{
 			// 呼び出し1回目

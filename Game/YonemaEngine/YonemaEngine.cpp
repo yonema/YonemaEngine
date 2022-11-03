@@ -1,6 +1,7 @@
 #include "YonemaEngine.h"
 #include "Graphics/GraphicsEngine.h"
 #include "Graphics/PMDModels/PMDRenderer.h"
+#include "Graphics/FBXModels/FBXRenderer.h"
 #include "Graphics/2D/Sprite.h"
 
 namespace nsYMEngine
@@ -22,6 +23,8 @@ namespace nsYMEngine
 		{
 			return false;
 		}
+
+
 
 		m_mikuPmdR = new nsGraphics::nsPMDModels::CPMDRenderer(
 			"Assets/Models/Samples/‰‰¹ƒ~ƒN.pmd",
@@ -46,12 +49,18 @@ namespace nsYMEngine
 		initData.alphaBlendMode = nsGraphics::ns2D::EnAlphaBlendMode::enTrans;
 		sprite->Init(initData);
 
+		m_boxFbxR = new nsGraphics::nsFBXModels::CFBXRenderer("Assets/Models/unitychan.fbx");
+
 
 		return true;
 	}
 
 	void CYonemaEngine::Terminate()
 	{
+		if (m_boxFbxR)
+		{
+			delete m_boxFbxR;
+		}
 		if (sprite)
 		{
 			sprite->Release();
@@ -70,6 +79,7 @@ namespace nsYMEngine
 		{
 			delete m_mikuPmdR;
 		}
+
 
 		nsGraphics::CGraphicsEngine::DeleteInstance();
 
@@ -107,6 +117,11 @@ namespace nsYMEngine
 			m_mikuMetalPmdR->Update();
 		}
 		m_rukaPmdR->Update();
+		static nsMath::CVector3 modelPos;
+		static nsMath::CQuaternion modelQRot;
+		modelQRot.AddRotationYDeg(1.0f);
+		static nsMath::CVector3 modelScale = nsMath::CVector3::One();
+		m_boxFbxR->UpdateWorldMatrix(modelPos, modelQRot, modelScale);
 
 		static nsMath::CVector3 pos = nsMath::CVector3::Zero();
 		static nsMath::CQuaternion rot = nsMath::CQuaternion::Identity();
@@ -172,6 +187,10 @@ namespace nsYMEngine
 			m_mikuMetalPmdR->Draw();
 		}
 		m_rukaPmdR->Draw();
+
+		m_graphicsEngine->DrawFBXTest();
+
+		m_boxFbxR->Draw();
 
 		m_graphicsEngine->DrawWithSimplePostEffect();
 
