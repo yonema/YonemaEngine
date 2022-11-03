@@ -36,6 +36,7 @@ namespace nsYMEngine
 		CGraphicsEngine::~CGraphicsEngine()
 		{
 			Terminate();
+			m_instance = nullptr;
 
 			return;
 		}

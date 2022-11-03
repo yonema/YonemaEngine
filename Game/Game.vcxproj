@@ -152,6 +152,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="Game\Game.cpp" />
+    <ClCompile Include="YonemaEngine\GameObject\GameObject.cpp" />
+    <ClCompile Include="YonemaEngine\GameObject\GameObjectManager.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\FBXModels\FBXGenericRenderer.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\FBXModels\FBXRenderer.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\2D\TransSpriteGenericRenderer.cpp" />
@@ -196,6 +199,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
+    <ClInclude Include="Game\Game.h" />
+    <ClInclude Include="Game\GamePreCompile.h" />
+    <ClInclude Include="YonemaEngine\CommonLibrary\CommonDataLibrary.h" />
+    <ClInclude Include="YonemaEngine\CommonLibrary\CommonLibrary.h" />
+    <ClInclude Include="YonemaEngine\GameObject\GameObject.h" />
+    <ClInclude Include="YonemaEngine\GameObject\GameObjectManager.h" />
     <ClInclude Include="YonemaEngine\Graphics\FBXModels\FBXGenericRenderer.h" />
     <ClInclude Include="YonemaEngine\Graphics\FBXModels\FBXRenderer.h" />
     <ClInclude Include="YonemaEngine\Graphics\2D\TransSpriteGenericRenderer.h" />
@@ -237,6 +246,7 @@
     <ClInclude Include="YonemaEngine\Memory\ResourceBank.h" />
     <ClInclude Include="YonemaEngine\YonemaEngine.h" />
     <ClInclude Include="YonemaEngine\PreCompileHeader\YonemaEnginePreCompile.h" />
+    <ClInclude Include="YonemaEngine\CommonLibrary\CommonFunctionLibrary.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\BasicHeader.hlsli">

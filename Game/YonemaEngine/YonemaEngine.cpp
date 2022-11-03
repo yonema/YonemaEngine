@@ -1,5 +1,6 @@
 #include "YonemaEngine.h"
 #include "Graphics/GraphicsEngine.h"
+#include "../Game/Game.h"
 #include "Graphics/PMDModels/PMDRenderer.h"
 #include "Graphics/FBXModels/FBXRenderer.h"
 #include "Graphics/2D/Sprite.h"
@@ -11,20 +12,21 @@ namespace nsYMEngine
 	CYonemaEngine::~CYonemaEngine()
 	{
 		Terminate();
-
+		m_instance = nullptr;
 		return;
 	}
 
 	bool CYonemaEngine::Init()
 	{
 		m_graphicsEngine = nsGraphics::CGraphicsEngine::CreateInstance();
+		m_gameObjectManager = nsGameObject::CGameObjectManager::CreateInstance();
 
 		if (m_graphicsEngine->Init() != true)
 		{
 			return false;
 		}
 
-
+		NewGO<nsAWA::CGame>(EnGOPriority::enMid, "AWAGame");
 
 		m_mikuPmdR = new nsGraphics::nsPMDModels::CPMDRenderer(
 			"Assets/Models/Samples/初音ミク.pmd",
@@ -81,7 +83,10 @@ namespace nsYMEngine
 		}
 
 
+		nsGameObject::CGameObjectManager::DeleteInstance();
+		m_gameObjectManager = nullptr;
 		nsGraphics::CGraphicsEngine::DeleteInstance();
+		m_graphicsEngine = nullptr;
 
 		return;
 	}
@@ -89,6 +94,9 @@ namespace nsYMEngine
 	void CYonemaEngine::Update()
 	{
 		m_gameTime.StartTimeMeasurement();
+
+		m_gameObjectManager->Update(GetDeltaTime());
+
 		// アップデート中の、モデルの破棄と生成のテスト。
 
 		static int debugCount = 0;

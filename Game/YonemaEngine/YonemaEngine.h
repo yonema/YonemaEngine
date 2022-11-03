@@ -45,6 +45,7 @@ namespace nsYMEngine
 			if (m_instance != nullptr)
 			{
 				delete m_instance;
+				m_instance = nullptr;
 			}
 		}
 		constexpr static CYonemaEngine* GetInstance() noexcept
@@ -62,6 +63,16 @@ namespace nsYMEngine
 			return m_gameTime.GetDeltaTime();
 		}
 
+		inline void ExitGame()
+		{
+			if (m_isExitGame != true)
+			{
+				PostQuitMessage(0);
+				m_isExitGame = true;
+			}
+			return;
+		}
+
 	private:
 
 		void Terminate();
@@ -69,7 +80,9 @@ namespace nsYMEngine
 	private:
 		static CYonemaEngine* m_instance;
 		nsGraphics::CGraphicsEngine* m_graphicsEngine = nullptr;
+		nsGameObject::CGameObjectManager* m_gameObjectManager = nullptr;
 		nsTime::CGameTime m_gameTime;
+		bool m_isExitGame = false;
 		nsGraphics::nsPMDModels::CPMDRenderer* m_mikuPmdR = nullptr;
 		nsGraphics::nsPMDModels::CPMDRenderer* m_mikuMetalPmdR = nullptr;
 		nsGraphics::nsPMDModels::CPMDRenderer* m_rukaPmdR = nullptr;

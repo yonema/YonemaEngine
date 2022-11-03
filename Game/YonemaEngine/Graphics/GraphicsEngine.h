@@ -74,11 +74,13 @@ namespace nsYMEngine
 
 				return m_instance;
 			}
+
 			inline static void DeleteInstance()
 			{
 				if (m_instance != nullptr)
 				{
 					delete m_instance;
+					m_instance = nullptr;
 				}
 			}
 			constexpr static CGraphicsEngine* GetInstance() noexcept

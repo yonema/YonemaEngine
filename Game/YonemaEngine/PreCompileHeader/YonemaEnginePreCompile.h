@@ -14,8 +14,12 @@
 #include <list>
 #include <map>
 #include <unordered_map>
+#include <array>
+#include <string>
+#include <functional>
 #include <memory>
 #include <algorithm>
+#include <bitset>
 
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
@@ -33,4 +37,6 @@
 #include "../Math/Quaternion.h"
 #include "../Math/Matrix.h"
 #include "../Graphics/Dx12Wrappers/Dx12Wrappers_Include.h"
+#include "../CommonLibrary/CommonLibrary.h"
 
+#include "../../Game/GamePreCompile.h"
