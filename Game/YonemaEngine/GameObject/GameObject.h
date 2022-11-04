@@ -11,7 +11,7 @@ namespace nsYMEngine
 		{
 		private:
 
-			enum class EnGameObjectFlagsTable
+			enum class EnGameObjectFlagTable
 			{
 				enStarted,
 				enDead,
@@ -22,15 +22,15 @@ namespace nsYMEngine
 			/**
 			 * @brief 開始処理が有効になる時のフラグビットセットの組み合わせ
 			*/
-			static const std::bitset<static_cast<int>(EnGameObjectFlagsTable::enNumFlags)>
+			static const std::bitset<static_cast<int>(EnGameObjectFlagTable::enNumFlags)>
 				m_kEnableStartFlags;
 			/**
 			 * @brief 更新処理が有効になる時のフラグビットセットの組み合わせ
 			*/
-			static const std::bitset<static_cast<int>(EnGameObjectFlagsTable::enNumFlags)>
+			static const std::bitset<static_cast<int>(EnGameObjectFlagTable::enNumFlags)>
 				m_kEnableUpdateFlags;
 
-		public:
+		protected:
 			/**
 			 * @brief スタート処理。この処理は自身を生成した次のフレームの開始時に一度だけ呼ばれます。
 			 * @return Update()処理を行うか？
@@ -52,9 +52,7 @@ namespace nsYMEngine
 
 		public:
 			constexpr IGameObject() = default;
-			// デストラクタいらないから、virtualにしない。
-			// デストラクタに処理を実装するときはvirtualを付け足しておく。
-			~IGameObject() = default;
+			virtual ~IGameObject() = default;
 
 			/**
 			 * @brief 開始処理が呼ばれたか調べる
@@ -64,7 +62,7 @@ namespace nsYMEngine
 			*/
 			constexpr bool IsStarted() const noexcept
 			{
-				return GetFlag(EnGameObjectFlagsTable::enStarted);
+				return GetFlag(EnGameObjectFlagTable::enStarted);
 			}
 
 			/**
@@ -72,7 +70,7 @@ namespace nsYMEngine
 			*/
 			inline void Activate() noexcept
 			{
-				SetFlag(EnGameObjectFlagsTable::enActive, true);
+				SetFlag(EnGameObjectFlagTable::enActive, true);
 			}
 
 			/**
@@ -80,7 +78,7 @@ namespace nsYMEngine
 			*/
 			inline void Deactivare() noexcept
 			{
-				SetFlag(EnGameObjectFlagsTable::enActive, false);
+				SetFlag(EnGameObjectFlagTable::enActive, false);
 			}
 
 			/**
@@ -91,7 +89,7 @@ namespace nsYMEngine
 			*/
 			constexpr bool IsActive() const noexcept
 			{
-				return GetFlag(EnGameObjectFlagsTable::enActive);
+				return GetFlag(EnGameObjectFlagTable::enActive);
 			}
 
 			/**
@@ -100,7 +98,7 @@ namespace nsYMEngine
 			*/
 			inline void Dead() noexcept
 			{
-				SetFlag(EnGameObjectFlagsTable::enDead, true);
+				SetFlag(EnGameObjectFlagTable::enDead, true);
 			}
 
 			/**
@@ -111,7 +109,7 @@ namespace nsYMEngine
 			*/
 			constexpr bool IsDead() const noexcept
 			{
-				return GetFlag(EnGameObjectFlagsTable::enDead);
+				return GetFlag(EnGameObjectFlagTable::enDead);
 			}
 
 			/**
@@ -142,9 +140,9 @@ namespace nsYMEngine
 			*/
 			inline void StartWrapper() 
 			{
-				if (m_flags == m_kEnableStartFlags)
+				if (m_flagTable == m_kEnableStartFlags)
 				{
-					SetFlag(EnGameObjectFlagsTable::enStarted, Start());
+					SetFlag(EnGameObjectFlagTable::enStarted, Start());
 				}
 			};
 
@@ -156,25 +154,35 @@ namespace nsYMEngine
 			*/
 			inline void UpdateWrapper(float deltaTime) 
 			{
-				if (m_flags == m_kEnableUpdateFlags)
+				if (m_flagTable == m_kEnableUpdateFlags)
 				{
 					Update(deltaTime);
 				}
 			};
 
-		private:
-			inline void SetFlag(EnGameObjectFlagsTable flag, bool value) noexcept
+			/**
+			 * @brief 破棄されるときに呼ばれる関数のラップ関数。
+			 * この関数はIGameObjectManagerからのみ実行されます。
+			 * 他の場所からは実行しないでください。
+			*/
+			inline void OnDestroyWrapper()
 			{
-				m_flags[static_cast<int>(flag)] = value;
+				OnDestroy();
 			}
-			constexpr bool GetFlag(EnGameObjectFlagsTable flag) const noexcept
+
+		private:
+			inline void SetFlag(EnGameObjectFlagTable flag, bool value) noexcept
 			{
-				return m_flags[static_cast<int>(flag)];
+				m_flagTable[static_cast<int>(flag)] = value;
+			}
+			constexpr bool GetFlag(EnGameObjectFlagTable flag) const noexcept
+			{
+				return m_flagTable[static_cast<int>(flag)];
 			}
 
 		private:
 			std::string m_name = "";
-			std::bitset<static_cast<int>(EnGameObjectFlagsTable::enNumFlags)> m_flags = 
+			std::bitset<static_cast<int>(EnGameObjectFlagTable::enNumFlags)> m_flagTable = 
 				m_kEnableStartFlags;
 		};
 

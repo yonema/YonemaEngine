@@ -11,7 +11,7 @@ namespace nsYMEngine
 			using GameObjectList = std::list<IGameObject*>;
 
 		private:
-			inline CGameObjectManager() = default;
+			constexpr CGameObjectManager() = default;
 			~CGameObjectManager();
 
 		public:
@@ -77,7 +77,7 @@ namespace nsYMEngine
 		private:
 			static CGameObjectManager* m_instance;
 			std::array<GameObjectList, static_cast<int>(EnGOPriority::enMax)> 
-				m_gameObjectListArray;
+				m_gameObjectListArray = {};
 
 		};
 

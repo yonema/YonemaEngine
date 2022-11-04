@@ -3,11 +3,7 @@
 #include "../GameWindow/GameWindow.h"
 #include "../../Application.h"
 #include "Dx12Wrappers/Texture.h"
-#include "PMDModels/PMDGenericRenderer.h"
-#include "FBXModels/FBXGenericRenderer.h"
-#include "SimplePostEffectGenericRenderer.h"
-#include "2D/SpriteGenericRenderer.h"
-#include "2D/TransSpriteGenericRenderer.h"
+#include "Renderers/Renderer.h"
 
 
 namespace nsYMEngine
@@ -31,6 +27,8 @@ namespace nsYMEngine
 			D3D_FEATURE_LEVEL_11_1,
 			D3D_FEATURE_LEVEL_11_0
 		};
+
+		using RendererType = nsRenderers::CRendererTable::EnRendererType;
 
 
 		CGraphicsEngine::~CGraphicsEngine()
@@ -95,6 +93,8 @@ namespace nsYMEngine
 				return false;
 			}
 
+			m_rendererTable.Init();
+
 			if (CreatePeraRenderTarget() != true)
 			{
 				return false;
@@ -117,10 +117,14 @@ namespace nsYMEngine
 			initData.texture = m_simplePostEffectRenderTarget.GetRenderTargetTexture();
 			initData.spriteSize = initData.texture->GetTextureSize();
 			m_simplePostEffectRenderTargetSprite.Init(initData);
+			m_rendererTable.RegistRenderer(RendererType::enSimplePostEffect, &m_mainRenderTargetSprite);
 			
 
 			// 初期化が終わったら、DXGIFactoryはもういらないため破棄する。
 			dxgiFactory->Release();
+
+			// 基本となるレンダーターゲットスプライトに設定する
+			m_pBaseRenderTargetSprite = &m_simplePostEffectRenderTargetSprite;
 
 
 			m_whiteTexture = new nsDx12Wrappers::CTexture();
@@ -135,16 +139,7 @@ namespace nsYMEngine
 
 			CreateSeceneConstantBuff();
 
-			m_pmdGenericRenderer = new nsPMDModels::CPMDGenericRenderer();
-			m_pmdGenericRenderer->Init();
-			m_fbxGenericRenderer = new nsFBXModels::CFBXGenericRenderer();
-			m_fbxGenericRenderer->Init();
-			m_simplePostEffectGenericRenderer = new CSimplePostEffectGenericRenderer();
-			m_simplePostEffectGenericRenderer->Init();
-			m_spriteGenericRenderer = new ns2D::CSpriteGenericRenderer();
-			m_spriteGenericRenderer->Init();
-			m_transSpriteGenericRenderer = new ns2D::CTransSpriteGenericRenderer();
-			m_transSpriteGenericRenderer->Init();
+
 
 			return true;
 		}
@@ -153,26 +148,6 @@ namespace nsYMEngine
 		{
 			// 破棄する前に、コマンドの実行の完了を待つ。
 			WaitForCommandExecutionToComplete();
-			if (m_transSpriteGenericRenderer)
-			{
-				delete m_transSpriteGenericRenderer;
-			}
-			if (m_spriteGenericRenderer)
-			{
-				delete m_spriteGenericRenderer;
-			}
-			if (m_simplePostEffectGenericRenderer)
-			{
-				delete m_simplePostEffectGenericRenderer;
-			}
-			if (m_fbxGenericRenderer)
-			{
-				delete m_fbxGenericRenderer;
-			}
-			if (m_pmdGenericRenderer)
-			{
-				delete m_pmdGenericRenderer;
-			}
 			if (m_whiteTexture)
 			{
 				delete m_whiteTexture;
@@ -249,34 +224,45 @@ namespace nsYMEngine
 			m_commandList.SetViewportAndScissorRect(
 				m_frameBuffer.GetViewport(), m_frameBuffer.GetScissorRect());
 
-			// PMDモデルの描画
-			m_commandList.SetGraphicsRootSignatureAndPipelineState(
-				m_pmdGenericRenderer->GetRootSignature(), m_pmdGenericRenderer->GetPipelineState()
-			);
 			m_commandList.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+			// PMDモデルの描画設定
+			m_commandList.SetGraphicsRootSignatureAndPipelineState(
+				m_rendererTable.GetRootSignature(
+					RendererType::enPMDModel),
+				m_rendererTable.GetPipelineState(
+					RendererType::enPMDModel)
+			);
+
 			m_commandList.SetDescriptorHeap(m_sceneDataDH);
 			m_commandList.SetGraphicsRootDescriptorTable(0, m_sceneDataDH);
 
 
-			// モデルのDraw()呼び出し。
+			// PMDモデル描画
+			for (auto renderer : m_rendererTable.GetRendererList(RendererType::enPMDModel))
+			{
+				renderer->DrawWrapper(&m_commandList);
+			}
 
 
-			// その他のフォーマットのモデルの描画
+			// FBXモデルの描画設定
+			m_commandList.SetGraphicsRootSignatureAndPipelineState(
+				m_rendererTable.GetRootSignature(
+					RendererType::enFBXModel),
+				m_rendererTable.GetPipelineState(
+					RendererType::enFBXModel)
+			);
+
+			// FBXモデル描画
+			for (auto renderer : m_rendererTable.GetRendererList(RendererType::enFBXModel))
+			{
+				renderer->DrawWrapper(&m_commandList);
+			}
 
 
 			// 描画終了
-			//m_commandList.TransitionFromRenderTargetToShaderResource(m_mainRenderTarget);
+			m_commandList.TransitionFromRenderTargetToShaderResource(m_mainRenderTarget);
 
-
-			return;
-		}
-
-		void CGraphicsEngine::DrawFBXTest()
-		{
-
-			m_commandList.SetGraphicsRootSignatureAndPipelineState(
-				m_fbxGenericRenderer->GetRootSignature(), m_fbxGenericRenderer->GetPipelineState()
-			);
 
 			return;
 		}
@@ -284,9 +270,6 @@ namespace nsYMEngine
 
 		void CGraphicsEngine::DrawWithSimplePostEffect()
 		{
-			// 後で消す予定
-			m_commandList.TransitionFromRenderTargetToShaderResource(m_mainRenderTarget);
-
 			// 描画先を設定
 			m_commandList.TransitionFromShaderResourceToRenderTarget(m_simplePostEffectRenderTarget);
 			m_commandList.SetRenderTarget(m_simplePostEffectRenderTarget);
@@ -294,16 +277,22 @@ namespace nsYMEngine
 			// 画面クリア
 			m_commandList.ClearRenderTargetAndDepthStencilView(m_simplePostEffectRenderTarget);
 
-			// シンプルなポストエフェクトをかけて描画
-			m_commandList.SetGraphicsRootSignatureAndPipelineState(
-				m_simplePostEffectGenericRenderer->GetRootSignature(), 
-				m_simplePostEffectGenericRenderer->GetPipelineState()
-			);
 			// インデックスバッファを指定していないため、TRIANGLELISTではなく、
 			// TRIANGLESTRIPを指定する。
 			m_commandList.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
-			m_mainRenderTargetSprite.Draw();
+			// シンプルなポストエフェクトの描画設定
+			m_commandList.SetGraphicsRootSignatureAndPipelineState(
+				m_rendererTable.GetRootSignature(
+					RendererType::enSimplePostEffect),
+				m_rendererTable.GetPipelineState(
+					RendererType::enSimplePostEffect)
+			);
+			// シンプルなポストエフェクトをかけて描画
+			for (auto renderer : m_rendererTable.GetRendererList(RendererType::enSimplePostEffect))
+			{
+				renderer->DrawWrapper(&m_commandList);
+			}
 
 			// 描画終了
 			m_commandList.TransitionFromRenderTargetToShaderResource(m_simplePostEffectRenderTarget);
@@ -323,34 +312,49 @@ namespace nsYMEngine
 			// 画面クリア
 			m_commandList.ClearRenderTargetAndDepthStencilView(m_frameBuffer);
 
-			m_commandList.SetGraphicsRootSignatureAndPipelineState(
-				m_spriteGenericRenderer->GetRootSignature(),
-				m_spriteGenericRenderer->GetPipelineState()
-			);
 			// インデックスバッファを指定していないため、TRIANGLELISTではなく、
 			// TRIANGLESTRIPを指定する。
 			m_commandList.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
-			m_simplePostEffectRenderTargetSprite.Draw();
 
-			// 不透明2D描画処理
-
+			// 不透明スプライトの描画設定
 			m_commandList.SetGraphicsRootSignatureAndPipelineState(
-				m_transSpriteGenericRenderer->GetRootSignature(),
-				m_transSpriteGenericRenderer->GetPipelineState()
+				m_rendererTable.GetRootSignature(
+					RendererType::enSprite),
+				m_rendererTable.GetPipelineState(
+					RendererType::enSprite)
 			);
-			// 半透明2D描画処理
 
-			//m_commandList.TransitionFromRenderTargetToPresent(m_frameBuffer);
+			// まず基本のレンダーターゲットのスプライト描画
+			m_pBaseRenderTargetSprite->Draw(&m_commandList);
+
+			// 不透明スプライト描画
+			for (auto renderer : m_rendererTable.GetRendererList(RendererType::enSprite))
+			{
+				renderer->DrawWrapper(&m_commandList);
+			}
+
+			// 半透明スプライトの描画設定
+			m_commandList.SetGraphicsRootSignatureAndPipelineState(
+				m_rendererTable.GetRootSignature(
+					RendererType::enTransSprite),
+				m_rendererTable.GetPipelineState(
+					RendererType::enTransSprite)
+			);
+			// 半透明スプライト描画
+			for (auto renderer : m_rendererTable.GetRendererList(RendererType::enTransSprite))
+			{
+				renderer->DrawWrapper(&m_commandList);
+			}
+
+			// 描画終了
+			m_commandList.TransitionFromRenderTargetToPresent(m_frameBuffer);
 
 			return;
 		}
 
 		void CGraphicsEngine::EndDraw()
 		{
-			// 後で消す予定
-			m_commandList.TransitionFromRenderTargetToPresent(m_frameBuffer);
-
 			// 命令の実行前に、必ずコマンドリストのクローズを行う。
 			m_commandList.Close();
 

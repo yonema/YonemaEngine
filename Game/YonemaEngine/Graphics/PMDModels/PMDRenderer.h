@@ -1,5 +1,5 @@
 #pragma once
-
+#include "../Renderers/ModelRendererBase.h"
 namespace nsYMEngine
 {
 	namespace nsGraphics
@@ -18,7 +18,7 @@ namespace nsYMEngine
 		namespace nsPMDModels
 		{
 
-			class CPMDRenderer : private nsUtils::SNoncopyable
+			class CPMDRenderer : public nsRenderers::IModelRendererBase
 			{
 			private:
 				static const size_t m_kPmdVertexSize;
@@ -148,21 +148,31 @@ namespace nsYMEngine
 				};
 
 
+			protected:
+				void Draw(nsDx12Wrappers::CCommandList* commandList) override final;
+
+			public:
+				void UpdateWorldMatrix(
+					const nsMath::CVector3& position,
+					const nsMath::CQuaternion& rotation,
+					const nsMath::CVector3& scale
+				) override final;
+
+				void UpdateAnimation(float deltaTime) override final;
+
+				void PlayAnimation() override final;
 
 			public:
 				CPMDRenderer(const char* filePath, const char* animFilePath = nullptr);
 				~CPMDRenderer();
 
-				void Update();
-
-				void Draw();
 
 				inline void DebugSetPosition(float x) noexcept
 				{
 					m_debugPosX = x;
 				}
 
-				void PlayAnimation();
+
 
 			private:
 				void Init(const char* filePath, const char* animFilePath = nullptr);
@@ -205,7 +215,7 @@ namespace nsYMEngine
 
 				void LoadVMDAnimation(const char* filePath);
 
-				void UpdateAnimation();
+
 
 				float GetYFromXOnBezier(
 					float x, const nsMath::CVector2& a, const nsMath::CVector2& b, uint8_t n) noexcept;

@@ -1,6 +1,7 @@
 #pragma once
 #include "Camera.h"
 #include "2D/Sprite.h"
+#include "Renderers/RendererTable.h"
 
 namespace nsYMEngine
 {
@@ -10,20 +11,6 @@ namespace nsYMEngine
 		{
 			class CTexture;
 		}
-		namespace nsPMDModels
-		{
-			class CPMDGenericRenderer;
-		}
-		namespace nsFBXModels
-		{
-			class CFBXGenericRenderer;
-		}
-		namespace ns2D
-		{
-			class CSpriteGenericRenderer;
-			class CTransSpriteGenericRenderer;
-		}
-		class CSimplePostEffectGenericRenderer;
 	}
 }
 
@@ -100,8 +87,6 @@ namespace nsYMEngine
 
 			void DrawToMainRenderTarget();
 
-			void DrawFBXTest();
-
 			void DrawWithSimplePostEffect();
 
 			void Draw2D();
@@ -168,6 +153,11 @@ namespace nsYMEngine
 				return m_descriptorSizeOfRtv;
 			}
 
+			constexpr auto GetRendererTable() noexcept
+			{
+				return &m_rendererTable;
+			}
+
 		private:
 
 			void Terminate();
@@ -210,13 +200,10 @@ namespace nsYMEngine
 			ns2D::CSprite m_mainRenderTargetSprite;
 			nsDx12Wrappers::CRenderTarget m_simplePostEffectRenderTarget;
 			ns2D::CSprite m_simplePostEffectRenderTargetSprite;
+			ns2D::CSprite* m_pBaseRenderTargetSprite;
 			nsDx12Wrappers::CConstantBuffer m_sceneDataCB;
 			nsDx12Wrappers::CDescriptorHeap m_sceneDataDH;
-			nsPMDModels::CPMDGenericRenderer* m_pmdGenericRenderer = nullptr;
-			nsFBXModels::CFBXGenericRenderer* m_fbxGenericRenderer = nullptr;
-			CSimplePostEffectGenericRenderer* m_simplePostEffectGenericRenderer = nullptr;
-			ns2D::CSpriteGenericRenderer* m_spriteGenericRenderer = nullptr;
-			ns2D::CTransSpriteGenericRenderer* m_transSpriteGenericRenderer = nullptr;
+			nsRenderers::CRendererTable m_rendererTable;
 			CCamera m_mainCamera;
 			nsDx12Wrappers::CTexture* m_whiteTexture;
 			nsDx12Wrappers::CTexture* m_blackTexture;

@@ -39,6 +39,7 @@ namespace nsYMEngine
 					{
 						if (go->IsDead())
 						{
+							go->OnDestroyWrapper();
 							delete go;
 							return true;
 						}

@@ -11,44 +11,8 @@ namespace nsYMEngine
 	{
 		namespace nsFBXModels
 		{
-			CFBXRenderer::CFBXRenderer(const char* const filePath)
+			void CFBXRenderer::Draw(nsDx12Wrappers::CCommandList* commandList)
 			{
-				Init(filePath);
-				return;
-			}
-			CFBXRenderer::~CFBXRenderer()
-			{
-				Terminate();
-				return;
-			}
-
-			void CFBXRenderer::UpdateWorldMatrix(
-				const nsMath::CVector3 position,
-				const nsMath::CQuaternion& rotation,
-				const nsMath::CVector3& scale
-			)
-			{
-				// ワールド行列作成。
-				nsMath::CMatrix mTrans, mRot, mScale, mWorld;
-				mTrans.MakeTranslation(position);
-				mRot.MakeRotationFromQuaternion(rotation);
-				mScale.MakeScaling(scale);
-				mWorld = mScale * mRot * mTrans;
-
-				// 定数バッファにコピー。
-				auto mappedCB =
-					static_cast<nsMath::CMatrix*>(m_constantBuffer.GetMappedConstantBuffer());
-				mappedCB[0] = mWorld;
-				auto mViewProj = CGraphicsEngine::GetInstance()->GetMatrixViewProj();
-				mappedCB[1] = mWorld * mViewProj;
-
-				return;
-			}
-
-			void CFBXRenderer::Draw()
-			{
-				static auto commandList = CGraphicsEngine::GetInstance()->GetCommandList();
-
 				// ○定数バッファのディスクリプタヒープをセット
 				ID3D12DescriptorHeap* modelDescHeaps[] = { m_descriptorHeap.Get() };
 				commandList->SetDescriptorHeaps(1, modelDescHeaps);
@@ -71,6 +35,40 @@ namespace nsYMEngine
 					commandList->DrawInstanced(m_vertexBuffers.at(i)->GetNumVertices());
 
 				}
+				return;
+			}
+
+			CFBXRenderer::CFBXRenderer(const char* const filePath)
+			{
+				Init(filePath);
+				return;
+			}
+			CFBXRenderer::~CFBXRenderer()
+			{
+				Terminate();
+				return;
+			}
+
+			void CFBXRenderer::UpdateWorldMatrix(
+				const nsMath::CVector3& position,
+				const nsMath::CQuaternion& rotation,
+				const nsMath::CVector3& scale
+			)
+			{
+				// ワールド行列作成。
+				nsMath::CMatrix mTrans, mRot, mScale, mWorld;
+				mTrans.MakeTranslation(position);
+				mRot.MakeRotationFromQuaternion(rotation);
+				mScale.MakeScaling(scale);
+				mWorld = mScale * mRot * mTrans;
+
+				// 定数バッファにコピー。
+				auto mappedCB =
+					static_cast<nsMath::CMatrix*>(m_constantBuffer.GetMappedConstantBuffer());
+				mappedCB[0] = mWorld;
+				auto mViewProj = CGraphicsEngine::GetInstance()->GetMatrixViewProj();
+				mappedCB[1] = mWorld * mViewProj;
+
 				return;
 			}
 

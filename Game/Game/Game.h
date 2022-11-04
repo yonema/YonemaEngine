@@ -2,7 +2,7 @@
 
 namespace nsAWA
 {
-	class CGame : public nsGameObject::IGameObject
+	class CGame : public IGameObject
 	{
 	private:
 		static const char* const m_kGameObjectName;

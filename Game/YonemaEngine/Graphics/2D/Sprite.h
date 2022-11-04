@@ -1,4 +1,6 @@
 #pragma once
+#include "../Renderers/Renderer.h"
+
 namespace nsYMEngine
 {
 	namespace nsGraphics
@@ -21,7 +23,7 @@ namespace nsYMEngine
 				DXGI_FORMAT colorFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 			};
 
-			class CSprite : private nsUtils::SNoncopyable
+			class CSprite : public nsRenderers::IRenderer
 			{
 			private:
 				static const int m_kMaxNumTextures = 8;
@@ -37,6 +39,9 @@ namespace nsYMEngine
 				};
 
 			public:
+				void Draw(nsDx12Wrappers::CCommandList* commandList) override final;
+
+			public:
 				constexpr CSprite() = default;
 				~CSprite();
 
@@ -50,8 +55,6 @@ namespace nsYMEngine
 					const nsMath::CVector3& scale,
 					const nsMath::CVector2& pivot
 				);
-
-				void Draw();
 
 				inline void SetMulColor(const nsMath::CVector4& mulColor) noexcept
 				{

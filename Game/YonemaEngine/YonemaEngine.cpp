@@ -28,58 +28,27 @@ namespace nsYMEngine
 
 		NewGO<nsAWA::CGame>(EnGOPriority::enMid, "AWAGame");
 
-		m_mikuPmdR = new nsGraphics::nsPMDModels::CPMDRenderer(
-			"Assets/Models/Samples/初音ミク.pmd",
-			//"Assets/Animations/Samples/squat.vmd"
-			"Assets/Animations/Samples/charge.vmd"
-		);
-		m_mikuMetalPmdR = new nsGraphics::nsPMDModels::CPMDRenderer(
-			"Assets/Models/Samples/初音ミクmetal.pmd", "Assets/Animations/Samples/pose.vmd");
-		m_rukaPmdR = new nsGraphics::nsPMDModels::CPMDRenderer("Assets/Models/Samples/巡音ルカ.pmd");
-
-		constexpr float distance = 15.0f;
-		m_mikuPmdR->DebugSetPosition(distance);
-		m_mikuMetalPmdR->DebugSetPosition(0.0f);
-		m_rukaPmdR->DebugSetPosition(-distance);
-
 		nsMath::CMatrix mat = nsMath::CMatrix::Identity();
 
-		sprite = new nsGraphics::ns2D::CSprite();
+		m_sprite = new nsGraphics::ns2D::CSprite();
 		nsGraphics::ns2D::SSpriteInitData initData;
 		initData.filePath = "Assets/Images/200x200PNG.png";
 		initData.spriteSize = { 200.0f,200.0f };
 		initData.alphaBlendMode = nsGraphics::ns2D::EnAlphaBlendMode::enTrans;
-		sprite->Init(initData);
-
-		m_boxFbxR = new nsGraphics::nsFBXModels::CFBXRenderer("Assets/Models/unitychan.fbx");
-
+		m_sprite->Init(initData);
+		m_graphicsEngine->GetRendererTable()->RegistRenderer(
+			nsGraphics::nsRenderers::CRendererTable::EnRendererType::enTransSprite, m_sprite);
 
 		return true;
 	}
 
 	void CYonemaEngine::Terminate()
 	{
-		if (m_boxFbxR)
-		{
-			delete m_boxFbxR;
-		}
-		if (sprite)
-		{
-			sprite->Release();
-			delete sprite;
-		}
 
-		if (m_rukaPmdR)
+		if (m_sprite)
 		{
-			delete m_rukaPmdR;
-		}
-		if (m_mikuMetalPmdR)
-		{
-			delete m_mikuMetalPmdR;
-		}
-		if (m_mikuPmdR)
-		{
-			delete m_mikuPmdR;
+			m_sprite->Release();
+			delete m_sprite;
 		}
 
 
@@ -98,38 +67,6 @@ namespace nsYMEngine
 		m_gameObjectManager->Update(GetDeltaTime());
 
 		// アップデート中の、モデルの破棄と生成のテスト。
-
-		static int debugCount = 0;
-		debugCount++;
-		if (debugCount > 120 && debugCount <= 240)
-		{
-			if (m_mikuMetalPmdR)
-			{
-				delete m_mikuMetalPmdR;
-				m_mikuMetalPmdR = nullptr;
-			}
-		}
-		else if (debugCount > 240)
-		{
-			if (m_mikuMetalPmdR == nullptr)
-			{
-				m_mikuMetalPmdR = new nsGraphics::nsPMDModels::CPMDRenderer("Assets/Models/Samples/初音ミクmetal.pmd", "Assets/Animations/Samples/pose.vmd");
-				debugCount = 0;
-			}
-		}
-
-		// Update処理
-		m_mikuPmdR->Update();
-		if (m_mikuMetalPmdR)
-		{
-			m_mikuMetalPmdR->Update();
-		}
-		m_rukaPmdR->Update();
-		static nsMath::CVector3 modelPos;
-		static nsMath::CQuaternion modelQRot;
-		modelQRot.AddRotationYDeg(1.0f);
-		static nsMath::CVector3 modelScale = nsMath::CVector3::One();
-		m_boxFbxR->UpdateWorldMatrix(modelPos, modelQRot, modelScale);
 
 		static nsMath::CVector3 pos = nsMath::CVector3::Zero();
 		static nsMath::CQuaternion rot = nsMath::CQuaternion::Identity();
@@ -156,28 +93,32 @@ namespace nsYMEngine
 		else
 		{
 			spriteCounter = 0;
-			if (sprite)
+			if (m_sprite)
 			{
-				delete sprite;
-				sprite = nullptr;
+				m_graphicsEngine->GetRendererTable()->RemoveRenderer(
+					nsGraphics::nsRenderers::CRendererTable::EnRendererType::enTransSprite, m_sprite);
+				delete m_sprite;
+				m_sprite = nullptr;
 			}
 			else
 			{
-				sprite = new nsGraphics::ns2D::CSprite();
+				m_sprite = new nsGraphics::ns2D::CSprite();
 				nsGraphics::ns2D::SSpriteInitData initData;
 				initData.filePath = "Assets/Images/200x200PNG.png";
 				initData.spriteSize = { 200.0f,200.0f };
 				initData.alphaBlendMode = nsGraphics::ns2D::EnAlphaBlendMode::enTrans;
-				sprite->Init(initData);
+				m_graphicsEngine->GetRendererTable()->RegistRenderer(
+					nsGraphics::nsRenderers::CRendererTable::EnRendererType::enTransSprite, m_sprite);
+				m_sprite->Init(initData);
 			}
 		}
 		spriteCounter++;
 
-		if (sprite)
+		if (m_sprite)
 		{
-			sprite->UpdateWorldMatrix(pos, rot, scale, { 0.5f,0.5f });
+			m_sprite->UpdateWorldMatrix(pos, rot, scale, { 0.5f,0.5f });
 			float value = static_cast<float>(spriteCounter) / spriteMaxCounter;
-			sprite->SetMulColor({ 1.0f,1.0f,1.0f,value });
+			m_sprite->SetMulColor({ 1.0f,1.0f,1.0f,value });
 		}
 
 		m_graphicsEngine->Update();
@@ -189,25 +130,9 @@ namespace nsYMEngine
 
 		m_graphicsEngine->DrawToMainRenderTarget();
 
-		m_mikuPmdR->Draw();
-		if (m_mikuMetalPmdR)
-		{
-			m_mikuMetalPmdR->Draw();
-		}
-		m_rukaPmdR->Draw();
-
-		m_graphicsEngine->DrawFBXTest();
-
-		m_boxFbxR->Draw();
-
 		m_graphicsEngine->DrawWithSimplePostEffect();
 
 		m_graphicsEngine->Draw2D();
-
-		if (sprite)
-		{
-			sprite->Draw();
-		}
 
 		m_graphicsEngine->EndDraw();
 

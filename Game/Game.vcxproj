@@ -153,6 +153,11 @@
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="Game\Game.cpp" />
+    <ClCompile Include="YonemaEngine\Graphics\Renderers\ModelRendererBase.cpp" />
+    <ClCompile Include="YonemaEngine\Graphics\Renderers\ModelRenderer.cpp" />
+    <ClCompile Include="YonemaEngine\Graphics\Renderers\SpriteRenderer.cpp" />
+    <ClCompile Include="YonemaEngine\Graphics\Renderers\RendererTable.cpp" />
+    <ClCompile Include="YonemaEngine\Graphics\Renderers\Renderer.cpp" />
     <ClCompile Include="YonemaEngine\GameObject\GameObject.cpp" />
     <ClCompile Include="YonemaEngine\GameObject\GameObjectManager.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\FBXModels\FBXGenericRenderer.cpp" />
@@ -160,7 +165,7 @@
     <ClCompile Include="YonemaEngine\Graphics\2D\TransSpriteGenericRenderer.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\2D\SpriteGenericRenderer.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\SimplePostEffectGenericRenderer.cpp" />
-    <ClCompile Include="YonemaEngine\Graphics\GenericRenderer.cpp" />
+    <ClCompile Include="YonemaEngine\Graphics\Renderers\GenericRenderer.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\2D\Sprite.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\Dx12Wrappers\CommandList.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\Dx12Wrappers\Shader.cpp" />
@@ -201,6 +206,11 @@
     <ClInclude Include="Application.h" />
     <ClInclude Include="Game\Game.h" />
     <ClInclude Include="Game\GamePreCompile.h" />
+    <ClInclude Include="YonemaEngine\Graphics\Renderers\ModelRendererBase.h" />
+    <ClInclude Include="YonemaEngine\Graphics\Renderers\ModelRenderer.h" />
+    <ClInclude Include="YonemaEngine\Graphics\Renderers\SpriteRenderer.h" />
+    <ClInclude Include="YonemaEngine\Graphics\Renderers\RendererTable.h" />
+    <ClInclude Include="YonemaEngine\Graphics\Renderers\Renderer.h" />
     <ClInclude Include="YonemaEngine\CommonLibrary\CommonDataLibrary.h" />
     <ClInclude Include="YonemaEngine\CommonLibrary\CommonLibrary.h" />
     <ClInclude Include="YonemaEngine\GameObject\GameObject.h" />
@@ -210,7 +220,7 @@
     <ClInclude Include="YonemaEngine\Graphics\2D\TransSpriteGenericRenderer.h" />
     <ClInclude Include="YonemaEngine\Graphics\2D\SpriteGenericRenderer.h" />
     <ClInclude Include="YonemaEngine\Graphics\SimplePostEffectGenericRenderer.h" />
-    <ClInclude Include="YonemaEngine\Graphics\GenericRenderer.h" />
+    <ClInclude Include="YonemaEngine\Graphics\Renderers\GenericRenderer.h" />
     <ClInclude Include="YonemaEngine\Graphics\2D\Sprite.h" />
     <ClInclude Include="YonemaEngine\Graphics\Dx12Wrappers\CommandList.h" />
     <ClInclude Include="YonemaEngine\Graphics\Dx12Wrappers\CommandList_Inline.h" />

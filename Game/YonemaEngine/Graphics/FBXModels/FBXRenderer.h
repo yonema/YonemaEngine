@@ -1,4 +1,5 @@
 #pragma once
+#include "../Renderers/ModelRendererBase.h"
 namespace fbxsdk
 {
 	class FbxNode;
@@ -12,7 +13,7 @@ namespace nsYMEngine
 	{
 		namespace nsFBXModels
 		{
-			class CFBXRenderer
+			class CFBXRenderer : public nsRenderers::IModelRendererBase
 			{
 			private:
 
@@ -32,19 +33,21 @@ namespace nsYMEngine
 					float alpha = 1.0f;
 				};
 
+			protected:
+				void Draw(nsDx12Wrappers::CCommandList* commandList) override final;
+
+			public:
+				void UpdateWorldMatrix(
+					const nsMath::CVector3& position,
+					const nsMath::CQuaternion& rotation,
+					const nsMath::CVector3& scale
+				) override final;
+
 			public:
 				CFBXRenderer(const char* const filePath);
 				~CFBXRenderer();
 
 				void Release();
-
-				void UpdateWorldMatrix(
-					const nsMath::CVector3 position,
-					const nsMath::CQuaternion& rotation,
-					const nsMath::CVector3& scale
-				);
-
-				void Draw();
 
 			private:
 				bool Init(const char* const filePath);

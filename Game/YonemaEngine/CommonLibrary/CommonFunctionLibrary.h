@@ -78,7 +78,7 @@ namespace nsYMEngine
 	 * @brief 同名同型のゲームオブジェクト全てに対して、指定した処理を行います。重い処理です。
 	 * @tparam T 処理を行いたいゲームオブジェクトの型
 	 * @param[in] objectName 処理を行いたいゲームオブジェクトの名前
-	 * @param[in] func 行う処理のコールバック関数。この関数でtrueを返すとQueryの処理を中断します。
+	 * @param[in] func 行う処理のコールバック関数。この関数でfalseを返すとQueryの処理を中断します。
 	*/
 	template<class T>
 	static inline void QueryGOs(const char* objectName, const std::function<bool(T* go)>& func)

@@ -1,5 +1,5 @@
 #pragma once
-#include "../GenericRenderer.h"
+#include "../Renderers/GenericRenderer.h"
 
 namespace nsYMEngine
 {
@@ -7,7 +7,7 @@ namespace nsYMEngine
 	{
 		namespace nsFBXModels
 		{
-			class CFBXGenericRenderer : public IGenericRenderer
+			class CFBXGenericRenderer : public nsRenderers::IGenericRenderer
 			{
 			private:
 				enum class EnDescRangeType : unsigned int

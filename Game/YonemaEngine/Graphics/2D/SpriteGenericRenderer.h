@@ -1,12 +1,12 @@
 #pragma once
-#include "../GenericRenderer.h"
+#include "../Renderers/GenericRenderer.h"
 namespace nsYMEngine
 {
 	namespace nsGraphics
 	{
 		namespace ns2D
 		{
-			class CSpriteGenericRenderer : public IGenericRenderer
+			class CSpriteGenericRenderer : public nsRenderers::IGenericRenderer
 			{
 			private:
 				enum class EnDescRangeType : unsigned int

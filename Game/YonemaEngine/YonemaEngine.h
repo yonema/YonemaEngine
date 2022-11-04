@@ -10,14 +10,6 @@ namespace nsYMEngine
 		{
 			class CSprite;
 		}
-		namespace nsPMDModels
-		{
-			class CPMDRenderer;
-		}
-		namespace nsFBXModels
-		{
-			class CFBXRenderer;
-		}
 	}
 }
 
@@ -83,11 +75,7 @@ namespace nsYMEngine
 		nsGameObject::CGameObjectManager* m_gameObjectManager = nullptr;
 		nsTime::CGameTime m_gameTime;
 		bool m_isExitGame = false;
-		nsGraphics::nsPMDModels::CPMDRenderer* m_mikuPmdR = nullptr;
-		nsGraphics::nsPMDModels::CPMDRenderer* m_mikuMetalPmdR = nullptr;
-		nsGraphics::nsPMDModels::CPMDRenderer* m_rukaPmdR = nullptr;
-		nsGraphics::ns2D::CSprite* sprite = nullptr;
-		nsGraphics::nsFBXModels::CFBXRenderer* m_boxFbxR = nullptr;
+		nsGraphics::ns2D::CSprite* m_sprite = nullptr;
 	};
 }
 

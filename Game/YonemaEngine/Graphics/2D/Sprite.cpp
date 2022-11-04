@@ -26,6 +26,33 @@ namespace nsYMEngine
 				nsMath::CVector3::Back(), nsMath::CVector3::Zero(), nsMath::CVector3::Up());
 
 
+			void CSprite::Draw(nsDx12Wrappers::CCommandList* commandList)
+			{
+				static auto mainCamera = CGraphicsEngine::GetInstance()->GetMainCamera();
+				const auto& viewport = commandList->GetCurrentViewport();
+
+				nsMath::CMatrix projMatrix;
+				projMatrix.MakeOrthoProjectionMatrix(viewport.Width, viewport.Height, 0.1f, 1.0f);
+
+				m_constantBufferCPU.mWorldViewProj = m_worldMatrix * m_kViewMatrix * projMatrix;
+				m_constantBufferCPU.screenParam.x = mainCamera->GetNearClip();
+				m_constantBufferCPU.screenParam.y = mainCamera->GetFarClip();
+				m_constantBufferCPU.screenParam.z = viewport.Width;
+				m_constantBufferCPU.screenParam.w = viewport.Height;
+
+				m_constantBuffer.CopyToMappedConstantBuffer(&m_constantBufferCPU, sizeof(m_constantBufferCPU));
+
+				commandList->SetVertexBuffer(m_vertexBuffer);
+				commandList->SetDescriptorHeap(m_cbvDescriptorHeap);
+				commandList->SetGraphicsRootDescriptorTable(0, m_cbvDescriptorHeap);
+				commandList->SetDescriptorHeap(m_srvDescriptorHeap);
+				commandList->SetGraphicsRootDescriptorTable(1, m_srvDescriptorHeap);
+				// インデックスなし。4頂点。
+				commandList->Draw(4);
+
+				return;
+			}
+
 			CSprite::~CSprite()
 			{
 				Terminate();
@@ -184,33 +211,7 @@ namespace nsYMEngine
 				return;
 			}
 
-			void CSprite::Draw()
-			{
-				static auto commandList = CGraphicsEngine::GetInstance()->GetCommandList();
-				static auto mainCamera = CGraphicsEngine::GetInstance()->GetMainCamera();
-				const auto& viewport = commandList->GetCurrentViewport();
 
-				nsMath::CMatrix projMatrix;
-				projMatrix.MakeOrthoProjectionMatrix(viewport.Width, viewport.Height, 0.1f, 1.0f);
-
-				m_constantBufferCPU.mWorldViewProj = m_worldMatrix * m_kViewMatrix * projMatrix;
-				m_constantBufferCPU.screenParam.x = mainCamera->GetNearClip();
-				m_constantBufferCPU.screenParam.y = mainCamera->GetFarClip();
-				m_constantBufferCPU.screenParam.z = viewport.Width;
-				m_constantBufferCPU.screenParam.w = viewport.Height;
-
-				m_constantBuffer.CopyToMappedConstantBuffer(&m_constantBufferCPU, sizeof(m_constantBufferCPU));
-
-				commandList->SetVertexBuffer(m_vertexBuffer);
-				commandList->SetDescriptorHeap(m_cbvDescriptorHeap);
-				commandList->SetGraphicsRootDescriptorTable(0, m_cbvDescriptorHeap);
-				commandList->SetDescriptorHeap(m_srvDescriptorHeap);
-				commandList->SetGraphicsRootDescriptorTable(1, m_srvDescriptorHeap);
-				// インデックスなし。4頂点。
-				commandList->Draw(4);
-
-				return;
-			}
 		}
 
 	}

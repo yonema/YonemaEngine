@@ -16,45 +16,8 @@ namespace nsYMEngine
 			const int CPMDRenderer::m_kNumMaterialDescriptors = 4;
 			const int CPMDRenderer::m_kNumCalculationsOnBezier = 12;
 
-
-			CPMDRenderer::CPMDRenderer(const char* filePath, const char* animFilePath)
+			void CPMDRenderer::Draw(nsDx12Wrappers::CCommandList* commandList)
 			{
-				Init(filePath, animFilePath);
-
-				return;
-			}
-			CPMDRenderer::~CPMDRenderer()
-			{
-				Terminate();
-
-				return;
-			}
-
-			void CPMDRenderer::Update()
-			{
-				m_debugRotY += 0.01f;
-				nsMath::CMatrix mTrans;
-				mTrans.MakeTranslation(m_debugPosX, 0.0f, 0.0f);
-				nsMath::CMatrix mRot;
-				mRot.MakeRotationY(m_debugRotY);
-				nsMath::CMatrix mScale;
-				mScale.MakeScaling(1.0f, 1.0f, 1.0f);
-				m_mWorld = mScale * mRot * mTrans;
-				auto mappedCB = 
-					static_cast<nsMath::CMatrix*>(m_modelCB.GetMappedConstantBuffer());
-				mappedCB[0] = m_mWorld;
-				auto mViewProj = CGraphicsEngine::GetInstance()->GetMatrixViewProj();
-				mappedCB[1] = m_mWorld * mViewProj;
-
-				UpdateAnimation();
-
-				return;
-			}
-
-			void CPMDRenderer::Draw()
-			{
-				static auto commandList = CGraphicsEngine::GetInstance()->GetCommandList();
-
 				// ○頂点バッファとインデックスバッファをセット
 				commandList->SetVertexBuffer(m_vertexBuffer);
 				commandList->SetIndexBuffer(m_indexBuffer);
@@ -73,7 +36,7 @@ namespace nsYMEngine
 
 				descriptorHeapH = m_materialDH.GetGPUHandle();
 				unsigned int idxOffset = 0;
-				const auto cbvsrvIncSize = 
+				const auto cbvsrvIncSize =
 					CGraphicsEngine::GetInstance()->GetDescriptorSizeOfCbvSrvUav() *
 					m_kNumMaterialDescriptors;
 
@@ -86,6 +49,44 @@ namespace nsYMEngine
 				}
 				return;
 			}
+
+			CPMDRenderer::CPMDRenderer(const char* filePath, const char* animFilePath)
+			{
+				Init(filePath, animFilePath);
+
+				return;
+			}
+			CPMDRenderer::~CPMDRenderer()
+			{
+				Terminate();
+
+				return;
+			}
+
+			void CPMDRenderer::UpdateWorldMatrix(
+				const nsMath::CVector3& position,
+				const nsMath::CQuaternion& rotation,
+				const nsMath::CVector3& scale
+			)
+			{
+				// ワールド行列作成。
+				nsMath::CMatrix mTrans, mRot, mScale, mWorld;
+				mTrans.MakeTranslation(position);
+				mRot.MakeRotationFromQuaternion(rotation);
+				mScale.MakeScaling(scale);
+				mWorld = mScale * mRot * mTrans;
+
+				// 定数バッファにコピー。
+				auto mappedCB =
+					static_cast<nsMath::CMatrix*>(m_modelCB.GetMappedConstantBuffer());
+				mappedCB[0] = mWorld;
+				auto mViewProj = CGraphicsEngine::GetInstance()->GetMatrixViewProj();
+				mappedCB[1] = mWorld * mViewProj;
+
+				return;
+			}
+
+
 
 			void CPMDRenderer::PlayAnimation()
 			{
@@ -632,9 +633,8 @@ namespace nsYMEngine
 			}
 
 
-			void CPMDRenderer::UpdateAnimation()
+			void CPMDRenderer::UpdateAnimation(float deltaTime)
 			{
-				const auto deltaTime = CYonemaEngine::GetInstance()->GetDeltaTime();
 				m_playAnimTime += deltaTime;
 				unsigned int frameNo = static_cast<unsigned int>(30.0f * m_playAnimTime);
 
