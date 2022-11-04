@@ -6,6 +6,16 @@ namespace fbxsdk
 	class FbxMesh;
 	class FbxSurfaceMaterial;
 }
+namespace nsYMEngine
+{
+	namespace nsGraphics
+	{
+		namespace nsRenderers
+		{
+			struct SModelInitData;
+		}
+	}
+}
 
 namespace nsYMEngine
 {
@@ -44,13 +54,13 @@ namespace nsYMEngine
 				) override final;
 
 			public:
-				CFBXRenderer(const char* const filePath);
+				CFBXRenderer(const SModelInitData& modelInitData);
 				~CFBXRenderer();
 
 				void Release();
 
 			private:
-				bool Init(const char* const filePath);
+				bool Init(const SModelInitData& modelInitData);
 				void Terminate();
 
 				void LoadMaterial(
@@ -64,7 +74,8 @@ namespace nsYMEngine
 					const fbxsdk::FbxMesh* mesh,
 					std::vector<SFbxVertex>* pVertices,
 					std::vector<unsigned short>* pIndices,
-					nsDx12Wrappers::CDescriptorHeap** ppMaterialDH
+					nsDx12Wrappers::CDescriptorHeap** ppMaterialDH,
+					const SModelInitData& modelInitData
 				);
 
 				bool CreateVertexAndIndexBuffer(

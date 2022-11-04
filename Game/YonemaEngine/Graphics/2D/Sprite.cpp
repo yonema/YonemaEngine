@@ -184,7 +184,7 @@ namespace nsYMEngine
 			}
 
 			void CSprite::UpdateWorldMatrix(
-				const nsMath::CVector3 position,
+				const nsMath::CVector2 position,
 				const nsMath::CQuaternion& rotation,
 				const nsMath::CVector3& scale,
 				const nsMath::CVector2& pivot
@@ -203,7 +203,7 @@ namespace nsYMEngine
 					{ halfSize.x * localPivot.x, halfSize.y * localPivot.y, 0.0f });
 
 				nsMath::CMatrix mTrans, mRot, mScale;
-				mTrans.MakeTranslation(position);
+				mTrans.MakeTranslation({ position.x, position.y, 0.0f });
 				mRot.MakeRotationFromQuaternion(rotation);
 				mScale.MakeScaling(scale);
 				m_worldMatrix = mPivotTrans * mScale * mRot * mTrans;

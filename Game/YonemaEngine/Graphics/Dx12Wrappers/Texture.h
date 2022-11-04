@@ -16,9 +16,10 @@ namespace nsYMEngine
 			{
 			private:
 				static const int m_kNumWICFileExtensions = 5;
-				static const char* m_kWICFileExtensions[m_kNumWICFileExtensions];
-				static const char* m_kTGAFileExtension;
-				static const char* m_kDDSFileExtension;
+				static const int m_kUpAndLowExtensions = 2;
+				static const char* m_kWICFileExtensions[m_kUpAndLowExtensions][m_kNumWICFileExtensions];
+				static const char* m_kTGAFileExtensions[m_kUpAndLowExtensions];
+				static const char* m_kDDSFileExtensions[m_kUpAndLowExtensions];
 				static const wchar_t* const m_kNamePrefix;
 
 			public:

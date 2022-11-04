@@ -3,7 +3,6 @@
 #include "../GameWindow/MessageBox.h"
 #include "../PMDModels/PMDRenderer.h"
 #include "../FBXModels/FBXRenderer.h"
-#include "../GraphicsEngine.h"
 
 namespace nsYMEngine
 {
@@ -21,7 +20,10 @@ namespace nsYMEngine
 
 			bool CModelRenderer::Start()
 			{
-				m_renderer->UpdateWorldMatrix(m_position, m_rotation, m_scale);
+				if (m_renderer)
+				{
+					m_renderer->UpdateWorldMatrix(m_position, m_rotation, m_scale);
+				}
 
 				return true;
 			}
@@ -57,40 +59,12 @@ namespace nsYMEngine
 
 			void CModelRenderer::Terminate()
 			{
-				if (m_rendererType != CRendererTable::EnRendererType::enNone)
-				{
-					DisableDrawing();
-				}
 				if (m_renderer)
 				{
+					m_renderer->DisableDrawing();
 					delete m_renderer;
+					m_renderer = nullptr;
 				}
-				return;
-			}
-
-			void CModelRenderer::EnableDrawing()
-			{
-				if (IsEnableDrawing())
-				{
-					return;
-				}
-
-				CGraphicsEngine::GetInstance()->GetRendererTable()->RegistRenderer(
-					m_rendererType, m_renderer);
-				m_isEnableDrawing = true;
-				return;
-			}
-
-			void CModelRenderer::DisableDrawing()
-			{
-				if (IsEnableDrawing() != true)
-				{
-					return;
-				}
-
-				CGraphicsEngine::GetInstance()->GetRendererTable()->RemoveRenderer(
-					m_rendererType, m_renderer);
-				m_isEnableDrawing = false;
 				return;
 			}
 
@@ -115,7 +89,7 @@ namespace nsYMEngine
 						modelInitData.modelFilePath, modelInitData.animFilePath);
 					break;
 				case EnModelFormat::enFBX:
-					m_renderer = new nsFBXModels::CFBXRenderer(modelInitData.modelFilePath);
+					m_renderer = new nsFBXModels::CFBXRenderer(modelInitData);
 					break;
 				case EnModelFormat::enVRM:
 					msg = "モデルのロードに失敗しました。\nごめんなさい、この拡張子はまだ対応していません。\n";
@@ -137,27 +111,32 @@ namespace nsYMEngine
 			{
 				std::string msg;
 
-				m_rendererType = modelInitData.rendererType;
+				if (m_renderer == nullptr)
+				{
+					return;
+				}
 
-				if (m_rendererType == CRendererTable::EnRendererType::enNone)
+				m_renderer->SetRenderType(modelInitData.rendererType);
+
+				if (m_renderer->GetRenderType() == CRendererTable::EnRendererType::enNone)
 				{
 					switch (modelFormat)
 					{
 						case EnModelFormat::enPMD:
-							m_rendererType = CRendererTable::EnRendererType::enPMDModel;
+							m_renderer->SetRenderType(CRendererTable::EnRendererType::enPMDModel);
 							break;
 						case EnModelFormat::enFBX:
-							m_rendererType = CRendererTable::EnRendererType::enFBXModel;
+							m_renderer->SetRenderType(CRendererTable::EnRendererType::enFBXModel);
 							break;
 						case EnModelFormat::enVRM:
-							m_rendererType = CRendererTable::EnRendererType::enNone;
+							m_renderer->SetRenderType(CRendererTable::EnRendererType::enNone);
 
 							msg = "レンダラーの登録に失敗しました。\nごめんなさい、このレンダラーはまだ対応していません。\n";
 							msg += modelInitData.modelFilePath;
 							nsGameWindow::MessageBoxError(nsUtils::GetWideStringFromString(msg).c_str());
 							break;
 						default:
-							m_rendererType = CRendererTable::EnRendererType::enNone;
+							m_renderer->SetRenderType(CRendererTable::EnRendererType::enNone);
 
 							msg = "レンダラーの登録に失敗しました。\nごめんなさい、このレンダラーはまだ対応していません。\n";
 							msg += modelInitData.modelFilePath;
@@ -166,9 +145,9 @@ namespace nsYMEngine
 					}
 				}
 
-				if (m_rendererType != CRendererTable::EnRendererType::enNone)
+				if (m_renderer->GetRenderType() != CRendererTable::EnRendererType::enNone)
 				{
-					EnableDrawing();
+					m_renderer->EnableDrawing();
 				}
 
 				return;

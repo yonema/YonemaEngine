@@ -14,6 +14,7 @@ namespace nsYMEngine
 			static const CVector2 m_kDown;
 			static const CVector2 m_kAxisX;
 			static const CVector2 m_kAxisY;
+			static const CVector2 m_kCenter;
 
 		public:
 			/**
@@ -42,6 +43,7 @@ namespace nsYMEngine
 			inline static const CVector2& Down() noexcept;
 			inline static const CVector2& AxisX() noexcept;
 			inline static const CVector2& AxisY() noexcept;
+			inline static const CVector2& Center() noexcept;
 
 
 			inline void Add(const CVector2& v) noexcept;
@@ -162,6 +164,10 @@ namespace nsYMEngine
 		inline const CVector2& CVector2::AxisY() noexcept
 		{
 			return m_kAxisY;
+		}
+		inline const CVector2& CVector2::Center() noexcept
+		{
+			return m_kCenter;
 		}
 
 		inline void CVector2::Add(const CVector2& v) noexcept

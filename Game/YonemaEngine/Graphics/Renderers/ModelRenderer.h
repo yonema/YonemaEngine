@@ -35,13 +35,12 @@ namespace nsYMEngine
 				EnModelFormat modelFormat = EnModelFormat::enNone;
 				CRendererTable::EnRendererType rendererType = 
 					CRendererTable::EnRendererType::enNone;
+				nsMath::CQuaternion vertexBias = nsMath::CQuaternion::Identity();
+				bool isVertesTranspos = false;
 			};
 
 			class CModelRenderer : public nsGameObject::IGameObject
 			{
-			public:
-
-
 			private:
 				static const char* 
 					m_kModelFormatExtensions[static_cast<int>(EnModelFormat::enNumModelFormat)];
@@ -90,15 +89,6 @@ namespace nsYMEngine
 					return m_scale;
 				}
 
-				void EnableDrawing();
-
-				void DisableDrawing();
-
-				constexpr bool IsEnableDrawing() const noexcept
-				{
-					return m_isEnableDrawing;
-				}
-
 			private:
 				void Terminate();
 
@@ -118,7 +108,6 @@ namespace nsYMEngine
 				nsMath::CVector3 m_position = nsMath::CVector3::Zero();
 				nsMath::CQuaternion m_rotation = nsMath::CQuaternion::Identity();
 				nsMath::CVector3 m_scale = nsMath::CVector3::One();
-				bool m_isEnableDrawing = false;
 			};
 
 		}

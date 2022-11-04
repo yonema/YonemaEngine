@@ -6,10 +6,6 @@ namespace nsYMEngine
 	namespace nsGraphics
 	{
 		class CGraphicsEngine; 
-		namespace ns2D
-		{
-			class CSprite;
-		}
 	}
 }
 
@@ -75,7 +71,6 @@ namespace nsYMEngine
 		nsGameObject::CGameObjectManager* m_gameObjectManager = nullptr;
 		nsTime::CGameTime m_gameTime;
 		bool m_isExitGame = false;
-		nsGraphics::ns2D::CSprite* m_sprite = nullptr;
 	};
 }
 

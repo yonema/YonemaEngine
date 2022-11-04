@@ -119,13 +119,17 @@ namespace nsYMEngine
 			{
 				for (auto go : goList)
 				{
-					if (go->IsMatchName(objectName))
+					if (go->IsMatchName(objectName) != true)
 					{
 						continue;
 					}
 					//見つけた。
 					T* p = dynamic_cast<T*>(go);
-					// 同じ名前でも、型が違えばnullptrになる。
+					if (p == nullptr)
+					{
+						// 同じ名前でも、型が違えばnullptrになる。
+						continue;
+					}
 					return p;
 				}
 			}

@@ -50,7 +50,7 @@ namespace nsYMEngine
 				void Release();
 
 				void UpdateWorldMatrix(
-					const nsMath::CVector3 position,
+					const nsMath::CVector2 position,
 					const nsMath::CQuaternion& rotation,
 					const nsMath::CVector3& scale,
 					const nsMath::CVector2& pivot

@@ -10,16 +10,13 @@ namespace nsYMEngine
 	{
 		namespace nsDx12Wrappers
 		{
-			const char* CTexture::m_kWICFileExtensions[m_kNumWICFileExtensions]
+			const char* CTexture::m_kWICFileExtensions[m_kUpAndLowExtensions][m_kNumWICFileExtensions] =
 			{
-				"sph",
-				"spa",
-				"bmp",
-				"png",
-				"jpg"
+				{ "sph", "spa", "bmp", "png", "jpg"	},
+				{ "SPH", "SAP", "BMP", "PNG", "JPG" }
 			};
-			const char* CTexture::m_kTGAFileExtension = "tga";
-			const char* CTexture::m_kDDSFileExtension = "dds";
+			const char* CTexture::m_kTGAFileExtensions[m_kUpAndLowExtensions] = { "tga", "TGA" };
+			const char* CTexture::m_kDDSFileExtensions[m_kUpAndLowExtensions] = { "dds",	"DDS" };
 			const wchar_t* const CTexture::m_kNamePrefix = L"Texture: ";
 
 
@@ -168,43 +165,62 @@ namespace nsYMEngine
 				HRESULT result;
 				bool roaded = false;
 
-				for (auto WICExtension : m_kWICFileExtensions)
+				for (const auto& WICExtensions : m_kWICFileExtensions)
 				{
-					if (strcmp(extension, WICExtension) != 0)
+					for (const auto& WICExtension : WICExtensions)
 					{
-						continue;
-					}
+						if (strcmp(extension, WICExtension) != 0)
+						{
+							continue;
+						}
 
-					result = DirectX::LoadFromWICFile(
-						nsUtils::GetWideStringFromString(filePath).c_str(),
-						DirectX::WIC_FLAGS_NONE,
-						metadata,
-						*scratchImage
-					);
-					roaded = true;
-					break;
+						result = DirectX::LoadFromWICFile(
+							nsUtils::GetWideStringFromString(filePath).c_str(),
+							DirectX::WIC_FLAGS_NONE,
+							metadata,
+							*scratchImage
+						);
+						roaded = true;
+						break;
+					}
+					if (roaded)
+					{
+						break;
+					}
 				}
 
 				if (roaded != true)
 				{
-					if (strcmp(extension, m_kTGAFileExtension) == 0)
+					for (const auto& TGAFileExtension : m_kTGAFileExtensions)
 					{
-						result = DirectX::LoadFromTGAFile(
-							nsUtils::GetWideStringFromString(filePath).c_str(),
-							metadata,
-							*scratchImage
-						);
-						roaded = true;
+						if (strcmp(extension, TGAFileExtension) == 0)
+						{
+							result = DirectX::LoadFromTGAFile(
+								nsUtils::GetWideStringFromString(filePath).c_str(),
+								metadata,
+								*scratchImage
+							);
+							roaded = true;
+							break;
+						}
+
 					}
-					else if (strcmp(extension, m_kDDSFileExtension) == 0)
+				}
+				if (roaded != true)
+				{
+					for (const auto& DDSFileExtension : m_kDDSFileExtensions)
 					{
-						result = DirectX::LoadFromDDSFile(
-							nsUtils::GetWideStringFromString(filePath).c_str(),
-							DirectX::DDS_FLAGS_NONE,
-							metadata,
-							*scratchImage
-						);
-						roaded = true;
+						if (strcmp(extension, DDSFileExtension) == 0)
+						{
+							result = DirectX::LoadFromDDSFile(
+								nsUtils::GetWideStringFromString(filePath).c_str(),
+								DirectX::DDS_FLAGS_NONE,
+								metadata,
+								*scratchImage
+							);
+							roaded = true;
+							break;
+						}
 					}
 				}
 

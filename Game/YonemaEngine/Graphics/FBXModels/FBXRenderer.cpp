@@ -38,9 +38,9 @@ namespace nsYMEngine
 				return;
 			}
 
-			CFBXRenderer::CFBXRenderer(const char* const filePath)
+			CFBXRenderer::CFBXRenderer(const SModelInitData& modelInitData)
 			{
-				Init(filePath);
+				Init(modelInitData);
 				return;
 			}
 			CFBXRenderer::~CFBXRenderer()
@@ -120,7 +120,7 @@ namespace nsYMEngine
 				return;
 			}
 
-			bool CFBXRenderer::Init(const char* const filePath)
+			bool CFBXRenderer::Init(const SModelInitData& modelInitData)
 			{			
 				// FbxImportやFbxSceneを作成するために必要な管理クラス。
 				const auto fbxManager = fbxsdk::FbxManager::Create();
@@ -146,7 +146,7 @@ namespace nsYMEngine
 				}
 
 				// Fbxファイルの初期化（Fbxファイルを開く）
-				if (fbxImporter->Initialize(filePath, -1, fbxManager->GetIOSettings()) != true)
+				if (fbxImporter->Initialize(modelInitData.modelFilePath, -1, fbxManager->GetIOSettings()) != true)
 				{
 					fbxImporter->Destroy();
 					fbxScene->Destroy();
@@ -194,7 +194,7 @@ namespace nsYMEngine
 						fbxScene->GetSrcObject<fbxsdk::FbxSurfaceMaterial>(i), 
 						&fbxMaterials, 
 						&m_diffuseTextures,
-						filePath);
+						modelInitData.modelFilePath);
 				}
 
 				CreateMaterialCBVTable(fbxMaterials);
@@ -211,7 +211,8 @@ namespace nsYMEngine
 						fbxScene->GetSrcObject<fbxsdk::FbxMesh>(i),
 						&verticesArray.at(i),
 						&indicesArray.at(i),
-						&m_materialDHs.at(i)
+						&m_materialDHs.at(i),
+						modelInitData
 					);
 				}
 
@@ -392,7 +393,8 @@ namespace nsYMEngine
 				const fbxsdk::FbxMesh* mesh,
 				std::vector<SFbxVertex>* pVertices,
 				std::vector<unsigned short>* pIndices,
-				nsDx12Wrappers::CDescriptorHeap** ppMaterialDH
+				nsDx12Wrappers::CDescriptorHeap** ppMaterialDH,
+				const SModelInitData& modelInitData
 			)
 			{
 				// fbxの頂点バッファ
@@ -442,12 +444,14 @@ namespace nsYMEngine
 				fbxMWolrd.m_vec4Mat[1].Normalize();
 				fbxMWolrd.m_vec4Mat[2].Normalize();
 				nsMath::CMatrix mRot = fbxMWolrd;
-				mRot.Transpose();
+				if (modelInitData.isVertesTranspos)
+				{
+					mRot.Transpose();
+				}
 				nsMath::CMatrix mBias;
-				mBias.MakeRotationX(nsMath::YM_PIDIV2);
-				mRot *= mBias;
+				mBias.MakeRotationFromQuaternion(modelInitData.vertexBias);
 
-				nsMath::CMatrix mWorld = mScale * mRot * mTrans;
+				nsMath::CMatrix mWorld = mBias * mScale * mRot * mTrans;
 
 
 				// 〇頂点バッファのデータをコピーする。
