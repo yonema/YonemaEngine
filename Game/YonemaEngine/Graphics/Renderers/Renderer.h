@@ -1,5 +1,5 @@
 #pragma once
-
+#include "RendererTable.h"
 
 namespace nsYMEngine
 {

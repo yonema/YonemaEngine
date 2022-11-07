@@ -152,6 +152,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="Game\InputMapping.cpp" />
+    <ClCompile Include="Game\Scenes\YonejiDebugScene.cpp" />
+    <ClCompile Include="YonemaEngine\Input\Keyboard.cpp" />
+    <ClCompile Include="YonemaEngine\Input\InputManager.cpp" />
+    <ClCompile Include="YonemaEngine\Input\Gamepad.cpp" />
     <ClCompile Include="Game\Game.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\Renderers\ModelRendererBase.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\Renderers\ModelRenderer.cpp" />
@@ -204,6 +209,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
+    <ClInclude Include="Game\InputMapping.h" />
+    <ClInclude Include="Game\Scenes\YonejiDebugScene.h" />
+    <ClInclude Include="YonemaEngine\Input\InputManagerData.h" />
+    <ClInclude Include="YonemaEngine\Input\Keyboard.h" />
+    <ClInclude Include="YonemaEngine\Input\InputManager.h" />
+    <ClInclude Include="YonemaEngine\Input\Gamepad.h" />
     <ClInclude Include="Game\Game.h" />
     <ClInclude Include="Game\GamePreCompile.h" />
     <ClInclude Include="YonemaEngine\Graphics\Renderers\ModelRendererBase.h" />

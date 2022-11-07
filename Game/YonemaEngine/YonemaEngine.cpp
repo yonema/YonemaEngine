@@ -1,9 +1,8 @@
 #include "YonemaEngine.h"
 #include "Graphics/GraphicsEngine.h"
+#include "Input/InputManager.h"
 #include "../Game/Game.h"
-#include "Graphics/PMDModels/PMDRenderer.h"
-#include "Graphics/FBXModels/FBXRenderer.h"
-#include "Graphics/2D/Sprite.h"
+#include "../Game/Scenes/YonejiDebugScene.h"
 
 namespace nsYMEngine
 {
@@ -26,7 +25,10 @@ namespace nsYMEngine
 			return false;
 		}
 
+		m_inputManager = new nsInput::CInputManager();
+
 		NewGO<nsAWA::CGame>(EnGOPriority::enMid, "AWAGame");
+		//NewGO<nsAWA::nsScenes::CYonejiDebugScene>(EnGOPriority::enMid, "YonejiDebugScene");
 
 		nsMath::CMatrix mat = nsMath::CMatrix::Identity();
 
@@ -35,6 +37,10 @@ namespace nsYMEngine
 
 	void CYonemaEngine::Terminate()
 	{
+		if (m_inputManager)
+		{
+			delete m_inputManager;
+		}
 		nsGameObject::CGameObjectManager::DeleteInstance();
 		m_gameObjectManager = nullptr;
 		nsGraphics::CGraphicsEngine::DeleteInstance();
@@ -47,7 +53,11 @@ namespace nsYMEngine
 	{
 		m_gameTime.StartTimeMeasurement();
 
-		m_gameObjectManager->Update(GetDeltaTime());
+		const float deltaTime = GetDeltaTime();
+
+		m_inputManager->Update(deltaTime);
+
+		m_gameObjectManager->Update(deltaTime);
 
 		m_graphicsEngine->Update();
 

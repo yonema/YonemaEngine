@@ -28,7 +28,7 @@ namespace nsYMEngine
 					delete m_instance;
 				}
 			}
-			inline static CGameWindow* GetInstance()
+			constexpr static CGameWindow* GetInstance()
 			{
 				return m_instance;
 			}
@@ -43,7 +43,7 @@ namespace nsYMEngine
 			*/
 			bool DispatchWindowMessage();
 
-			HWND GetHWND() const 
+			constexpr HWND GetHWND() const 
 			{
 				return m_hwnd;
 			}

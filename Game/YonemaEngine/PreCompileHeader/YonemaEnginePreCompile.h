@@ -20,6 +20,7 @@
 #include <memory>
 #include <algorithm>
 #include <bitset>
+#include <limits>
 
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
@@ -28,6 +29,7 @@
 #pragma comment(lib, "libfbxsdk-md.lib")
 #pragma comment(lib, "libxml2-md.lib")
 #pragma comment(lib, "zlib-md.lib")
+#pragma comment(lib, "xinput.lib")
 
 #include "../Utils/Noncopyable.h"
 #include "../Math/Math.h"

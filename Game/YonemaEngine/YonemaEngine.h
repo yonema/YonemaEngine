@@ -7,6 +7,10 @@ namespace nsYMEngine
 	{
 		class CGraphicsEngine; 
 	}
+	namespace nsInput
+	{
+		class CInputManager;
+	}
 }
 
 namespace nsYMEngine
@@ -61,6 +65,11 @@ namespace nsYMEngine
 			return;
 		}
 
+		constexpr const nsInput::CInputManager* const GetInput()const noexcept
+		{
+			return m_inputManager;
+		}
+
 	private:
 
 		void Terminate();
@@ -69,6 +78,7 @@ namespace nsYMEngine
 		static CYonemaEngine* m_instance;
 		nsGraphics::CGraphicsEngine* m_graphicsEngine = nullptr;
 		nsGameObject::CGameObjectManager* m_gameObjectManager = nullptr;
+		nsInput::CInputManager* m_inputManager = nullptr;
 		nsTime::CGameTime m_gameTime;
 		bool m_isExitGame = false;
 	};
