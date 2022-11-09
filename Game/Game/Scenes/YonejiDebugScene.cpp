@@ -5,7 +5,8 @@ namespace nsAWA
 	{
 		bool CYonejiDebugScene::Start()
 		{
-			m_modelRenderer = NewGO<CModelRenderer>(EnGOPriority::enMid, "ynjTestModel");
+			//m_modelRenderer = NewGO<CModelRenderer>(EnGOPriority::enMid, "ynjTestModel");
+			m_modelRenderer = NewGO<CModelRenderer>("ynjTestModel");
 			SModelInitData modelInitData;
 			modelInitData.modelFilePath = "Assets/Models/hoge.fbx";
 			//modelInitData.modelFilePath = "Assets/Animations/Rumba_Dancing.fbx";

@@ -15,7 +15,6 @@ SPSInput VSMain(SVSInput input)
 
 	output.svpos = mul(mBone, input.pos);
 	output.svpos = mul(g_mWorldViewProj, output.svpos);
-	output.svpos = mul(g_mWorldViewProj, input.pos);
 
 	output.normal = normalize(mul(g_mWorld, float4(input.normal, 0.0f)).xyz);
 

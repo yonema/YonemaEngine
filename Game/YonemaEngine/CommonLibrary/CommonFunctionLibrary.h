@@ -19,6 +19,21 @@ namespace nsYMEngine
 	}
 
 	/**
+	 * @brief ゲームオブジェクトの生成
+	 * @tparam T 生成するゲームオブジェクトの型。nsGameObject::IGameObjectを継承している必要があります。
+	 * @param[in] objectName ゲームオブジェクトの名前。ゲームオブジェクトの検索などで使用します。
+	 * @param[in] priority ゲームオブジェクトの優先度。低い値の優先度ほど早く更新処理が呼ばれます。
+	 * @return 生成したゲームオブジェクト
+	*/
+	template<class T>
+	inline T* NewGO(
+		const char* objectName,
+		EnGOPriority priority = EnGOPriority::enMid)
+	{
+		return nsGameObject::CGameObjectManager::GetInstance()->NewGameObject<T>(priority, objectName);
+	}
+
+	/**
 	 * @brief ゲームオブジェクトの破棄。この関数を呼んだ1フレーム後に破棄が行われます。
 	 * @param go[in] 破棄するゲームオブジェクト
 	*/
