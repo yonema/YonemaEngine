@@ -2,7 +2,6 @@
 #include "../GraphicsEngine.h"
 #include "../Utils/AlignSize.h"
 #include "../Utils/StringManipulation.h"
-#include <fbxsdk.h>
 
 
 namespace nsYMEngine
@@ -20,7 +19,8 @@ namespace nsYMEngine
 				commandList->SetGraphicsRootDescriptorTable(0, descriptorHeapH);
 
 
-
+				// マテリアルごとに描画
+				// 最初にマテリアルごとにメッシュ分解しているため、メッシュごとに描画と同意。
 				const auto kNumBuufers = static_cast<int>(m_indexBuffers.size());
 				for (int i = 0; i < kNumBuufers; i++)
 				{
@@ -69,6 +69,22 @@ namespace nsYMEngine
 				auto mViewProj = CGraphicsEngine::GetInstance()->GetMatrixViewProj();
 				mappedCB[1] = mWorld * mViewProj;
 
+				return;
+			}
+
+			void CFBXRenderer::UpdateAnimation(float deltaTime)
+			{
+				return;
+				int frameNo = 0;
+				for (const auto& animationData : m_animationData)
+				{
+					m_boneMatrix.at(m_boneNameTable[animationData.first]) = 
+						animationData.second.at(frameNo);
+				}
+				auto mappedCB =
+					static_cast<nsMath::CMatrix*>(m_constantBuffer.GetMappedConstantBuffer());
+
+				copy(m_boneMatrix.begin(), m_boneMatrix.end(), mappedCB + 2);
 				return;
 			}
 
@@ -121,69 +137,186 @@ namespace nsYMEngine
 			}
 
 			bool CFBXRenderer::Init(const SModelInitData& modelInitData)
-			{			
-				// FbxImportやFbxSceneを作成するために必要な管理クラス。
-				const auto fbxManager = fbxsdk::FbxManager::Create();
+			{
+				fbxsdk::FbxManager* fbxManager = nullptr;
+				fbxsdk::FbxScene* fbxScene = nullptr;
 
-				auto ioSetting = fbxsdk::FbxIOSettings::Create(fbxManager, IOSROOT);
-				fbxManager->SetIOSettings(ioSetting);
-
-				// FbxファイルをImportするためのパーサークラス。
-				auto fbxImporter = fbxsdk::FbxImporter::Create(fbxManager, "FbxImporter");
-
-				if (fbxImporter == nullptr)
+				if (InitializeSdkObjects(fbxManager, fbxScene) != true)
 				{
 					return false;
 				}
 
-				// Importerによって、分解されたFbxのデータを保存するためのクラス
-				auto fbxScene = fbxsdk::FbxScene::Create(fbxManager, "FbxScene");
-
-				if (fbxScene == nullptr)
+				fbxsdk::FbxImporter* fbxImporter = nullptr;
+				fbxImporter = fbxsdk::FbxImporter::Create(fbxManager, "MyFbxImporter");
+				if (fbxImporter == nullptr)
 				{
-					fbxImporter->Destroy();
+					DestroySdkObjects(fbxManager, false);
 					return false;
+				}
+
+				int fileFormat = -1;
+				// ファイルに指定されたインポート（リーダー）ファイル形式を検出する
+				if (fbxManager->GetIOPluginRegistry()->
+					DetectReaderFileFormat(modelInitData.modelFilePath, fileFormat) != true)
+				{
+					// 検出できないファイル形式です。 FbxImporter::eFBX_BINARY 形式でトライします。
+					fileFormat = fbxManager->GetIOPluginRegistry()->
+						FindReaderIDByDescription("FBX binary (*.fbx)");
 				}
 
 				// Fbxファイルの初期化（Fbxファイルを開く）
-				if (fbxImporter->Initialize(modelInitData.modelFilePath, -1, fbxManager->GetIOSettings()) != true)
+				if (fbxImporter->Initialize(
+					modelInitData.modelFilePath, fileFormat, fbxManager->GetIOSettings()) != true)
 				{
-					fbxImporter->Destroy();
-					fbxScene->Destroy();
+					DestroySdkObjects(fbxManager, false);
 					return false;
 				}
+
 
 				// Importerが持ってるデータを分解してSceneに渡す。
 				// @attention コストの高い処理！
 				if (fbxImporter->Import(fbxScene/*, true*/) != true)
 				{
-					fbxImporter->Destroy();
-					fbxScene->Destroy();
+					std::string str = "Unable to import file ";
+					str += modelInitData.modelFilePath;
+					str += "\nError reported: ";
+					str += fbxImporter->GetStatus().GetErrorString();
+
+					::OutputDebugStringA("\n");
+					::OutputDebugStringA("********************************************************************************\n");
+					::OutputDebugStringA(str.c_str());
+					::OutputDebugStringA("\n");
+					::OutputDebugStringA("********************************************************************************\n");
+					::OutputDebugStringA("\n");
+
+					DestroySdkObjects(fbxManager, false);
 					return false;
+				}
+
+				// 整合性をチェック
+				fbxsdk::FbxStatus status;
+				fbxsdk::FbxArray<fbxsdk::FbxString*> details;
+				fbxsdk::FbxSceneCheckUtility sceneCheck(
+					fbxsdk::FbxCast<fbxsdk::FbxScene>(fbxScene), &status, &details);
+				bool lNotify = (!sceneCheck.Validate(fbxsdk::FbxSceneCheckUtility::eCkeckData) &&
+					details.GetCount() > 0) || 
+					(fbxImporter->GetStatus().GetCode() != fbxsdk::FbxStatus::eSuccess);
+				if (lNotify)
+				{
+					::OutputDebugStringA("\n");
+					::OutputDebugStringA("********************************************************************************\n");
+					if (details.GetCount())
+					{
+						::OutputDebugStringA("Scene integrity verification failed with the following errors:\n");
+
+						for (int i = 0; i < details.GetCount(); i++)
+						{
+							std::string str = "   ";
+							str += details[i]->Buffer();
+							str += "\n";
+							::OutputDebugStringA(str.c_str());
+						}
+
+						fbxsdk::FbxArrayDelete<fbxsdk::FbxString*>(details);
+					}
+
+					if (fbxImporter->GetStatus().GetCode() != fbxsdk::FbxStatus::eSuccess)
+					{
+						::OutputDebugStringA("\n");
+						::OutputDebugStringA("WARNING:\n");
+						::OutputDebugStringA("   The importer was able to read the file but with errors.\n");
+						::OutputDebugStringA("   Loaded scene may be incomplete.\n\n");
+						std::string str = "   Last error message:";
+						str += fbxImporter->GetStatus().GetErrorString();
+						str += "\n";
+						::OutputDebugStringA(str.c_str());
+					}
+
+					::OutputDebugStringA("********************************************************************************\n");
+					::OutputDebugStringA("\n");
+				}
+
+				// 必要に応じて軸変換を行う。
+
+				// Fbxファイルに設定してある軸設定
+				fbxsdk::FbxAxisSystem SceneAxisSystem = 
+					fbxScene->GetGlobalSettings().GetAxisSystem();
+				// このゲームの軸設定
+				fbxsdk::FbxAxisSystem OurAxisSystem(fbxsdk::FbxAxisSystem::DirectX);
+				//fbxsdk::FbxAxisSystem OurAxisSystem(
+				//	fbxsdk::FbxAxisSystem::eYAxis,
+				//	fbxsdk::FbxAxisSystem::eParityOdd,
+				//	fbxsdk::FbxAxisSystem::eRightHanded);
+
+				if (SceneAxisSystem != OurAxisSystem)
+				{
+					// 軸設定に差異があれば軸変換を行う。
+					OurAxisSystem.ConvertScene(fbxScene);
+				}
+
+				// 必要に応じて単位変換を行う。
+
+				// Fbxファイルに設定してある単位設定
+				fbxsdk::FbxSystemUnit SceneSystemUnit = fbxScene->GetGlobalSettings().GetSystemUnit();
+				// センチメートルに対する相対的な倍率を調べる。
+				if (SceneSystemUnit.GetScaleFactor() != 1.0)
+				{
+					// 目的の単位設定でなかったなら、単位変換を行う。
+					fbxsdk::FbxSystemUnit::cm.ConvertScene(fbxScene);
+				}
+
+				// メッシュ、NURBS、パッチを、三角メッシュに変換する。
+				// コストの高い処理。
+				fbxsdk::FbxGeometryConverter geometryConverter(fbxManager);
+				bool res = false;
+				try
+				{
+					res = geometryConverter.Triangulate(fbxScene, true);
+				}
+				catch (std::runtime_error) 
+				{
+					::OutputDebugStringA("Scene integrity verification failed.\n");
+					return false;
+				}
+
+				unsigned int totalFrames = 0;
+				
+				auto timeMode = fbxsdk::FbxGetGlobalTimeMode();
+				fbxsdk::FbxTime oneFrameTime, startTime, stopTime;
+				oneFrameTime.SetTime(0, 0, 0, 1, 0, timeMode);
+				fbxsdk::FbxArray<fbxsdk::FbxString*> animStackNameArray;
+				fbxScene->FillAnimStackNameArray(animStackNameArray);
+				const auto animStackCount = animStackNameArray.GetCount();
+
+				for (int i = 0; i < animStackCount; i++)
+				{
+					auto takeInfo = fbxScene->GetTakeInfo(*(animStackNameArray[i]));
+					if (takeInfo)
+					{
+						startTime = takeInfo->mLocalTimeSpan.GetStart().Get();
+						stopTime = takeInfo->mLocalTimeSpan.GetStop().Get();
+						auto totalTime = (stopTime - startTime) / oneFrameTime;
+						totalFrames = static_cast<unsigned int>(totalTime.Get());
+						break;
+					}
 				}
 
 				// インポートしたため、Importerはもういらない。
 				fbxImporter->Destroy();
+				fbxImporter = nullptr;
 
 
 
 				const auto rootNode = fbxScene->GetRootNode();
 				if (rootNode == nullptr)
 				{
-					fbxImporter->Destroy();
-					fbxScene->Destroy();
+					DestroySdkObjects(fbxManager, false);
 					return false;
 				}
 
 
-				fbxsdk::FbxGeometryConverter fbxConverter(fbxManager);
-				bool res = fbxConverter.SplitMeshesPerMaterial(fbxScene, true);
+				res = geometryConverter.SplitMeshesPerMaterial(fbxScene, true);
 
-				// 三角形ポリゴンに変換する。
-				// 最初から三角形ポリゴンならする必要なし。
-				// ポリゴンを三角形にする。
-				// コストの高い処理。
-				res = fbxConverter.Triangulate(fbxScene, true);
 
 				const int matObjectCount = fbxScene->GetSrcObjectCount<fbxsdk::FbxSurfaceMaterial>();
 				std::unordered_map<std::string, SFbxMaterial> fbxMaterials;
@@ -204,14 +337,19 @@ namespace nsYMEngine
 				std::vector<std::vector<unsigned short>> indicesArray;
 				verticesArray.resize(meshObjectCount);
 				indicesArray.resize(meshObjectCount);
+				m_weightTableArray.resize(meshObjectCount);
+				//m_boneMatrixArray.resize(meshObjectCount);
 				m_materialDHs.resize(meshObjectCount);
 				for (int i = 0; i < meshObjectCount; i++)
 				{
 					CreateMesh(
+						static_cast<unsigned int>(i),
 						fbxScene->GetSrcObject<fbxsdk::FbxMesh>(i),
-						&verticesArray.at(i),
-						&indicesArray.at(i),
-						&m_materialDHs.at(i),
+						&verticesArray,
+						&indicesArray,
+						startTime,
+						oneFrameTime,
+						totalFrames,
 						modelInitData
 					);
 				}
@@ -222,17 +360,65 @@ namespace nsYMEngine
 
 
 				// Sceneからデータを取得したため、Sceneはもういらない。
-				fbxScene->Destroy();
-
-				ioSetting->Destroy();
-				fbxManager->Destroy();
-
+				DestroySdkObjects(fbxManager, true);
 
 				CreateConstantBufferView();
 
 				CreateShaderResourceView();
 
 				return true;
+			}
+
+
+			bool CFBXRenderer::InitializeSdkObjects(
+				fbxsdk::FbxManager*& pManager, fbxsdk::FbxScene*& pScene)
+			{
+				pManager = fbxsdk::FbxManager::Create();
+				if (pManager == nullptr)
+				{
+					::OutputDebugStringA("Error: Unable to create FBX Manager!\n");
+					nsGameWindow::MessageBoxWarning(L"FbxManagerが生成できませんでした。");
+					return false;
+				}
+
+				// fbxのバージョンを表示
+				std::string str("Autodesk FBX SDK version ");
+				str += pManager->GetVersion();
+				str += "\n";
+				::OutputDebugStringA(str.c_str());
+
+				fbxsdk::FbxIOSettings* ios = fbxsdk::FbxIOSettings::Create(pManager, IOSROOT);
+				pManager->SetIOSettings(ios);
+
+				// 実行ディレクトリからプラグインを読み込む（任意）
+				fbxsdk::FbxString lPath = fbxsdk::FbxGetApplicationDirectory();
+				pManager->LoadPluginsDirectory(lPath.Buffer());
+
+				pScene = fbxsdk::FbxScene::Create(pManager, "MyFbxScene");
+				if (pScene == nullptr)
+				{
+					::OutputDebugStringA("Error: Unable to create FBX scene!\n");
+					nsGameWindow::MessageBoxWarning(L"FbxSceneが生成できませんでした。");
+					return false;
+				}
+
+				return true;
+			}
+
+			void CFBXRenderer::DestroySdkObjects(fbxsdk::FbxManager* pManager, bool exitStatus)
+			{
+				if (pManager)
+				{
+					// FbxManagerを削除します。
+					// FbxManagerを使用して割り当てられたオブジェクトで、
+					// 明示的に破棄されていないものもすべて自動的に破棄されます。
+					pManager->Destroy();
+				}
+				if (exitStatus)
+				{
+					::OutputDebugStringA("Program Success!\n");
+				}
+				return;
 			}
 
 			void CFBXRenderer::LoadMaterial(
@@ -390,13 +576,19 @@ namespace nsYMEngine
 
 
 			void CFBXRenderer::CreateMesh(
+				unsigned int objectIdx,
 				const fbxsdk::FbxMesh* mesh,
-				std::vector<SFbxVertex>* pVertices,
-				std::vector<unsigned short>* pIndices,
-				nsDx12Wrappers::CDescriptorHeap** ppMaterialDH,
+				std::vector<std::vector<SFbxVertex>>* pVerticesArray,
+				std::vector<std::vector<unsigned short>>* pIndicesArray,
+				const fbxsdk::FbxTime& startTime,
+				const fbxsdk::FbxTime& oneFrameTime,
+				const unsigned int totalFrames,
 				const SModelInitData& modelInitData
 			)
 			{
+				auto* pVertices = &pVerticesArray->at(objectIdx);
+				auto* pIndices = &pIndicesArray->at(objectIdx);
+
 				// fbxの頂点バッファ
 				const auto kFbxVertices = mesh->GetControlPoints();
 				// fbxのインデックスバッファ
@@ -405,6 +597,8 @@ namespace nsYMEngine
 				const auto kFbxPolygonVertexCount = mesh->GetPolygonVertexCount();
 				// fbxのワールド行列。
 				const auto& kFbxMWorld = mesh->GetNode()->EvaluateGlobalTransform();
+
+				m_weightTableArray.at(objectIdx).resize(kFbxPolygonVertexCount);
 
 				// ワールド行列を使いやすいように、このエンジンの行列クラスにコピーする。
 				nsMath::CMatrix fbxMWolrd;
@@ -418,7 +612,7 @@ namespace nsYMEngine
 
 
 
-				// 単位をそろえるため、平行移動量を100.0fで割る。
+				//// 単位をそろえるため、平行移動量を100.0fで割る。
 				fbxMWolrd.m_fMat[3][0] /= 100.0f;
 				fbxMWolrd.m_fMat[3][1] /= 100.0f;
 				fbxMWolrd.m_fMat[3][2] /= 100.0f;
@@ -455,7 +649,6 @@ namespace nsYMEngine
 
 
 				// 〇頂点バッファのデータをコピーする。
-				std::vector<SFbxVertex> fbxVertex;
 				pVertices->resize(kFbxPolygonVertexCount);
 
 				//・座標のコピー。
@@ -577,7 +770,7 @@ namespace nsYMEngine
 
 				if (mesh->GetElementMaterialCount() == 0)
 				{
-					*ppMaterialDH = m_materialDHTable.at("");
+					m_materialDHs.at(objectIdx) = m_materialDHTable.at("");
 					return;
 				}
 
@@ -587,12 +780,132 @@ namespace nsYMEngine
 				if (surfaceMaterial != nullptr)
 				{
 					const auto& name = surfaceMaterial->GetName();
-					*ppMaterialDH = m_materialDHTable.at(surfaceMaterial->GetName());
+					m_materialDHs.at(objectIdx) = m_materialDHTable.at(surfaceMaterial->GetName());
 				}
 				else
 				{
-					*ppMaterialDH = m_materialDHTable.at("");
+					m_materialDHs.at(objectIdx) = m_materialDHTable.at("");
 				}
+
+
+				const int skinCount = mesh->GetDeformerCount(fbxsdk::FbxDeformer::EDeformerType::eSkin);
+				auto timeMode = fbxsdk::FbxGetGlobalTimeMode();
+				// 複数のスケルトンは未対応
+				for (int skinIdx = 0; skinIdx < skinCount; skinIdx++)
+				{
+					fbxsdk::FbxSkin* skin = static_cast<fbxsdk::FbxSkin*>(
+						mesh->GetDeformer(skinIdx, fbxsdk::FbxDeformer::EDeformerType::eSkin));
+
+					const int clusterCount = skin->GetClusterCount();
+					bool updateBoneMatrix = false;
+					if (m_boneMatrix.empty())
+					{
+						m_boneMatrix.resize(clusterCount);
+						updateBoneMatrix = true;
+					}
+					for (int clusterIdx = 0; clusterIdx < clusterCount; clusterIdx++)
+					{
+						// クラスタ(ボーン)
+						auto cluster = skin->GetCluster(clusterIdx);
+
+						const int cpIndicesCount = cluster->GetControlPointIndicesCount();
+						const int* cpIndices = cluster->GetControlPointIndices();
+						const double* cpWeights = cluster->GetControlPointWeights();
+						int cpNum = 0;
+						float totalWeight = 0;
+						auto clusterName = cluster->GetName();
+						if (cpIndicesCount < 0)
+						{
+							int a = 1;
+						}
+						for (int cpIndicesIdx = 0; cpIndicesIdx < cpIndicesCount; cpIndicesIdx++)
+						{
+							const int cpIndex = cpIndices[cpIndicesIdx];
+							const float weight = static_cast<float>(cpWeights[cpIndicesIdx]);
+							//if (weight > 0.0f)
+							{
+								if (m_weightTableArray.at(objectIdx).at(cpIndex).count(clusterName) > 0)
+								{
+									int a = 1;
+								}
+								m_weightTableArray.at(objectIdx).at(cpIndex).emplace(clusterName, weight);
+							}
+						}
+
+						if (updateBoneMatrix)
+						{
+							if (m_boneNameTable.count(clusterName) == 0)
+							{
+								m_boneNameTable.emplace(clusterName, clusterIdx);
+							}
+							else
+							{
+								int a = 1;
+							}
+
+							fbxsdk::FbxAMatrix mTransfrom;
+							cluster->GetTransformLinkMatrix(mTransfrom);
+
+							for (int y = 0; y < 4; y++)
+							{
+								for (int x = 0; x < 4; x++)
+								{
+									// 初期ポーズを取得
+									m_boneMatrix.at(clusterIdx).m_fMat[y][x] =
+										static_cast<float>(mTransfrom[y][x]);
+								}
+							}
+							m_boneMatrix.at(clusterIdx) = nsMath::CMatrix::Identity();
+						}
+
+						if (m_animationData.count(clusterName) == 0)
+						{
+							std::vector<nsMath::CMatrix> tempMat;
+							m_animationData.emplace(clusterName, tempMat);
+							auto& animData = m_animationData.at(clusterName);
+							animData.resize(totalFrames);
+							for (unsigned int frameIdx = 0; frameIdx < totalFrames; frameIdx++)
+							{
+								const auto& fbxMat = cluster->GetLink()->
+									EvaluateGlobalTransform(oneFrameTime * frameIdx);
+								auto& anim = animData.at(frameIdx);
+								fbxMat[0][0];
+								for (int y = 0; y < 4; y++)
+								{
+									for (int x = 0; x < 4; x++)
+									{
+										anim.m_fMat[y][x] = static_cast<float>(fbxMat[y][x]);
+									}
+								}
+							}
+						}
+					}
+				}
+
+				for (int i = 0; i < kFbxPolygonVertexCount; i++)
+				{
+					int idx = 0;
+					if (m_weightTableArray.at(objectIdx).at(i).empty())
+					{
+						int a = 1;
+					}
+					for (const auto& weightTable : m_weightTableArray.at(objectIdx).at(i))
+					{
+						if (idx > 3)
+						{
+							int a = 1;
+							break;
+						}
+
+						pVertices->at(i).boneNo[idx] = m_boneNameTable[weightTable.first];
+						pVertices->at(i).weights[idx] =
+							static_cast<unsigned short>(weightTable.second * 10000.0f);
+						idx++;
+
+					}
+				}
+
+
 
 				return;
 			}
@@ -636,24 +949,21 @@ namespace nsYMEngine
 			{
 				// 〇定数バッファ作成
 				auto cbSize = sizeof(nsMath::CMatrix) * 2;
+
+				unsigned int boneNum = static_cast<unsigned int>(m_boneMatrix.size());
+				cbSize += sizeof(nsMath::CMatrix) * boneNum;
+
 				m_constantBuffer.Init(static_cast<unsigned int>(cbSize), L"FBXModel");
 
-				nsMath::CMatrix mTrans;
-				mTrans.MakeTranslation(0.0f, 2.0f, -1.0f);
-				nsMath::CQuaternion qRot;
-				qRot.SetRotationYDeg(-180.0f);
-				nsMath::CMatrix mRot;
-				mRot.MakeRotationFromQuaternion(qRot);
-				nsMath::CMatrix mScale;
-				constexpr float scaling = 10.0f;
-				mScale.MakeScaling(scaling, scaling, scaling);
-				nsMath::CMatrix mWorld = mScale * mRot * mTrans;
+				nsMath::CMatrix mWorld = nsMath::CMatrix::Identity();
 
 				auto mappedCB =
 					static_cast<nsMath::CMatrix*>(m_constantBuffer.GetMappedConstantBuffer());
 				mappedCB[0] = mWorld;
 				auto mViewProj = CGraphicsEngine::GetInstance()->GetMatrixViewProj();
 				mappedCB[1] = mWorld * mViewProj;
+
+				copy(m_boneMatrix.begin(), m_boneMatrix.end(), mappedCB + 2);
 
 				// 〇ディスクリプタヒープ作成
 				constexpr unsigned int numDescHeaps = 1;
@@ -762,7 +1072,7 @@ namespace nsYMEngine
 					&matSRVDesc,
 					matDescHandle
 				);
-;
+
 				return true;
 			}
 

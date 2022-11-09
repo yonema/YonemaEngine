@@ -1,7 +1,6 @@
 #include "Application.h"
 #include "YonemaEngine/YonemaEngine.h"
 #include "YonemaEngine/GameWindow/GameWindow.h"
-#include "YonemaEngine/GameWindow/MessageBox.h"
 
 namespace nsYMEngine
 {

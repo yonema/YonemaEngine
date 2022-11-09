@@ -2,7 +2,6 @@
 #include "../GraphicsEngine.h"
 #include "../../Utils/StringManipulation.h"
 #include "../../Utils/AlignSize.h"
-#include "../../GameWindow/MessageBox.h"
 
 namespace nsYMEngine
 {

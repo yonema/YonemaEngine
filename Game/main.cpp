@@ -1,5 +1,3 @@
-#include "YonemaEngine/GameWindow/GameWindow.h"
-#include "YonemaEngine/GameWindow/MessageBox.h"
 #include "Application.h"
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)

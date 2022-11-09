@@ -1,5 +1,4 @@
 #include "Blob.h"
-#include "../GameWindow/MessageBox.h"
 #include "../Utils/StringManipulation.h"
 
 namespace nsYMEngine

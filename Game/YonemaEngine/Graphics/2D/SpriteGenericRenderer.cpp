@@ -1,5 +1,4 @@
 #include "SpriteGenericRenderer.h"
-#include "../GameWindow/MessageBox.h"
 #include "../GraphicsEngine.h"
 
 namespace nsYMEngine

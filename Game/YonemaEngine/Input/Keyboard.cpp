@@ -5,8 +5,9 @@ namespace nsYMEngine
 	namespace nsInput
 	{
 		const int CKeyboard::m_kByteSizeForGetKeyboardState = 256;
-		const DWORD CKeyboard::m_keycodeTable[static_cast<int>(EnKeyButton::enNumButtons)]
+		const DWORD CKeyboard::m_kKeycodeTable[static_cast<int>(EnKeyButton::enNumButtons)]
 		{
+			0,
 			// A to Z
 			'A',	// enA,
 			'B',	// enB,
@@ -89,7 +90,13 @@ namespace nsYMEngine
 
 			for (int i = 0; i < static_cast<int>(EnKeyButton::enNumButtons); i++)
 			{
-				if (key[m_keycodeTable[i]] & 0x80)
+				if (m_kKeycodeTable[i] == 0)
+				{
+					// enNoneはとばす。
+					continue;
+				}
+
+				if (key[m_kKeycodeTable[i]] & 0x80)
 				{
 					// 対象のボタンが押されている。
 					// triggerは、ボタンが押された最初の1フレームだけ1にする。

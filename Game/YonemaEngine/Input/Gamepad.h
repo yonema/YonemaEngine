@@ -22,6 +22,7 @@ namespace nsYMEngine
 			*/
 			enum class EnPadButton
 			{
+				enNone,
 				enUp,
 				enDown,
 				enLeft,

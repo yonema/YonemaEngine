@@ -27,8 +27,8 @@ namespace nsYMEngine
 
 		m_inputManager = new nsInput::CInputManager();
 
-		NewGO<nsAWA::CGame>(EnGOPriority::enMid, "AWAGame");
-		//NewGO<nsAWA::nsScenes::CYonejiDebugScene>(EnGOPriority::enMid, "YonejiDebugScene");
+		//NewGO<nsAWA::CGame>(EnGOPriority::enMid, "AWAGame");
+		NewGO<nsAWA::nsScenes::CYonejiDebugScene>(EnGOPriority::enMid, "YonejiDebugScene");
 
 		nsMath::CMatrix mat = nsMath::CMatrix::Identity();
 

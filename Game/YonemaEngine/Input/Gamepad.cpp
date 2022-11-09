@@ -14,6 +14,7 @@ namespace nsYMEngine
 		const DWORD CGamepad::m_kLRTriggerForXPadTable = 0;
 		const DWORD CGamepad::m_kXPadTable[static_cast<int>(EnPadButton::enNumButtons)]
 		{
+			0,
 			XINPUT_GAMEPAD_DPAD_UP,			// enUp
 			XINPUT_GAMEPAD_DPAD_DOWN,		// enDown
 			XINPUT_GAMEPAD_DPAD_LEFT,		// enLeft

@@ -1,5 +1,7 @@
 #pragma once
 #include "../Renderers/ModelRendererBase.h"
+#include <fbxsdk.h>
+
 namespace fbxsdk
 {
 	class FbxNode;
@@ -33,6 +35,8 @@ namespace nsYMEngine
 					nsMath::CVector3 normal;
 					nsMath::CVector4 color;
 					nsMath::CVector2 uv;
+					unsigned short boneNo[4];
+					unsigned short weights[4];
 				};
 
 				struct SFbxMaterial
@@ -53,6 +57,8 @@ namespace nsYMEngine
 					const nsMath::CVector3& scale
 				) override final;
 
+				void UpdateAnimation(float deltaTime) override final;
+
 			public:
 				CFBXRenderer(const SModelInitData& modelInitData);
 				~CFBXRenderer();
@@ -61,6 +67,24 @@ namespace nsYMEngine
 
 			private:
 				bool Init(const SModelInitData& modelInitData);
+
+				/**
+				 * @brief FbxSdkを使用する準備をします。
+				 * @param[out] pManager FbxManager格納用ポインタ
+				 * @param[out] pScene FbxScene格納用ポインタ
+				 * @return 初期化に成功したか？
+				 * @retval true 初期化成功
+				 * @retval false 初期化失敗
+				*/
+				bool InitializeSdkObjects(fbxsdk::FbxManager*& pManager, fbxsdk::FbxScene*& pScene);
+
+				/**
+				 * @brief FBX_SDKによって作成されたすべてのオブジェクトを破棄します。
+				 * @param[in] pManager 破棄するFbxManager
+				 * @param[in] exitStatus FBX_SDKによる処理が成功したか？trueで成功表示。
+				*/
+				void DestroySdkObjects(fbxsdk::FbxManager* pManager, bool exitStatus);
+
 				void Terminate();
 
 				void LoadMaterial(
@@ -71,10 +95,13 @@ namespace nsYMEngine
 					const char* filePath);
 
 				void CreateMesh(
+					unsigned int objectIdx,
 					const fbxsdk::FbxMesh* mesh,
-					std::vector<SFbxVertex>* pVertices,
-					std::vector<unsigned short>* pIndices,
-					nsDx12Wrappers::CDescriptorHeap** ppMaterialDH,
+					std::vector<std::vector<SFbxVertex>>* pVerticesArray,
+					std::vector<std::vector<unsigned short>>* pIndicesArray,
+					const fbxsdk::FbxTime& startTime,
+					const fbxsdk::FbxTime& oneFrameTime,
+					const unsigned int totalFrames,
 					const SModelInitData& modelInitData
 				);
 
@@ -101,6 +128,11 @@ namespace nsYMEngine
 				nsDx12Wrappers::CDescriptorHeap m_descriptorHeap;
 				std::unordered_map <std::string, nsDx12Wrappers::CConstantBuffer*> m_materialCBTable;
 				std::unordered_map <std::string, nsDx12Wrappers::CDescriptorHeap*> m_materialDHTable;
+
+				std::unordered_map<std::string, std::vector<nsMath::CMatrix>> m_animationData;
+				std::vector<std::vector<std::unordered_map<std::string, float>>> m_weightTableArray;
+				std::vector<nsMath::CMatrix> m_boneMatrix;
+				std::unordered_map<std::string, unsigned short> m_boneNameTable;
 			};
 
 		}

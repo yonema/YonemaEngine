@@ -38,6 +38,7 @@
 #include "../Math/Vector4.h"
 #include "../Math/Quaternion.h"
 #include "../Math/Matrix.h"
+#include "../GameWindow/MessageBox.h"
 #include "../Graphics/Dx12Wrappers/Dx12Wrappers_Include.h"
 #include "../CommonLibrary/CommonLibrary.h"
 

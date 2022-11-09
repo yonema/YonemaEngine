@@ -152,7 +152,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
-    <ClCompile Include="Game\InputMapping.cpp" />
     <ClCompile Include="Game\Scenes\YonejiDebugScene.cpp" />
     <ClCompile Include="YonemaEngine\Input\Keyboard.cpp" />
     <ClCompile Include="YonemaEngine\Input\InputManager.cpp" />

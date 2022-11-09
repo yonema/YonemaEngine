@@ -8,7 +8,8 @@ namespace nsAWA
 			m_modelRenderer = NewGO<CModelRenderer>(EnGOPriority::enMid, "ynjTestModel");
 			SModelInitData modelInitData;
 			modelInitData.modelFilePath = "Assets/Models/hoge.fbx";
-			modelInitData.vertexBias.SetRotationX(nsMath::YM_PIDIV2);
+			//modelInitData.modelFilePath = "Assets/Animations/Rumba_Dancing.fbx";
+			modelInitData.vertexBias.SetRotationX(-nsMath::YM_PIDIV2);
 			m_modelRenderer->SetScale(10.0f);
 			m_modelRenderer->Init(modelInitData);
 
@@ -23,6 +24,10 @@ namespace nsAWA
 
 		void CYonejiDebugScene::Update(float deltaTime)
 		{
+			if (Keyboard()->IsPress(EnKeyButton::enNone))
+			{
+				int a = 1;
+			}
 			nsMath::CVector3 addPos = { 0.0f, 0.0f, 0.0f };
 			//if (Gamepad()->IsTrigger(EnPadButton::enA))
 			//if (Keyboard()->IsTrigger(EnKeyButton::enA))

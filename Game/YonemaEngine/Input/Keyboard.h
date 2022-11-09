@@ -11,6 +11,7 @@ namespace nsYMEngine
 			*/
 			enum class EnKeyButton
 			{
+				enNone,
 				// A to Z
 				enA,
 				enB,
@@ -95,7 +96,7 @@ namespace nsYMEngine
 
 		private:
 			static const int m_kByteSizeForGetKeyboardState;
-			static const DWORD m_keycodeTable[static_cast<int>(EnKeyButton::enNumButtons)];
+			static const DWORD m_kKeycodeTable[static_cast<int>(EnKeyButton::enNumButtons)];
 
 
 		public:

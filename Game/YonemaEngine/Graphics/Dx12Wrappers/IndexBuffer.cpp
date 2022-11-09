@@ -1,6 +1,5 @@
 #include "IndexBuffer.h"
 #include "../GraphicsEngine.h"
-#include "../../GameWindow/MessageBox.h"
 
 namespace nsYMEngine
 {

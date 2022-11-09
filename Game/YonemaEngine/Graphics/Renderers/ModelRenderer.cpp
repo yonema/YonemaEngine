@@ -1,6 +1,5 @@
 #include "ModelRenderer.h"
 #include "../Utils/StringManipulation.h"
-#include "../GameWindow/MessageBox.h"
 #include "../PMDModels/PMDRenderer.h"
 #include "../FBXModels/FBXRenderer.h"
 

@@ -6,6 +6,8 @@ struct SVSInput
 	float3 normal : NORMAL;
 	float4 color : COLOR;
 	float2 uv : TEXCOORD;
+	min16uint4 boneNo : BONE_NO;
+	min16uint4 weight : WEIGHT;
 };
 
 // 頂点シェーダーからピクセルシェーダーへのやり取りに使用する構造体
@@ -27,7 +29,8 @@ cbuffer ModelCB : register(b0)
 {
 	float4x4 g_mWorld;
 	float4x4 g_mWorldViewProj;
-	//float4x4 g_mBones[256];
+	// 固定長配列のため、あらかじめ多めに256個のボーン行列を確保。
+	float4x4 g_mBones[256];
 }
 
 cbuffer MaterialCB : register(b1)

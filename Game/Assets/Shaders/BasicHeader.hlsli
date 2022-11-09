@@ -37,6 +37,7 @@ cbuffer ModelCB : register(b1)
 {
 	float4x4 g_mWorld;
 	float4x4 g_mWorldViewProj;
+	// 固定長配列のため、あらかじめ多めに256個のボーン行列を確保。
 	float4x4 g_mBones[256];
 }
 
