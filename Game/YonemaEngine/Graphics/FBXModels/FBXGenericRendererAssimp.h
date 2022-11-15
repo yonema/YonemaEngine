@@ -7,13 +7,12 @@ namespace nsYMEngine
 	{
 		namespace nsFBXModels
 		{
-			class CFBXGenericRenderer : public nsRenderers::IGenericRenderer
+			class CFBXGenericRendererAssimp : public nsRenderers::IGenericRenderer
 			{
 			private:
 				enum class EnDescRangeType : unsigned int
 				{
 					enCbvForModelData,
-					enCbvForMaterialData,
 					enSrvForMaterialData,
 					enNumDescRangeTypes
 				};
@@ -35,8 +34,8 @@ namespace nsYMEngine
 				static const char* const m_kPsEntryFuncName;
 
 			public:
-				constexpr CFBXGenericRenderer() = default;
-				~CFBXGenericRenderer() = default;
+				constexpr CFBXGenericRendererAssimp() = default;
+				~CFBXGenericRendererAssimp() = default;
 				bool Init() override;
 
 			private:

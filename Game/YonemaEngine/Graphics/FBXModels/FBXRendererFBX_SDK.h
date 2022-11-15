@@ -25,7 +25,31 @@ namespace nsYMEngine
 	{
 		namespace nsFBXModels
 		{
-			class CFBXRenderer : public nsRenderers::IModelRendererBase
+
+			class CFBXAnimTimeInfo : nsUtils::SNoncopyable
+			{
+			public:
+				constexpr CFBXAnimTimeInfo() = default;
+				~CFBXAnimTimeInfo() = default;
+
+				void Init(fbxsdk::FbxScene* fbxScene);
+
+				inline int GetMaxFrame() const noexcept
+				{
+					return static_cast<int>(m_totalTime.Get());
+				}
+
+				fbxsdk::FbxTime GetTime(int frame) const noexcept;
+
+			private:
+				fbxsdk::FbxTime m_startTime = {};
+				fbxsdk::FbxTime m_stopTime = {};
+				fbxsdk::FbxTime m_oneFrameTime = {};
+				fbxsdk::FbxTime m_totalTime = {};
+
+			};
+
+			class CFBXRendererFBX_SDK : public nsRenderers::IModelRendererBase
 			{
 			private:
 
@@ -47,6 +71,15 @@ namespace nsYMEngine
 					float alpha = 1.0f;
 				};
 
+				struct SBoneInfo 
+				{
+					std::string name;			//! ボーン名
+					unsigned int frameNum;		//! フレーム数
+					nsMath::CMatrix initMatrix;		//! 初期姿勢
+					nsMath::CMatrix globalBindposeInvMatrix;
+					std::vector<nsMath::CMatrix> frameMatrixArray;		//! フレーム時姿勢
+				};
+
 			protected:
 				void Draw(nsDx12Wrappers::CCommandList* commandList) override final;
 
@@ -60,8 +93,8 @@ namespace nsYMEngine
 				void UpdateAnimation(float deltaTime) override final;
 
 			public:
-				CFBXRenderer(const SModelInitData& modelInitData);
-				~CFBXRenderer();
+				CFBXRendererFBX_SDK(const SModelInitData& modelInitData);
+				~CFBXRendererFBX_SDK();
 
 				void Release();
 
@@ -99,9 +132,6 @@ namespace nsYMEngine
 					const fbxsdk::FbxMesh* mesh,
 					std::vector<std::vector<SFbxVertex>>* pVerticesArray,
 					std::vector<std::vector<unsigned short>>* pIndicesArray,
-					const fbxsdk::FbxTime& startTime,
-					const fbxsdk::FbxTime& oneFrameTime,
-					const unsigned int totalFrames,
 					const SModelInitData& modelInitData
 				);
 
@@ -121,6 +151,7 @@ namespace nsYMEngine
 			private:
 				std::vector<nsDx12Wrappers::CIndexBuffer*> m_indexBuffers;
 				std::vector<nsDx12Wrappers::CVertexBuffer*> m_vertexBuffers;
+				std::vector<unsigned int> m_numIndicesArray;
 				std::vector<nsDx12Wrappers::CDescriptorHeap*> m_materialDHs;
 				std::unordered_map <std::string, nsDx12Wrappers::CTexture*> m_diffuseTextures;
 
@@ -129,10 +160,13 @@ namespace nsYMEngine
 				std::unordered_map <std::string, nsDx12Wrappers::CConstantBuffer*> m_materialCBTable;
 				std::unordered_map <std::string, nsDx12Wrappers::CDescriptorHeap*> m_materialDHTable;
 
-				std::unordered_map<std::string, std::vector<nsMath::CMatrix>> m_animationData;
 				std::vector<std::vector<std::unordered_map<std::string, float>>> m_weightTableArray;
-				std::vector<nsMath::CMatrix> m_boneMatrix;
 				std::unordered_map<std::string, unsigned short> m_boneNameTable;
+				nsMath::CMatrix m_bias;
+				CFBXAnimTimeInfo m_animTimeInfo;
+				std::vector<std::vector<nsMath::CMatrix>> m_nodeMatrixByFrameArray;
+				std::vector<SBoneInfo> m_boneInfoArray;
+				std::vector<nsMath::CMatrix> m_boneMatrixArray;
 			};
 
 		}

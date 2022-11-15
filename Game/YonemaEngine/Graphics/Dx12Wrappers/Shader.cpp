@@ -30,15 +30,17 @@ namespace nsYMEngine
 			)
 			{
 				CBlob errorBlob;
-
+				UINT compileFlags = D3DCOMPILE_ENABLE_STRICTNESS;
 #ifdef _DEBUG
 				// Enable better shader debugging with the graphics debugging tools.
 				// デバック用および最適化なし
-				UINT compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
+				compileFlags |= 
+					D3DCOMPILE_DEBUG | 
+					D3DCOMPILE_SKIP_OPTIMIZATION | 
+					D3DCOMPILE_WARNINGS_ARE_ERRORS;
 #else
-				UINT compileFlags = 0;
+				compileFlags |= D3DCOMPILE_OPTIMIZATION_LEVEL3
 #endif
-
 				auto result = D3DCompileFromFile(
 					filePath,
 					nullptr,

@@ -55,7 +55,7 @@ namespace nsYMEngine
 				}
 				inline void SetScale(float scale) noexcept
 				{
-					m_scale.Scale(scale);
+					SetScale({ scale, scale, scale });
 				}
 				constexpr const nsMath::CVector3& GetScale() const noexcept
 				{

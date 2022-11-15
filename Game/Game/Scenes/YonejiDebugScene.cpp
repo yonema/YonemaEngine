@@ -8,11 +8,23 @@ namespace nsAWA
 			//m_modelRenderer = NewGO<CModelRenderer>(EnGOPriority::enMid, "ynjTestModel");
 			m_modelRenderer = NewGO<CModelRenderer>("ynjTestModel");
 			SModelInitData modelInitData;
-			modelInitData.modelFilePath = "Assets/Models/hoge.fbx";
-			//modelInitData.modelFilePath = "Assets/Animations/Rumba_Dancing.fbx";
-			modelInitData.vertexBias.SetRotationX(-nsMath::YM_PIDIV2);
-			m_modelRenderer->SetScale(10.0f);
+			//modelInitData.modelFilePath = "Assets/Models/hoge.fbx";
+			modelInitData.modelFilePath = "Assets/Animations/Rumba_Dancing.fbx";
+			//modelInitData.modelFilePath = "Assets/Models/testWoldPosAndRotate.fbx";
+			//modelInitData.modelFilePath = "Assets/Models/skeltalBox.fbx";
+			//modelInitData.modelFilePath = "Assets/Models/SampleBox.fbx";
+			//modelInitData.modelFilePath = "Assets/Models/unitychan.fbx";
+			//modelInitData.vertexBias.SetRotationX(nsMath::YM_PIDIV2);
+			m_modelRenderer->SetScale(0.1f);
+			m_modelRenderer->SetPosition({ 0.0f, 4.0f, 0.0f });
 			m_modelRenderer->Init(modelInitData);
+
+
+
+			SSpriteInitData sampleSpriteData;
+			sampleSpriteData.filePath = "Assets/Images/200x200PNG.png";
+			sampleSpriteData.spriteSize = { 300.0f,300.0f };
+
 
 			return true;
 		}
@@ -49,6 +61,11 @@ namespace nsAWA
 			//MainCamera()->SetPosition(camPos + addPos);
 			auto& modelPos = m_modelRenderer->GetPosition();
 			m_modelRenderer->SetPosition(modelPos + addPos);
+
+			auto rot = m_modelRenderer->GetRotation();
+			rot.AddRotationYDeg(50.0f * deltaTime);
+			m_modelRenderer->SetRotation(rot);
+
 
 			return;
 		}

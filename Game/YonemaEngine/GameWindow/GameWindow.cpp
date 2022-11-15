@@ -64,13 +64,22 @@ namespace nsYMEngine
 			// 関数を使ってウィンドウのサイズを補正する。
 			AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, false);
 
+			// 画面のサイズ
+			const int screenWidth = GetSystemMetrics(SM_CXSCREEN);
+			const int screenHeight = GetSystemMetrics(SM_CYSCREEN);
+
+			// ウィンドウを画面の中央に配置する。
+			const int windowPosX = (screenWidth - (wrc.right - wrc.left)) / 2;
+			const int windowPosY = (screenHeight - (wrc.bottom - wrc.top)) / 2;
+
 			// ウィンドウオブジェクトの生成。
 			m_hwnd = CreateWindow(
 				m_windClassEx.lpszClassName,		// 使用するウィンドウクラス名の指定
 				L"GameSample",			// タイトルバーの文字。クラス名と違っても大丈夫。
 				WS_OVERLAPPEDWINDOW,	// ウィンドウのスタイル。タイトルバーと境界線があるウィンドウ。
-				CW_USEDEFAULT,			// 表示x座標。OSにおまかせ。
-				CW_USEDEFAULT,			// 表示y座標。OSにおまかせ。
+				//CW_USEDEFAULT,			// 表示x座標。OSにおまかせ。
+				windowPosX,				// 表示x座標。画面中央に配置。
+				windowPosY,				// 表示y座標。画面中央に配置。
 				wrc.right - wrc.left,	// ウィンドウの幅
 				wrc.bottom - wrc.top,	// ウィンドウの高さ
 				nullptr,				// 親ウィンドウハンドル

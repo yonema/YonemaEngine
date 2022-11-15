@@ -73,6 +73,8 @@ namespace nsYMEngine
 			const char* const texPath
 		) noexcept;
 
+		std::string ToUTF8(const std::wstring& wstr) noexcept;
+
 
 	}
 }

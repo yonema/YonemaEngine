@@ -134,7 +134,7 @@ namespace nsYMEngine
 				unsigned int numRt, const CRenderTarget* renderTargets[])
 			{
 				D3D12_CPU_DESCRIPTOR_HANDLE rtDescHandles[m_kMaxNumRenderTargets];
-				numRt = min(numRt, m_kMaxNumRenderTargets);
+				numRt = std::min(numRt, m_kMaxNumRenderTargets);
 
 				for (unsigned int i = 0; i < numRt; i++)
 				{
@@ -161,7 +161,7 @@ namespace nsYMEngine
 			)
 			{
 				D3D12_CPU_DESCRIPTOR_HANDLE rtDescHandles[m_kMaxNumRenderTargets];
-				numRt = min(numRt, m_kMaxNumRenderTargets);
+				numRt = std::min(numRt, m_kMaxNumRenderTargets);
 
 				for (unsigned int i = 0; i < numRt; i++)
 				{
@@ -188,7 +188,7 @@ namespace nsYMEngine
 			inline void CCommandList::ClearRenderTargetViews(
 				unsigned int numRt, const CRenderTarget* renderTargets[])
 			{
-				numRt = min(numRt, m_kMaxNumRenderTargets);
+				numRt = std::min(numRt, m_kMaxNumRenderTargets);
 				for (unsigned int i = 0; i < numRt; i++)
 				{
 					ClearRenderTargetView(
@@ -343,7 +343,7 @@ namespace nsYMEngine
 			inline void CCommandList::SetDescriptorHeaps(
 				unsigned int numDescHeaps, const CDescriptorHeap* descHeaps[])
 			{
-				numDescHeaps = min(numDescHeaps, m_kMaxNumDescriptorHeaps);
+				numDescHeaps = std::min(numDescHeaps, m_kMaxNumDescriptorHeaps);
 				for (unsigned int i = 0; i < numDescHeaps; i++)
 				{
 					m_descriptorHeaps[i] = descHeaps[i]->Get();
@@ -354,7 +354,7 @@ namespace nsYMEngine
 			inline void CCommandList::SetDescriptorHeaps(
 				unsigned int numDescHeaps, ID3D12DescriptorHeap* descHeaps[])
 			{
-				numDescHeaps = min(numDescHeaps, m_kMaxNumDescriptorHeaps);
+				numDescHeaps = std::min(numDescHeaps, m_kMaxNumDescriptorHeaps);
 				for (unsigned int i = 0; i < numDescHeaps; i++)
 				{
 					m_descriptorHeaps[i] = descHeaps[i];

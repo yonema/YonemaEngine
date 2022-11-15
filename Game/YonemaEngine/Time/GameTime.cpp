@@ -26,7 +26,7 @@ namespace nsYMEngine
 				{
 					totalTime += deltaTime;
 				}
-				m_deltaTime = min(m_kLatestDeltaTime, totalTime / static_cast<float>(deltaTimeQueSize));
+				m_deltaTime = std::min(m_kLatestDeltaTime, totalTime / static_cast<float>(deltaTimeQueSize));
 				m_deltaTimeQue.pop_front();
 			}
 			return;

@@ -199,7 +199,7 @@ namespace nsYMEngine
 				pStick->y = kThumbY / magnitude;
 
 				// 予想される最大値で、入力量をクリップする。
-				magnitude = min(magnitude, m_kMaxMagnitudeForStick);
+				magnitude = std::min(magnitude, m_kMaxMagnitudeForStick);
 
 				// 入力量を、デッドゾーンからの相対的な大きさに調整する。
 				magnitude -= kDeadZone;

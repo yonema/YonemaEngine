@@ -1,4 +1,4 @@
-#include "FBXRenderer.h"
+#include "FBXRendererFBX_SDK.h"
 #include "../GraphicsEngine.h"
 #include "../Utils/AlignSize.h"
 #include "../Utils/StringManipulation.h"
@@ -10,7 +10,131 @@ namespace nsYMEngine
 	{
 		namespace nsFBXModels
 		{
-			void CFBXRenderer::Draw(nsDx12Wrappers::CCommandList* commandList)
+			void CFBXAnimTimeInfo::Init(fbxsdk::FbxScene* fbxScene)
+			{
+				fbxsdk::FbxArray<fbxsdk::FbxString*> animStackNameArray;
+				fbxScene->FillAnimStackNameArray(animStackNameArray);
+
+				const auto animStackCount = animStackNameArray.GetCount();
+
+				bool hasAnimStack = false;
+
+				for (int i = 0; i < animStackCount; i++)
+				{
+					auto takeInfo = fbxScene->GetTakeInfo(animStackNameArray[i]->Buffer());
+					if (takeInfo)
+					{
+						m_startTime = takeInfo->mLocalTimeSpan.GetStart().Get();
+						m_stopTime = takeInfo->mLocalTimeSpan.GetStop().Get();
+						hasAnimStack = true;
+						break;
+					}
+				}
+
+				if (hasAnimStack != true)
+				{
+					return;
+				}
+
+
+				auto timeMode = fbxsdk::FbxGetGlobalTimeMode();
+				m_oneFrameTime.SetTime(0, 0, 0, 1, 0, timeMode);
+
+				m_totalTime = (m_stopTime - m_startTime) / m_oneFrameTime;
+
+				return;
+			}
+
+			fbxsdk::FbxTime CFBXAnimTimeInfo::GetTime(int frame) const noexcept
+			{
+				return m_startTime + m_oneFrameTime * frame;
+			}
+
+
+			fbxsdk::FbxAMatrix GetPoseMatrix(fbxsdk::FbxPose* pPose, int pNodeIndex)
+			{
+				fbxsdk::FbxAMatrix lPoseMatrix;
+				fbxsdk::FbxMatrix lMatrix = pPose->GetMatrix(pNodeIndex);
+
+				memcpy((double*)lPoseMatrix, (double*)lMatrix, sizeof(lMatrix.mData));
+
+				return lPoseMatrix;
+			}
+
+			fbxsdk::FbxAMatrix GetGlobalPosition(fbxsdk::FbxNode* pNode, const fbxsdk::FbxTime& pTime, fbxsdk::FbxPose* pPose = NULL, fbxsdk::FbxAMatrix* pParentGlobalPosition = NULL)
+			{
+				fbxsdk::FbxAMatrix lGlobalPosition;
+				bool        lPositionFound = false;
+
+				if (pPose)
+				{
+					int lNodeIndex = pPose->Find(pNode);
+
+					if (lNodeIndex > -1)
+					{
+						// The bind pose is always a global matrix.
+						// If we have a rest pose, we need to check if it is
+						// stored in global or local space.
+						if (pPose->IsBindPose() || !pPose->IsLocalMatrix(lNodeIndex))
+						{
+							lGlobalPosition = GetPoseMatrix(pPose, lNodeIndex);
+						}
+						else
+						{
+							// We have a local matrix, we need to convert it to
+							// a global space matrix.
+							fbxsdk::FbxAMatrix lParentGlobalPosition;
+
+							if (pParentGlobalPosition)
+							{
+								lParentGlobalPosition = *pParentGlobalPosition;
+							}
+							else
+							{
+								if (pNode->GetParent())
+								{
+									lParentGlobalPosition = GetGlobalPosition(pNode->GetParent(), pTime, pPose);
+								}
+							}
+
+							fbxsdk::FbxAMatrix lLocalPosition = GetPoseMatrix(pPose, lNodeIndex);
+							lGlobalPosition = lParentGlobalPosition * lLocalPosition;
+						}
+
+						lPositionFound = true;
+					}
+				}
+
+				if (!lPositionFound)
+				{
+					// There is no pose entry for that node, get the current global position instead.
+
+					// Ideally this would use parent global position and local position to compute the global position.
+					// Unfortunately the equation 
+					//    lGlobalPosition = pParentGlobalPosition * lLocalPosition
+					// does not hold when inheritance type is other than "Parent" (RSrs).
+					// To compute the parent rotation and scaling is tricky in the RrSs and Rrs cases.
+					lGlobalPosition = pNode->EvaluateGlobalTransform(pTime);
+				}
+
+				return lGlobalPosition;
+			}
+
+			fbxsdk::FbxAMatrix GetGeometryTransformation(fbxsdk::FbxNode* inNode)
+			{
+				if (!inNode)
+				{
+					throw std::exception("Null for mesh geometry");
+				}
+
+				const fbxsdk::FbxVector4 lT = inNode->GetGeometricTranslation(fbxsdk::FbxNode::eSourcePivot);
+				const fbxsdk::FbxVector4 lR = inNode->GetGeometricRotation(fbxsdk::FbxNode::eSourcePivot);
+				const fbxsdk::FbxVector4 lS = inNode->GetGeometricScaling(fbxsdk::FbxNode::eSourcePivot);
+
+				return fbxsdk::FbxAMatrix(lT, lR, lS);
+			}
+
+			void CFBXRendererFBX_SDK::Draw(nsDx12Wrappers::CCommandList* commandList)
 			{
 				// ○定数バッファのディスクリプタヒープをセット
 				ID3D12DescriptorHeap* modelDescHeaps[] = { m_descriptorHeap.Get() };
@@ -32,24 +156,24 @@ namespace nsYMEngine
 					commandList->SetIndexBuffer(*m_indexBuffers.at(i));
 					commandList->SetVertexBuffer(*m_vertexBuffers.at(i));
 
-					commandList->DrawInstanced(m_vertexBuffers.at(i)->GetNumVertices());
+					commandList->DrawInstanced(m_numIndicesArray.at(i));
 
 				}
 				return;
 			}
 
-			CFBXRenderer::CFBXRenderer(const SModelInitData& modelInitData)
+			CFBXRendererFBX_SDK::CFBXRendererFBX_SDK(const SModelInitData& modelInitData)
 			{
 				Init(modelInitData);
 				return;
 			}
-			CFBXRenderer::~CFBXRenderer()
+			CFBXRendererFBX_SDK::~CFBXRendererFBX_SDK()
 			{
 				Terminate();
 				return;
 			}
 
-			void CFBXRenderer::UpdateWorldMatrix(
+			void CFBXRendererFBX_SDK::UpdateWorldMatrix(
 				const nsMath::CVector3& position,
 				const nsMath::CQuaternion& rotation,
 				const nsMath::CVector3& scale
@@ -72,29 +196,19 @@ namespace nsYMEngine
 				return;
 			}
 
-			void CFBXRenderer::UpdateAnimation(float deltaTime)
+			void CFBXRendererFBX_SDK::UpdateAnimation(float deltaTime)
 			{
-				return;
-				int frameNo = 0;
-				for (const auto& animationData : m_animationData)
-				{
-					m_boneMatrix.at(m_boneNameTable[animationData.first]) = 
-						animationData.second.at(frameNo);
-				}
-				auto mappedCB =
-					static_cast<nsMath::CMatrix*>(m_constantBuffer.GetMappedConstantBuffer());
 
-				copy(m_boneMatrix.begin(), m_boneMatrix.end(), mappedCB + 2);
 				return;
 			}
 
-			void CFBXRenderer::Terminate()
+			void CFBXRendererFBX_SDK::Terminate()
 			{
 				Release();
 				return;
 			}
 
-			void CFBXRenderer::Release()
+			void CFBXRendererFBX_SDK::Release()
 			{
 				for (auto& diffuseTexture : m_diffuseTextures)
 				{
@@ -136,7 +250,7 @@ namespace nsYMEngine
 				return;
 			}
 
-			bool CFBXRenderer::Init(const SModelInitData& modelInitData)
+			bool CFBXRendererFBX_SDK::Init(const SModelInitData& modelInitData)
 			{
 				fbxsdk::FbxManager* fbxManager = nullptr;
 				fbxsdk::FbxScene* fbxScene = nullptr;
@@ -145,7 +259,6 @@ namespace nsYMEngine
 				{
 					return false;
 				}
-
 				fbxsdk::FbxImporter* fbxImporter = nullptr;
 				fbxImporter = fbxsdk::FbxImporter::Create(fbxManager, "MyFbxImporter");
 				if (fbxImporter == nullptr)
@@ -279,27 +392,11 @@ namespace nsYMEngine
 					return false;
 				}
 
+				geometryConverter.RemoveBadPolygonsFromMeshes(fbxScene);
 				unsigned int totalFrames = 0;
 				
-				auto timeMode = fbxsdk::FbxGetGlobalTimeMode();
-				fbxsdk::FbxTime oneFrameTime, startTime, stopTime;
-				oneFrameTime.SetTime(0, 0, 0, 1, 0, timeMode);
-				fbxsdk::FbxArray<fbxsdk::FbxString*> animStackNameArray;
-				fbxScene->FillAnimStackNameArray(animStackNameArray);
-				const auto animStackCount = animStackNameArray.GetCount();
+				m_animTimeInfo.Init(fbxScene);
 
-				for (int i = 0; i < animStackCount; i++)
-				{
-					auto takeInfo = fbxScene->GetTakeInfo(*(animStackNameArray[i]));
-					if (takeInfo)
-					{
-						startTime = takeInfo->mLocalTimeSpan.GetStart().Get();
-						stopTime = takeInfo->mLocalTimeSpan.GetStop().Get();
-						auto totalTime = (stopTime - startTime) / oneFrameTime;
-						totalFrames = static_cast<unsigned int>(totalTime.Get());
-						break;
-					}
-				}
 
 				// インポートしたため、Importerはもういらない。
 				fbxImporter->Destroy();
@@ -337,8 +434,10 @@ namespace nsYMEngine
 				std::vector<std::vector<unsigned short>> indicesArray;
 				verticesArray.resize(meshObjectCount);
 				indicesArray.resize(meshObjectCount);
+				m_numIndicesArray.resize(meshObjectCount);
 				m_weightTableArray.resize(meshObjectCount);
 				//m_boneMatrixArray.resize(meshObjectCount);
+				m_nodeMatrixByFrameArray.resize(meshObjectCount);
 				m_materialDHs.resize(meshObjectCount);
 				for (int i = 0; i < meshObjectCount; i++)
 				{
@@ -347,13 +446,58 @@ namespace nsYMEngine
 						fbxScene->GetSrcObject<fbxsdk::FbxMesh>(i),
 						&verticesArray,
 						&indicesArray,
-						startTime,
-						oneFrameTime,
-						totalFrames,
 						modelInitData
 					);
 				}
 
+				for (int boneIdx = 0; boneIdx < m_boneInfoArray.size(); boneIdx++)
+				{
+					auto initMat = m_boneInfoArray.at(boneIdx).initMatrix;
+					auto globalBindposeInvMat = m_boneInfoArray.at(boneIdx).globalBindposeInvMatrix;
+					auto invInitMat = initMat;
+					invInitMat.Inverse();
+					auto frameMat = m_boneInfoArray.at(boneIdx).frameMatrixArray.at(30);
+					//frameMat.MakeRotationY(3.14f * 0.5f);
+					//frameMat = nsMath::CMatrix::Identity();
+					auto matTmp = frameMat;
+
+					nsMath::CMatrix mTrans;
+					mTrans.m_fMat[3][0] = matTmp.m_fMat[3][0];
+					mTrans.m_fMat[3][1] = matTmp.m_fMat[3][1];
+					mTrans.m_fMat[3][2] = matTmp.m_fMat[3][2];
+
+					matTmp.m_vec4Mat[3] = nsMath::CVector4::Identity();
+
+					nsMath::CVector3 scale;
+					nsMath::CMatrix mScale;
+					// 行列から拡大率を取得する。
+					scale.x = matTmp.m_vec4Mat[0].Length();
+					scale.y = matTmp.m_vec4Mat[1].Length();
+					scale.z = matTmp.m_vec4Mat[2].Length();
+					mScale.MakeScaling(scale);
+
+					// 行列から拡大率と平行移動量を除去して回転量を取得する。
+					matTmp.m_vec4Mat[0].Normalize();
+					matTmp.m_vec4Mat[1].Normalize();
+					matTmp.m_vec4Mat[2].Normalize();
+					nsMath::CMatrix mRot = matTmp;
+					//if (modelInitData.isVertesTranspos)
+					//{
+					//	mRot.Transpose();
+					//}
+					//nsMath::CMatrix mBias;
+					//m_bias.MakeRotationFromQuaternion(modelInitData.vertexBias);
+
+					//if (boneIdx == m_boneNameTable.at("J_Bip_L_UpperArm"))
+					{
+						nsMath::CMatrix mWorld = mScale * mRot * mTrans;
+						m_boneMatrixArray.at(boneIdx) = invInitMat * frameMat;
+						m_boneMatrixArray.at(boneIdx) = globalBindposeInvMat * frameMat;
+					}
+					//m_boneMatrixArray.at(boneIdx) = nsMath::CMatrix::Identity();
+
+				}
+				
 
 				CreateVertexAndIndexBuffer(verticesArray, indicesArray);
 
@@ -370,7 +514,7 @@ namespace nsYMEngine
 			}
 
 
-			bool CFBXRenderer::InitializeSdkObjects(
+			bool CFBXRendererFBX_SDK::InitializeSdkObjects(
 				fbxsdk::FbxManager*& pManager, fbxsdk::FbxScene*& pScene)
 			{
 				pManager = fbxsdk::FbxManager::Create();
@@ -405,7 +549,7 @@ namespace nsYMEngine
 				return true;
 			}
 
-			void CFBXRenderer::DestroySdkObjects(fbxsdk::FbxManager* pManager, bool exitStatus)
+			void CFBXRendererFBX_SDK::DestroySdkObjects(fbxsdk::FbxManager* pManager, bool exitStatus)
 			{
 				if (pManager)
 				{
@@ -421,7 +565,7 @@ namespace nsYMEngine
 				return;
 			}
 
-			void CFBXRenderer::LoadMaterial(
+			void CFBXRendererFBX_SDK::LoadMaterial(
 				fbxsdk::FbxSurfaceMaterial* material,
 				std::unordered_map<std::string, SFbxMaterial>* pFbxMaterials,
 				//nsDx12Wrappers::CTexture** ppTexture,
@@ -575,30 +719,33 @@ namespace nsYMEngine
 			}
 
 
-			void CFBXRenderer::CreateMesh(
+			void CFBXRendererFBX_SDK::CreateMesh(
 				unsigned int objectIdx,
 				const fbxsdk::FbxMesh* mesh,
 				std::vector<std::vector<SFbxVertex>>* pVerticesArray,
 				std::vector<std::vector<unsigned short>>* pIndicesArray,
-				const fbxsdk::FbxTime& startTime,
-				const fbxsdk::FbxTime& oneFrameTime,
-				const unsigned int totalFrames,
 				const SModelInitData& modelInitData
 			)
 			{
 				auto* pVertices = &pVerticesArray->at(objectIdx);
 				auto* pIndices = &pIndicesArray->at(objectIdx);
 
-				// fbxの頂点バッファ
-				const auto kFbxVertices = mesh->GetControlPoints();
-				// fbxのインデックスバッファ
-				const auto kFbxIndices = mesh->GetPolygonVertices();
-				// fbxの頂点数
-				const auto kFbxPolygonVertexCount = mesh->GetPolygonVertexCount();
-				// fbxのワールド行列。
-				const auto& kFbxMWorld = mesh->GetNode()->EvaluateGlobalTransform();
+				// メッシュの頂点座標
+				const auto* meshVertices = mesh->GetControlPoints();
+				// メッシュの頂点数
+				const int meshVerticesCount = mesh->GetControlPointsCount();
+				// メッシュのインデックスバッファ
+				const int* meshIndices = mesh->GetPolygonVertices();
+				// メッシュのインデックスバッファ数
+				const int meshIndicesCount = mesh->GetPolygonVertexCount();
+				// メッシュのポリゴン数
+				const auto meshPolygonCount = mesh->GetPolygonCount();
 
-				m_weightTableArray.at(objectIdx).resize(kFbxPolygonVertexCount);
+
+				// fbxのワールド行列。
+				const auto& meshMWorld = mesh->GetNode()->EvaluateGlobalTransform();
+
+				m_weightTableArray.at(objectIdx).resize(meshVerticesCount);
 
 				// ワールド行列を使いやすいように、このエンジンの行列クラスにコピーする。
 				nsMath::CMatrix fbxMWolrd;
@@ -606,21 +753,21 @@ namespace nsYMEngine
 				{
 					for (int x = 0; x < 4; x++)
 					{
-						fbxMWolrd.m_fMat[y][x] = static_cast<float>(kFbxMWorld[y][x]);
+						fbxMWolrd.m_fMat[y][x] = static_cast<float>(meshMWorld[y][x]);
 					}
 				}
 
 
 
 				//// 単位をそろえるため、平行移動量を100.0fで割る。
-				fbxMWolrd.m_fMat[3][0] /= 100.0f;
-				fbxMWolrd.m_fMat[3][1] /= 100.0f;
-				fbxMWolrd.m_fMat[3][2] /= 100.0f;
+				//fbxMWolrd.m_fMat[3][0] /= 100.0f;
+				//fbxMWolrd.m_fMat[3][1] /= 100.0f;
+				//fbxMWolrd.m_fMat[3][2] /= 100.0f;
 				
 				nsMath::CMatrix mTrans;
 				mTrans.m_fMat[3][0] = fbxMWolrd.m_fMat[3][0];
 				mTrans.m_fMat[3][1] = fbxMWolrd.m_fMat[3][1];
-				mTrans.m_fMat[3][2] = -fbxMWolrd.m_fMat[3][2];
+				mTrans.m_fMat[3][2] = fbxMWolrd.m_fMat[3][2];
 
 				fbxMWolrd.m_vec4Mat[3] = nsMath::CVector4::Identity();
 
@@ -628,9 +775,9 @@ namespace nsYMEngine
 				nsMath::CMatrix mScale;
 				// 行列から拡大率を取得する。
 				scale.x = fbxMWolrd.m_vec4Mat[0].Length();
-				scale.y = fbxMWolrd.m_vec4Mat[2].Length();
-				scale.z = fbxMWolrd.m_vec4Mat[1].Length();
-				scale.Scale(0.01f);
+				scale.y = fbxMWolrd.m_vec4Mat[1].Length();
+				scale.z = fbxMWolrd.m_vec4Mat[2].Length();
+				//scale.Scale(0.01f);
 				mScale.MakeScaling(scale);
 
 				// 行列から拡大率と平行移動量を除去して回転量を取得する。
@@ -638,74 +785,206 @@ namespace nsYMEngine
 				fbxMWolrd.m_vec4Mat[1].Normalize();
 				fbxMWolrd.m_vec4Mat[2].Normalize();
 				nsMath::CMatrix mRot = fbxMWolrd;
-				if (modelInitData.isVertesTranspos)
-				{
-					mRot.Transpose();
-				}
-				nsMath::CMatrix mBias;
-				mBias.MakeRotationFromQuaternion(modelInitData.vertexBias);
+				//if (modelInitData.isVertesTranspos)
+				//{
+				//	mRot.Transpose();
+				//}
+				//nsMath::CMatrix mBias;
+				m_bias.MakeRotationFromQuaternion(modelInitData.vertexBias);
 
-				nsMath::CMatrix mWorld = mBias * mScale * mRot * mTrans;
+				nsMath::CMatrix mWorld = m_bias * mScale * mRot * mTrans;
 
 
 				// 〇頂点バッファのデータをコピーする。
-				pVertices->resize(kFbxPolygonVertexCount);
+				pVertices->resize(meshVerticesCount);
+				const auto& node = mesh->GetNode();
+				const auto& lclTranslation = node->LclTranslation.Get();
+				const auto& lclSclaing = node->LclScaling.Get();
+				const auto& lclRotation = node->LclRotation.Get();
 
 				//・座標のコピー。
-				for (int i = 0; i < kFbxPolygonVertexCount; i++)
+				for (int vertexIdx = 0; vertexIdx < meshVerticesCount; vertexIdx++)
 				{
-					unsigned short index = static_cast<unsigned short>(kFbxIndices[i]);
-
 					// 座標をコピー
-					// ・右手系(Fbx)から左手系(DirectX)に変換するため、X軸を反転。
-					// ・Zup(Fbx)からYup(DirectX)に変換するため、
-					// 　Y = fbxZ
-					// 　Z = -fbxY
-					// 　を入れる。 
+					for (int i = 0; i < 3; i++)
+					{
+						pVertices->at(vertexIdx).position.m_fVec[i] = 
+							static_cast<float>(meshVertices[vertexIdx][i]);
+					}
+					mWorld.Apply(pVertices->at(vertexIdx).position);
+					
+					//unsigned short index = static_cast<unsigned short>(kFbxIndices[i]);
 
-					pVertices->at(i).position.x =
-						static_cast<float>(-kFbxVertices[index][0]);
-					pVertices->at(i).position.y =
-						static_cast<float>(kFbxVertices[index][2]);
-					pVertices->at(i).position.z =
-						static_cast<float>(-kFbxVertices[index][1]);
+					//// 座標をコピー
+					//// ・右手系(Fbx)から左手系(DirectX)に変換するため、X軸を反転。
+					//// ・Zup(Fbx)からYup(DirectX)に変換するため、
+					//// 　Y = fbxZ
+					//// 　Z = -fbxY
+					//// 　を入れる。 
 
-					mWorld.Apply(pVertices->at(i).position);
+					//pVertices->at(i).position.x =
+					//	static_cast<float>(-kFbxVertices[index][0]);
+					//pVertices->at(i).position.y =
+					//	static_cast<float>(kFbxVertices[index][2]);
+					//pVertices->at(i).position.z =
+					//	static_cast<float>(-kFbxVertices[index][1]);
+
+					//mWorld.Apply(pVertices->at(i).position);
 				}
 
 				mWorld.Inverse();
 				mWorld.Transpose();
 
-				// ・法線のコピー。
-				fbxsdk::FbxArray<fbxsdk::FbxVector4> fbxNormals;
-				mesh->GetPolygonVertexNormals(fbxNormals);
+				const auto* elementNormal = mesh->GetElementNormal();
 
-				// 法線は頂点とは違い、インデックスバッファの順番で作られているので
-				// そのままの順番でコピーする。
 
-				for (int i = 0; i < fbxNormals.Size(); i++)
+				if (elementNormal->GetMappingMode() == fbxsdk::FbxGeometryElement::eByControlPoint)
+				//if (true)
 				{
-					// 法線をコピー
-					// 右手系(Fbx)から左手系(DirectX)に変換するため、X軸を反転。
-					// ・Zup(Fbx)からYup(DirectX)に変換するため、
-					// 　Y = fbxZ
-					// 　Z = -fbxY
-					// 　を入れる。 
-					pVertices->at(i).normal.x =
-						-static_cast<float>(fbxNormals[i][0]);
-					pVertices->at(i).normal.y =
-						static_cast<float>(fbxNormals[i][2]);
-					pVertices->at(i).normal.z =
-						static_cast<float>(-fbxNormals[i][1]);
+					// 制御点によるマッピングモード。
+					// メッシュは滑らかで柔らかくなければなりません。
+					// 各制御点を取得することで、法線を得ることができます。
 
-					mWorld.Apply(pVertices->at(i).normal);
+					
+					// 法線要素のマッピングモードは制御点によるものなので、各頂点の法線を取得しましょう。
+					for (int vertexIdx = 0; vertexIdx < meshVerticesCount; vertexIdx++)
+					{
+						int normalIdx = 0;
+
+						// 法線の参照モードによって法線のインデックスの取得方法が変わります。
+
+						if (elementNormal->GetReferenceMode() == fbxsdk::FbxGeometryElement::eDirect)
+						{
+							// 参照モードがDirectの場合、法線のインデックスは頂点のインデックスと同じです。
+							// 制御頂点のインデックスで法線を取得します。
+							normalIdx = vertexIdx;
+						}
+						else if (elementNormal->GetReferenceMode() == fbxsdk::FbxGeometryElement::eIndexToDirect)
+						{
+							// 参照モードがindex-to-directの場合、index-to-directの値で法線を取得します。
+							normalIdx = elementNormal->GetIndexArray().GetAt(vertexIdx);
+						}
+
+						// 各頂点の法線を取得します。
+						const auto& normal = elementNormal->GetDirectArray().GetAt(normalIdx);
+
+						// 法線をコピー。
+						for (int i = 0; i < 3; i++)
+						{
+							pVertices->at(vertexIdx).normal.m_fVec[i] = 
+								static_cast<float>(normal[i]);
+
+						}
+						mWorld.Apply(pVertices->at(vertexIdx).normal);
+						pVertices->at(vertexIdx).normal.Normalize();
+					}
 				}
+				// 未実装
+				else if (elementNormal->GetMappingMode() == fbxsdk::FbxGeometryElement::eByPolygonVertex)
+				{
+					// ポリゴン-頂点によるマッピングモード。
+					// ポリゴン-頂点を取得することで法線を得ることができます。
+
+					int polygonVertexIdx = 0;
+
+					// 法線要素のマッピングモードがポリゴン-頂点であるため、各ポリゴンの法線を取得しましょう。
+					for (int polygonIdx = 0; polygonIdx < meshPolygonCount; polygonIdx++)
+					{
+						// ポリゴンサイズを取得すると、現在のポリゴンの頂点の数が分かります。
+						int verticesCountInPolygon = mesh->GetPolygonSize(polygonIdx);
+						// 現在のポリゴンの各頂点を取得する。
+						for (int vertInPolyIdx = 0; vertInPolyIdx < verticesCountInPolygon; vertInPolyIdx++)
+						{
+							int normalIdx = 0;
+							int polygonVertexIndex = mesh->GetPolygonVertex(polygonIdx, vertInPolyIdx);
+							// 法線の参照モードによって法線のインデックスの取得方法が変わります。
+
+							if (elementNormal->GetReferenceMode() == fbxsdk::FbxGeometryElement::eDirect)
+							{
+								// 参照モードはDirectの場合、法線のインデックスはpolygonVertexIdxと同じです。
+								normalIdx = polygonVertexIdx;
+							}
+							else if (elementNormal->GetReferenceMode() == fbxsdk::FbxGeometryElement::eIndexToDirect)
+							{
+								// 参照モードがindex-to-directの場合、法線はindex-to-directの値で取得される。
+								normalIdx = elementNormal->GetIndexArray().GetAt(polygonVertexIdx);
+							}
+
+							// 各ポリゴン頂点の法線を取得する。
+							const auto& normal = elementNormal->GetDirectArray().GetAt(normalIdx);
+
+							// 法線をコピー。
+							// しなきゃいけないけど、未実装。
+							//nsGameWindow::MessageBoxWarning(L"法線のマッピングモードがeByPolygonVertexですが、未対応です。");
+
+							// 法線をコピー。
+							if (pVertices->at(polygonVertexIndex).normal.LengthSq() > FLT_EPSILON)
+							{
+								nsMath::CVector3 newNormal;
+								for (int i = 0; i < 3; i++)
+								{
+									newNormal.m_fVec[i] = static_cast<float>(normal[i]);
+								}
+								mWorld.Apply(newNormal);
+								newNormal.Normalize();
+								pVertices->at(polygonVertexIndex).normal.Lerp(
+									0.5f,
+									pVertices->at(polygonVertexIndex).normal,
+									newNormal
+								);
+								pVertices->at(polygonVertexIndex).normal.Normalize();
+							}
+							else
+							{
+								for (int i = 0; i < 3; i++)
+								{
+									pVertices->at(polygonVertexIndex).normal.m_fVec[i] =
+										static_cast<float>(normal[i]);
+
+								}
+								mWorld.Apply(pVertices->at(polygonVertexIndex).normal);
+								pVertices->at(polygonVertexIndex).normal.Normalize();
+							}
+
+
+
+							polygonVertexIdx++;
+
+						}
+					}
+				}
+
+
+
+				// ・法線のコピー。
+				//fbxsdk::FbxArray<fbxsdk::FbxVector4> fbxNormals;
+				//mesh->GetPolygonVertexNormals(fbxNormals);
+				//// 法線は頂点とは違い、インデックスバッファの順番で作られているので
+				//// そのままの順番でコピーする。
+
+				//for (int i = 0; i < fbxNormals.Size(); i++)
+				//{
+				//	// 法線をコピー
+				//	// 右手系(Fbx)から左手系(DirectX)に変換するため、X軸を反転。
+				//	// ・Zup(Fbx)からYup(DirectX)に変換するため、
+				//	// 　Y = fbxZ
+				//	// 　Z = -fbxY
+				//	// 　を入れる。 
+				//	pVertices->at(i).normal.x =
+				//		-static_cast<float>(fbxNormals[i][0]);
+				//	pVertices->at(i).normal.y =
+				//		static_cast<float>(fbxNormals[i][2]);
+				//	pVertices->at(i).normal.z =
+				//		static_cast<float>(-fbxNormals[i][1]);
+
+				//	mWorld.Apply(pVertices->at(i).normal);
+				//}
 
 				// ・頂点カラーのコピー。
 				const fbxsdk::FbxGeometryElementVertexColor* vertexColor = nullptr;
 				if (mesh->GetElementVertexColorCount() > 0)
 				{
-					vertexColor = mesh->GetElementVertexColor();
+					//vertexColor = mesh->GetElementVertexColor();
 				}
 
 				if (vertexColor != nullptr)
@@ -714,13 +993,17 @@ namespace nsYMEngine
 						vertexColor->GetReferenceMode() == fbxsdk::FbxLayerElement::eIndexToDirect)
 					{
 						const auto& vcArray = vertexColor->GetDirectArray();
+						
 						const auto& vcIndices = vertexColor->GetIndexArray();
 
 						const int vcIndicesCount = vcIndices.GetCount();
-						for (int i = 0; i < vcIndicesCount; i++)
+						const int hoge = vcArray.GetCount();
+						//for (int i = 0; i < vcIndicesCount; i++)
+						for (int i = 0; i < vcArray.GetCount(); i++)
 						{
-							int id = vcIndices.GetAt(i);
-							const auto& color = vcArray.GetAt(id);
+							//int id = vcIndices.GetAt(i);
+							//const auto& color = vcArray.GetAt(id);
+							const auto& color = vcArray.GetAt(i);
 
 							pVertices->at(i).color.r = static_cast<float>(color.mRed);
 							pVertices->at(i).color.g = static_cast<float>(color.mGreen);
@@ -731,41 +1014,143 @@ namespace nsYMEngine
 
 				}
 
-				// ・UVのコピー。
-				fbxsdk::FbxStringList uvSetNames;
-				mesh->GetUVSetNames(uvSetNames);
-
-				fbxsdk::FbxArray<FbxVector2> uvBuffer;
-				// UVSetの名前からUVSetを取得する
-				// 今回はマルチテクスチャには対応しないので最初の名前を使う
-				mesh->GetPolygonVertexUVs(uvSetNames.GetStringAt(0), uvBuffer);
-
-				for (int i = 0; i < uvBuffer.Size(); i++)
 				{
-					const auto& uv = uvBuffer[i];
+					fbxsdk::FbxStringList uvSetNameList;
+					mesh->GetUVSetNames(uvSetNameList);
+					int uvSetNamesCount = uvSetNameList.GetCount();
+					if (uvSetNamesCount > 1)
+					{
+						int a = 1;
+					}
+					// マルチテクスチャには対応しないので最初の名前を使う
+					const auto& uvSetName = uvSetNameList.GetStringAt(0);
+					const auto& elementUV = mesh->GetElementUV(uvSetName);
 
-					pVertices->at(i).uv.x = static_cast<float>(uv[0]);
-					// Vは反転させる
-					pVertices->at(i).uv.y = (1.0f - static_cast<float>(uv[1]));
-					//pVertices->at(i).uv.y = static_cast<float>(uv[1]);
+					// eByPolygonVertexとeByControlPointのマッピングモードのみ対応。
+
+					// uvデータを参照するインデックスの配列
+					const bool userIdx =
+						elementUV->GetReferenceMode() != fbxsdk::FbxGeometryElement::eDirect;
+					const int indexCount =
+						(userIdx) ? elementNormal->GetIndexArray().GetCount() : 0;
+
+
+					if (elementUV->GetMappingMode() == fbxsdk::FbxGeometryElement::eByControlPoint)
+					//if (true)
+					{
+						// ポリゴン単位でデータを反復処理する。
+						for (int polygonIdx = 0; polygonIdx < meshPolygonCount; polygonIdx++)
+						{
+							// ポリゴンサイズを取得すると、現在のポリゴンの頂点の数が分かります。
+							int verticesCountInPolygon = mesh->GetPolygonSize(polygonIdx);
+
+							for (int vertInPolyIdx = 0; vertInPolyIdx < verticesCountInPolygon; vertInPolyIdx++)
+							{
+								// 制御点配列から現在の頂点のインデックスを取得します。
+								int polygonVertexIndex = mesh->GetPolygonVertex(polygonIdx, vertInPolyIdx);
+
+								// UV インデックスは参照モードに依存する
+								int uvIndex = userIdx ? 
+									elementUV->GetIndexArray().GetAt(polygonVertexIndex) : polygonVertexIndex;
+
+								const auto& uvValue = elementUV->GetDirectArray().GetAt(uvIndex);
+
+								// uvのコピー。
+								for (int i = 0; i < 2; i++)
+								{
+									pVertices->at(polygonVertexIndex).uv.m_fVec[i] = 
+										static_cast<float>(uvValue[i]);
+								}
+
+								pVertices->at(polygonVertexIndex).uv.y =
+									1.0f - pVertices->at(polygonVertexIndex).uv.y;
+							}
+						}
+					}
+					// @todo 未実装
+					else if (elementUV->GetMappingMode() == fbxsdk::FbxGeometryElement::eByPolygonVertex)
+					{
+						int polygonVertexIdx = 0;
+						// ポリゴン単位でデータを反復処理する。
+						for (int polygonIdx = 0; polygonIdx < meshPolygonCount; polygonIdx++)
+						{
+							// ポリゴンサイズを取得すると、現在のポリゴンの頂点の数が分かります。
+							int verticesCountInPolygon = mesh->GetPolygonSize(polygonIdx);
+							for (int vertInPolyIdx = 0; vertInPolyIdx < verticesCountInPolygon; vertInPolyIdx++)
+							{
+								// 制御点配列から現在の頂点のインデックスを取得します。
+								int polygonVertexIndex = mesh->GetPolygonVertex(polygonIdx, vertInPolyIdx);
+
+								// UV インデックスは参照モードに依存する
+								int uvIndex = userIdx ?
+									elementUV->GetIndexArray().GetAt(polygonVertexIdx) : polygonVertexIdx;
+
+								const auto& uvValue = elementUV->GetDirectArray().GetAt(uvIndex);
+
+								// UVをコピー。
+								// しなきゃいけないけど、未実装。
+								//nsGameWindow::MessageBoxWarning(L"UVのマッピングモードがeByPolygonVertexですが、未対応です。");
+
+								// uvのコピー。
+								if (pVertices->at(polygonVertexIndex).uv.LengthSq() > FLT_EPSILON)
+								{
+									int a = 1;
+								}
+								for (int i = 0; i < 2; i++)
+								{
+									pVertices->at(polygonVertexIndex).uv.m_fVec[i] =
+										static_cast<float>(uvValue[i]);
+								}
+								pVertices->at(polygonVertexIndex).uv.y = 
+									1.0f - pVertices->at(polygonVertexIndex).uv.y;
+								polygonVertexIdx++;
+							}
+
+						}
+					}
+
 				}
 
+				//// ・UVのコピー。
+				//fbxsdk::FbxStringList uvSetNames;
+				//mesh->GetUVSetNames(uvSetNames);
 
-				// 〇インデックスバッファを作り直す。
+				//fbxsdk::FbxArray<FbxVector2> uvBuffer;
+				//// UVSetの名前からUVSetを取得する
+				//// 今回はマルチテクスチャには対応しないので最初の名前を使う
+				//mesh->GetPolygonVertexUVs(uvSetNames.GetStringAt(0), uvBuffer);
 
-				// fbxのポリゴン数
-				const auto kFbxPolygonCount = mesh->GetPolygonCount();
-				// インデックスバッファの数は、ポリゴン数 * 1ポリゴンの頂点数(3)
-				pIndices->resize(kFbxPolygonCount * 3);
+				//for (int i = 0; i < uvBuffer.Size(); i++)
+				//{
+				//	const auto& uv = uvBuffer[i];
 
-				for (int i = 0; i < kFbxPolygonCount; i++)
+				//	pVertices->at(i).uv.x = static_cast<float>(uv[0]);
+				//	// Vは反転させる
+				//	pVertices->at(i).uv.y = (1.0f - static_cast<float>(uv[1]));
+				//	//pVertices->at(i).uv.y = static_cast<float>(uv[1]);
+				//}
+
+				// インデックスバッファのコピー。
+				pIndices->resize(meshIndicesCount);
+				for (int indicesIdx = 0; indicesIdx < meshIndicesCount; indicesIdx++)
 				{
-					// インデックスバッファの作成。
-					// 右手系(Fbx)から左手系(DirectX)に変換するため、逆回りにする。
-					pIndices->at(i * 3) = i * 3 + 2;
-					pIndices->at(i * 3 + 1) = i * 3 + 1;
-					pIndices->at(i * 3 + 2) = i * 3;
+					pIndices->at(indicesIdx) = meshIndices[indicesIdx];
 				}
+				//// 〇インデックスバッファを作り直す。
+
+				//// fbxのポリゴン数
+				//const auto kFbxPolygonCount = mesh->GetPolygonCount();
+				//// インデックスバッファの数は、ポリゴン数 * 1ポリゴンの頂点数(3)
+				//pIndices->resize(kFbxPolygonCount * 3);
+
+				//for (int i = 0; i < kFbxPolygonCount; i++)
+				//{
+				//	// インデックスバッファの作成。
+				//	// 右手系(Fbx)から左手系(DirectX)に変換するため、逆回りにする。
+				//	pIndices->at(i * 3) = i * 3 + 2;
+				//	pIndices->at(i * 3 + 1) = i * 3 + 1;
+				//	pIndices->at(i * 3 + 2) = i * 3;
+				//}
 
 
 				if (mesh->GetElementMaterialCount() == 0)
@@ -795,19 +1180,13 @@ namespace nsYMEngine
 				{
 					fbxsdk::FbxSkin* skin = static_cast<fbxsdk::FbxSkin*>(
 						mesh->GetDeformer(skinIdx, fbxsdk::FbxDeformer::EDeformerType::eSkin));
-
+					auto skinType = skin->GetSkinningType();
 					const int clusterCount = skin->GetClusterCount();
-					bool updateBoneMatrix = false;
-					if (m_boneMatrix.empty())
-					{
-						m_boneMatrix.resize(clusterCount);
-						updateBoneMatrix = true;
-					}
 					for (int clusterIdx = 0; clusterIdx < clusterCount; clusterIdx++)
 					{
 						// クラスタ(ボーン)
 						auto cluster = skin->GetCluster(clusterIdx);
-
+						auto linkMode = cluster->GetLinkMode();
 						const int cpIndicesCount = cluster->GetControlPointIndicesCount();
 						const int* cpIndices = cluster->GetControlPointIndices();
 						const double* cpWeights = cluster->GetControlPointWeights();
@@ -832,57 +1211,19 @@ namespace nsYMEngine
 							}
 						}
 
-						if (updateBoneMatrix)
+						if (m_boneNameTable.count(clusterName) == 0)
 						{
-							if (m_boneNameTable.count(clusterName) == 0)
-							{
-								m_boneNameTable.emplace(clusterName, clusterIdx);
-							}
-							else
-							{
-								int a = 1;
-							}
-
-							fbxsdk::FbxAMatrix mTransfrom;
-							cluster->GetTransformLinkMatrix(mTransfrom);
-
-							for (int y = 0; y < 4; y++)
-							{
-								for (int x = 0; x < 4; x++)
-								{
-									// 初期ポーズを取得
-									m_boneMatrix.at(clusterIdx).m_fMat[y][x] =
-										static_cast<float>(mTransfrom[y][x]);
-								}
-							}
-							m_boneMatrix.at(clusterIdx) = nsMath::CMatrix::Identity();
+							m_boneNameTable.emplace(clusterName, clusterIdx);
+						}
+						else
+						{
+							int a = 1;
 						}
 
-						if (m_animationData.count(clusterName) == 0)
-						{
-							std::vector<nsMath::CMatrix> tempMat;
-							m_animationData.emplace(clusterName, tempMat);
-							auto& animData = m_animationData.at(clusterName);
-							animData.resize(totalFrames);
-							for (unsigned int frameIdx = 0; frameIdx < totalFrames; frameIdx++)
-							{
-								const auto& fbxMat = cluster->GetLink()->
-									EvaluateGlobalTransform(oneFrameTime * frameIdx);
-								auto& anim = animData.at(frameIdx);
-								fbxMat[0][0];
-								for (int y = 0; y < 4; y++)
-								{
-									for (int x = 0; x < 4; x++)
-									{
-										anim.m_fMat[y][x] = static_cast<float>(fbxMat[y][x]);
-									}
-								}
-							}
-						}
 					}
 				}
 
-				for (int i = 0; i < kFbxPolygonVertexCount; i++)
+				for (int i = 0; i < meshVerticesCount; i++)
 				{
 					int idx = 0;
 					if (m_weightTableArray.at(objectIdx).at(i).empty())
@@ -906,11 +1247,89 @@ namespace nsYMEngine
 				}
 
 
+				int maxFrameCount = m_animTimeInfo.GetMaxFrame();
+				m_nodeMatrixByFrameArray.at(objectIdx).resize(maxFrameCount);
+				for (int frameIdx = 0; frameIdx < maxFrameCount; frameIdx++)
+				{
+					const auto node = mesh->GetNode();
+					const auto& mat = node->EvaluateGlobalTransform(m_animTimeInfo.GetTime(frameIdx));
+					for (int y = 0; y < 4; y++)
+					{
+						for (int x = 0; x < 4; x++)
+						{
+							m_nodeMatrixByFrameArray.at(objectIdx).at(frameIdx).m_fMat[y][x] =
+								static_cast<float>(mat[y][x]);
+						}
+					}
+				}
 
+				if (m_boneInfoArray.empty())
+				{
+					auto meshNode = mesh->GetNode();
+					fbxsdk::FbxAMatrix geometryTransform = GetGeometryTransformation(meshNode);
+
+					for (int skinIdx = 0; skinIdx < skinCount; skinIdx++)
+					{
+						fbxsdk::FbxSkin* skin = static_cast<fbxsdk::FbxSkin*>(
+							mesh->GetDeformer(skinIdx, fbxsdk::FbxDeformer::EDeformerType::eSkin));
+						const int clusterCount = skin->GetClusterCount();
+
+						m_boneInfoArray.resize(clusterCount);
+						m_boneMatrixArray.resize(clusterCount);
+						for (int clusterIdx = 0; clusterIdx < clusterCount; clusterIdx++)
+						{
+							// クラスタ(ボーン)
+							auto cluster = skin->GetCluster(clusterIdx);
+							m_boneInfoArray.at(clusterIdx).name = cluster->GetLink()->GetName();
+							m_boneInfoArray.at(clusterIdx).frameNum = m_animTimeInfo.GetMaxFrame();
+							fbxsdk::FbxAMatrix initMat;
+							cluster->GetTransformLinkMatrix(initMat);
+
+							fbxsdk::FbxAMatrix transformMatrix, transformLinkMatrix,
+								globalBindposeInvMatrix;
+							cluster->GetTransformMatrix(transformMatrix);
+
+							// バインディング時のメッシュの変形
+							cluster->GetTransformLinkMatrix(transformLinkMatrix);
+
+							// バインディング時のクラスタの、クラスタ空間からワールド空間への変換
+							globalBindposeInvMatrix = transformLinkMatrix.Inverse() * transformMatrix * geometryTransform;
+
+							for (int y = 0; y < 4; y++)
+							{
+								for (int x = 0; x < 4; x++)
+								{
+									m_boneInfoArray.at(clusterIdx).globalBindposeInvMatrix.m_fMat[y][x] =
+										static_cast<float>(globalBindposeInvMatrix[y][x]);
+									m_boneInfoArray.at(clusterIdx).initMatrix.m_fMat[y][x] =
+										static_cast<float>(initMat[y][x]);
+								}
+							}
+
+							m_boneInfoArray.at(clusterIdx).frameMatrixArray.resize(m_boneInfoArray.at(clusterIdx).frameNum);
+							for (unsigned int frameIdx = 0; frameIdx < m_boneInfoArray.at(clusterIdx).frameNum; frameIdx++)
+							{
+								const auto& time = m_animTimeInfo.GetTime(frameIdx);
+								fbxsdk::FbxAMatrix currentTransformOffset = meshNode->EvaluateGlobalTransform(time) * geometryTransform;
+								currentTransformOffset.Inverse();
+								const auto& frameMat = currentTransformOffset.Inverse() * cluster->GetLink()->EvaluateGlobalTransform(time);
+								for (int y = 0; y < 4; y++)
+								{
+									for (int x = 0; x < 4; x++)
+									{
+										m_boneInfoArray.at(clusterIdx).frameMatrixArray.at(frameIdx).m_fMat[y][x] = 
+											static_cast<float>(frameMat[y][x]);
+									}
+								}
+							}
+
+						}
+					}
+				}
 				return;
 			}
 
-			bool CFBXRenderer::CreateVertexAndIndexBuffer(
+			bool CFBXRendererFBX_SDK::CreateVertexAndIndexBuffer(
 				const std::vector<std::vector<SFbxVertex>>& verticesArray,
 				const std::vector<std::vector<unsigned short>>& indicesArray
 			)
@@ -923,7 +1342,7 @@ namespace nsYMEngine
 				for (int i = 0; i < kNumBuffers; i++)
 				{
 					m_vertexBuffers.at(i) = new nsDx12Wrappers::CVertexBuffer();
-					auto& vertices = verticesArray.at(i);
+					const auto& vertices = verticesArray.at(i);
 					auto resV = m_vertexBuffers.at(i)->Init(
 						static_cast<unsigned int>(alignedStrideSize * vertices.size()),
 						alignedStrideSize,
@@ -931,7 +1350,8 @@ namespace nsYMEngine
 					);
 
 					m_indexBuffers.at(i) = new nsDx12Wrappers::CIndexBuffer();
-					auto indices = indicesArray.at(i);
+					const auto& indices = indicesArray.at(i);
+					m_numIndicesArray.at(i) = static_cast<unsigned int>(indices.size());
 					auto resI = m_indexBuffers.at(i)->Init(
 						static_cast<unsigned int>(sizeof(indices.at(0)) * indices.size()),
 						&indices.at(0)
@@ -945,12 +1365,12 @@ namespace nsYMEngine
 				return true;
 			}
 
-			bool CFBXRenderer::CreateConstantBufferView()
+			bool CFBXRendererFBX_SDK::CreateConstantBufferView()
 			{
 				// 〇定数バッファ作成
 				auto cbSize = sizeof(nsMath::CMatrix) * 2;
 
-				unsigned int boneNum = static_cast<unsigned int>(m_boneMatrix.size());
+				unsigned int boneNum = static_cast<unsigned int>(m_boneMatrixArray.size());
 				cbSize += sizeof(nsMath::CMatrix) * boneNum;
 
 				m_constantBuffer.Init(static_cast<unsigned int>(cbSize), L"FBXModel");
@@ -963,7 +1383,7 @@ namespace nsYMEngine
 				auto mViewProj = CGraphicsEngine::GetInstance()->GetMatrixViewProj();
 				mappedCB[1] = mWorld * mViewProj;
 
-				copy(m_boneMatrix.begin(), m_boneMatrix.end(), mappedCB + 2);
+				copy(m_boneMatrixArray.begin(), m_boneMatrixArray.end(), mappedCB + 2);
 
 				// 〇ディスクリプタヒープ作成
 				constexpr unsigned int numDescHeaps = 1;
@@ -978,7 +1398,7 @@ namespace nsYMEngine
 				return true;
 			}
 
-			bool CFBXRenderer::CreateMaterialCBVTable(
+			bool CFBXRendererFBX_SDK::CreateMaterialCBVTable(
 				const std::unordered_map<std::string, SFbxMaterial>& fbxMaterials)
 			{
 				auto cbSize = static_cast<unsigned int>(sizeof(SFbxMaterial));
@@ -1076,7 +1496,7 @@ namespace nsYMEngine
 				return true;
 			}
 
-			bool CFBXRenderer::CreateShaderResourceView()
+			bool CFBXRendererFBX_SDK::CreateShaderResourceView()
 			{
 
 

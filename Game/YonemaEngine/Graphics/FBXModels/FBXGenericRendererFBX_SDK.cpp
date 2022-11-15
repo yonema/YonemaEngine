@@ -1,4 +1,4 @@
-#include "FBXGenericRenderer.h"
+#include "FBXGenericRendererFBX_SDK.h"
 #include "../GraphicsEngine.h"
 
 namespace nsYMEngine
@@ -7,14 +7,14 @@ namespace nsYMEngine
 	{
 		namespace nsFBXModels
 		{
-			const wchar_t* const CFBXGenericRenderer::m_kVsFilePath =
+			const wchar_t* const CFBXGenericRendererFBX_SDK::m_kVsFilePath =
 				L"Assets/Shaders/FbxTestVertexShader.hlsl";
-			const char* const CFBXGenericRenderer::m_kVsEntryFuncName = "VSMain";
-			const wchar_t* const CFBXGenericRenderer::m_kPsFilePath =
+			const char* const CFBXGenericRendererFBX_SDK::m_kVsEntryFuncName = "VSMain";
+			const wchar_t* const CFBXGenericRendererFBX_SDK::m_kPsFilePath =
 				L"Assets/Shaders/FbxTestPixelShader.hlsl";
-			const char* const CFBXGenericRenderer::m_kPsEntryFuncName = "PSMain";
+			const char* const CFBXGenericRendererFBX_SDK::m_kPsEntryFuncName = "PSMain";
 
-			bool CFBXGenericRenderer::Init()
+			bool CFBXGenericRendererFBX_SDK::Init()
 			{
 				auto device = CGraphicsEngine::GetInstance()->GetDevice();
 				if (CreateRootSignature(device) != true)
@@ -30,7 +30,7 @@ namespace nsYMEngine
 			}
 
 
-			bool CFBXGenericRenderer::CreateRootSignature(ID3D12Device5* device)
+			bool CFBXGenericRendererFBX_SDK::CreateRootSignature(ID3D12Device5* device)
 			{
 				int numCBVs = 0;
 				int numSRVs = 0;
@@ -105,7 +105,7 @@ namespace nsYMEngine
 				return res;
 			}
 
-			bool CFBXGenericRenderer::CreatePipelineState(ID3D12Device5* device)
+			bool CFBXGenericRendererFBX_SDK::CreatePipelineState(ID3D12Device5* device)
 			{
 				nsDx12Wrappers::CBlob vsBlob;
 				nsDx12Wrappers::CBlob psBlob;

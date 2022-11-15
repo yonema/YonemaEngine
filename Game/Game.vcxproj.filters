@@ -117,10 +117,10 @@
     <ClCompile Include="YonemaEngine\Graphics\2D\TransSpriteGenericRenderer.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="YonemaEngine\Graphics\FBXModels\FBXRenderer.cpp">
+    <ClCompile Include="YonemaEngine\Graphics\FBXModels\FBXRendererFBX_SDK.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="YonemaEngine\Graphics\FBXModels\FBXGenericRenderer.cpp">
+    <ClCompile Include="YonemaEngine\Graphics\FBXModels\FBXGenericRendererFBX_SDK.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="YonemaEngine\GameObject\GameObjectManager.cpp">
@@ -157,6 +157,12 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="YonemaEngine\Input\Keyboard.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YonemaEngine\Graphics\FBXModels\FBXRendererAssimp.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YonemaEngine\Graphics\FBXModels\FBXGenericRendererAssimp.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -286,10 +292,10 @@
     <ClInclude Include="YonemaEngine\Graphics\2D\TransSpriteGenericRenderer.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="YonemaEngine\Graphics\FBXModels\FBXRenderer.h">
+    <ClInclude Include="YonemaEngine\Graphics\FBXModels\FBXRendererFBX_SDK.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="YonemaEngine\Graphics\FBXModels\FBXGenericRenderer.h">
+    <ClInclude Include="YonemaEngine\Graphics\FBXModels\FBXGenericRendererFBX_SDK.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="YonemaEngine\GameObject\GameObjectManager.h">
@@ -346,6 +352,12 @@
     <ClInclude Include="YonemaEngine\Input\InputManagerData.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="YonemaEngine\Graphics\FBXModels\FBXRendererAssimp.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YonemaEngine\Graphics\FBXModels\FBXGenericRendererAssimp.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\SpriteHeader.hlsli" />
@@ -353,6 +365,7 @@
     <None Include="Assets\Shaders\BasicHeader.hlsli" />
     <None Include="Assets\Shaders\PeraPolygonHeader.hlsli" />
     <None Include="Assets\Shaders\FbxTestHeader.hlsli" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Assets\Shaders\SpriteVertexShader.hlsl" />

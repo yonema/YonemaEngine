@@ -32,7 +32,7 @@ namespace nsYMEngine
 			int idx2 = static_cast<int>(filePath.rfind('\\'));
 
 			// '/'か'\\'のどちらか有効なほうを採用する。
-			auto idx = max(idx1, idx2);
+			auto idx = std::max(idx1, idx2);
 
 			// そのままだと'/'が入ってしまうから、一個進める。
 			idx++;
@@ -123,13 +123,27 @@ namespace nsYMEngine
 			int pathIndex2 = static_cast<int>(modelPath.rfind('\\'));
 
 			// '/'か'\\'のどちらか有効なほうを採用する。
-			auto pathIndex = max(pathIndex1, pathIndex2);
+			auto pathIndex = std::max(pathIndex1, pathIndex2);
 
 			// そのままだと最後の'/'が入らないから、一個進める。
 			pathIndex++;
 			auto folderPath = modelPath.substr(0, pathIndex);
 
 			return folderPath + texPath;
+		}
+
+		std::string ToUTF8(const std::wstring& wstr) noexcept
+		{
+			auto length = WideCharToMultiByte(CP_UTF8, 0U, wstr.data(), -1, nullptr, 0, nullptr, nullptr);
+			auto buffer = new char[length];
+
+			WideCharToMultiByte(CP_UTF8, 0U, wstr.data(), -1, buffer, length, nullptr, nullptr);
+
+			std::string result(buffer);
+			delete[] buffer;
+			buffer = nullptr;
+
+			return result;
 		}
 
 	}

@@ -33,11 +33,11 @@ cbuffer ModelCB : register(b0)
 	float4x4 g_mBones[256];
 }
 
-cbuffer MaterialCB : register(b1)
-{
-	float4 g_ambient;
-	float4 g_diffuse;
-	float4 g_specular;
-	float g_alpha;
-}
+//cbuffer MaterialCB : register(b1)
+//{
+//	float4 g_ambient;
+//	float4 g_diffuse;
+//	float4 g_specular;
+//	float g_alpha;
+//}
 
