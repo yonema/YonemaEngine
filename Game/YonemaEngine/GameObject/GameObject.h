@@ -76,7 +76,7 @@ namespace nsYMEngine
 			/**
 			 * @brief 非アクティブ化する。更新処理や開始処理が行われなくなります。
 			*/
-			inline void Deactivare() noexcept
+			inline void Deactivate() noexcept
 			{
 				SetFlag(EnGameObjectFlagTable::enActive, false);
 			}
