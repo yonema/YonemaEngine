@@ -5,9 +5,13 @@ namespace nsYMEngine
 {
 	namespace nsGraphics
 	{
-		namespace nsFBXModels
+		namespace nsAssimpCommon
 		{
 			struct SLocalTransform;
+		}
+		namespace nsAnimations
+		{
+			class CSkelton;
 		}
 		namespace nsRenderers
 		{
@@ -75,83 +79,20 @@ namespace nsYMEngine
 					std::string diffuseMapFilePath;
 				};
 
-				struct SBasicMeshEntry 
+				struct SBasicMeshInfo
 				{
-					SBasicMeshEntry()
-					{
-						NumIndices = 0;
-						BaseVertex = 0;
-						BaseIndex = 0;
-						MaterialIndex = 0;
-					}
+					constexpr SBasicMeshInfo() = default;
 
-					unsigned int NumIndices;
-					unsigned int BaseVertex;
-					unsigned int BaseIndex;
-					unsigned int MaterialIndex;
+					unsigned int numIndices = 0;
+					unsigned int baseVertexNo = 0;
+					unsigned int baseIndexNo = 0;
+					unsigned int materialIndex = 0;
 				};
 
-				struct SNodeInfo
-				{
 
-					SNodeInfo() {}
 
-					SNodeInfo(const aiNode* n) { pNode = n; }
 
-					const aiNode* pNode = NULL;
-					bool isRequired = false;
-				};
 
-				struct SBoneInfo
-				{
-					nsMath::CMatrix OffsetMatrix;
-					nsMath::CMatrix FinalTransformation;
-
-					SBoneInfo(const nsMath::CMatrix& Offset)
-					{
-						OffsetMatrix = Offset;
-						FinalTransformation = nsMath::CMatrix::Zero();
-					}
-				};
-
-				struct SVertexBoneData
-				{
-					unsigned int BoneIDs[4] = { 0 };
-					float Weights[4] = { 0.0f };
-					int index = 0;  // slot for the next update
-
-					SVertexBoneData()
-					{
-					}
-
-					void AddBoneData(unsigned int BoneID, float Weight)
-					{
-						for (int i = 0; i < index; i++) {
-							if (BoneIDs[i] == BoneID) {
-								//  printf("bone %d already found at index %d old weight %f new weight %f\n", BoneID, i, Weights[i], Weight);
-								return;
-							}
-						}
-
-						// The iClone 7 Raptoid Mascot (https://sketchfab.com/3d-models/iclone-7-raptoid-mascot-free-download-56a3e10a73924843949ae7a9800c97c7)
-						// has a problem of zero weights causing an overflow and the assertion below. This fixes it.
-						if (Weight == 0.0f) {
-							return;
-						}
-
-						// printf("Adding bone %d weight %f at index %i\n", BoneID, Weight, index);
-
-						if (index == 4) {
-							return;
-							assert(0);
-						}
-
-						BoneIDs[index] = BoneID;
-						Weights[index] = Weight;
-
-						index++;
-					}
-				};
 
 
 
@@ -167,11 +108,7 @@ namespace nsYMEngine
 
 				void Terminate();
 
-				void LoadMeshBones(const aiMesh& srcMesh, unsigned int meshIdx);
-
-				void LoadSingleBone(const aiBone* pBone, unsigned int MeshIndex);
-
-				int GetBoneId(const aiBone* pBone);
+				bool ImportScene(const char* modelFilePath);
 
 				void LoadMesh(SMesh* dstMesh, const aiMesh& srcMesh, unsigned int meshIdx);
 
@@ -188,47 +125,43 @@ namespace nsYMEngine
 
 				bool CreateMaterialSRV();
 
-				void InitializeRequiredNodeMap(const aiNode* pNode);
-
-				void MarkRequiredNodesForBone(const aiBone* pBone);
-
 				void GetBoneTransforms(
-					float TimeInSeconds,
-					std::vector<nsMath::CMatrix>* Transforms,
-					unsigned int AnimationIndex = 0
+					float timeInSeconds,
+					std::vector<nsMath::CMatrix>* transforms,
+					unsigned int animIdx = 0
 				);
 
-				float CalcAnimationTimeTicks(float TimeInSeconds, unsigned int AnimationIndex);
+				float CalcAnimationTimeTicks(float timeInSeconds, unsigned int animIdx);
 
 				void ReadNodeHierarchy(
-					float AnimationTimeTicks,
-					const aiNode* pNode,
-					const nsMath::CMatrix& ParentTransform, 
-					const aiAnimation& Animation
+					float animTimeTicks,
+					const aiNode& node,
+					const nsMath::CMatrix& parentTransform, 
+					const aiAnimation& animation
 				);
 
 				const aiNodeAnim* FindNodeAnim(const aiAnimation&
 					Animation, const std::string& NodeName);
 
 				void CalcLocalTransform(
-					SLocalTransform& Transform,
-					float AnimationTimeTicks,
-					const aiNodeAnim* pNodeAnim
+					nsAssimpCommon::SLocalTransform& localTransform,
+					float animTimeTicks,
+					const aiNodeAnim& nodeAnim
 				);
 				void CalcInterpolatedScaling(
-					aiVector3D& Out, float AnimationTimeTicks, const aiNodeAnim* pNodeAnim);
+					aiVector3D* pScaling, float animTimeTicks, const aiNodeAnim& nodeAnim);
 
 				void CalcInterpolatedRotation(
-					aiQuaternion& Out, float AnimationTimeTicks, const aiNodeAnim* pNodeAnim);
+					aiQuaternion* pRotation, float animTimeTicks, const aiNodeAnim& nodeAnim);
 
 				void CalcInterpolatedPosition(
-					aiVector3D& Out, float AnimationTimeTicks, const aiNodeAnim* pNodeAnim);
+					aiVector3D* pPosition, float animTimeTicks, const aiNodeAnim& nodeAnim);
 
-				unsigned int FindScaling(float AnimationTimeTicks, const aiNodeAnim* pNodeAnim);
+				unsigned int FindScaling(float animTimeTicks, const aiNodeAnim& nodeAnim);
 
-				unsigned int FindRotation(float AnimationTimeTicks, const aiNodeAnim* pNodeAnim);
+				unsigned int FindRotation(float animTimeTicks, const aiNodeAnim& nodeAnim);
 
-				unsigned int FindPosition(float AnimationTimeTicks, const aiNodeAnim* pNodeAnim);
+				unsigned int FindPosition(float animTimeTicks, const aiNodeAnim& nodeAnim);
 
 
 			private:
@@ -244,18 +177,14 @@ namespace nsYMEngine
 				std::unordered_map <std::string, nsDx12Wrappers::CDescriptorHeap*> m_materialDHs;
 
 				nsMath::CMatrix m_bias;
-				nsMath::CMatrix m_globalInverseTransform;
 
 				std::unordered_map<unsigned int, std::unordered_map<std::string, float>> m_boneNameAndWeightListTable;
-				std::vector<SBoneInfo> m_boneInfo;
-				std::vector<SVertexBoneData> m_bones;
-				std::vector<SBasicMeshEntry> m_meshes;
-				std::unordered_map<std::string, SNodeInfo> m_requiredNodeMap;
-				std::unordered_map<std::string, unsigned int> m_BoneNameToIndexMap;
+				std::vector<SBasicMeshInfo> m_meshInfoArray;
 				Assimp::Importer* m_importer = nullptr;
 				const aiScene* m_scene = nullptr;;
 				std::vector<nsMath::CMatrix> m_boneMatrices;
 				float m_animationTimer = 0.0f;
+				nsAnimations::CSkelton* m_skelton = nullptr;
 			};
 
 		}

@@ -9,6 +9,10 @@ namespace nsYMEngine
 		{
 			class IModelRendererBase;
 		}
+		namespace nsAnimations
+		{
+			class CAnimator;
+		}
 	}
 }
 
@@ -37,6 +41,7 @@ namespace nsYMEngine
 					CRendererTable::EnRendererType::enNone;
 				nsMath::CQuaternion vertexBias = nsMath::CQuaternion::Identity();
 				bool isVertesTranspos = false;
+				nsAnimations::CAnimator* animator = nullptr;
 			};
 
 			class CModelRenderer : public nsGameObject::IGameObject
