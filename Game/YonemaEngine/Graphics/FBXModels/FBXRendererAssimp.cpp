@@ -72,9 +72,14 @@ namespace nsYMEngine
 
 			void CFBXRendererAssimp::UpdateAnimation(float deltaTime)
 			{
-				m_animationTimer += deltaTime;
+				if (m_animator == nullptr) 
+				{
+					return;
+				}
 
-				GetBoneTransforms(m_animationTimer, &m_boneMatrices);
+				m_animator->UpdateAnimation(deltaTime);
+
+				m_animator->CalcAndGetAnimatedBoneTransforms(&m_boneMatrices);
 
 				auto mappedCB =
 					static_cast<nsMath::CMatrix*>(m_modelCB.GetMappedConstantBuffer());
@@ -84,7 +89,7 @@ namespace nsYMEngine
 				return;
 			}
 
-			CFBXRendererAssimp::CFBXRendererAssimp(const SModelInitData& modelInitData)
+			CFBXRendererAssimp::CFBXRendererAssimp(const nsRenderers::SModelInitData& modelInitData)
 			{
 				Init(modelInitData);
 
@@ -136,24 +141,30 @@ namespace nsYMEngine
 						vertexBuffer->Release();
 					}
 				}
-				delete m_importer;
-				m_importer = nullptr;
 				return;
 			}
 
 			bool CFBXRendererAssimp::Init(const SModelInitData& modelInitData)
 			{
-				if (ImportScene(modelInitData.modelFilePath) != true)
+				Assimp::Importer* importer = nullptr;
+				const aiScene* scene = nullptr;
+
+				if (ImportScene(modelInitData.modelFilePath, importer, scene) != true)
 				{
 					return false;
 				}
 				
+				if (modelInitData.animInitData)
+				{
+					m_skelton = new nsAnimations::CSkelton();
+					m_skelton->Init(*scene->mRootNode);
+					m_animator = new nsAnimations::CAnimator();
+					m_animator->Init(*modelInitData.animInitData, m_skelton);
+				}
 
-				m_skelton = new nsAnimations::CSkelton();
-				m_skelton->Init(*m_scene->mRootNode);
 
 
-				auto numMeshes = m_scene->mNumMeshes;
+				auto numMeshes = scene->mNumMeshes;
 
 
 				m_meshInfoArray.resize(numMeshes);
@@ -164,29 +175,31 @@ namespace nsYMEngine
 				std::vector<unsigned int> baseVertexNoArray(numMeshes);
 				for (unsigned int i = 0; i < numMeshes; i++)
 				{
-					m_meshInfoArray[i].materialIndex = m_scene->mMeshes[i]->mMaterialIndex;
-					m_meshInfoArray[i].numIndices = m_scene->mMeshes[i]->mNumFaces * 3;
+					m_meshInfoArray[i].materialIndex = scene->mMeshes[i]->mMaterialIndex;
+					m_meshInfoArray[i].numIndices = scene->mMeshes[i]->mNumFaces * 3;
 					m_meshInfoArray[i].baseVertexNo = numVertices;
 					m_meshInfoArray[i].baseIndexNo = numIndices;
 					baseVertexNoArray[i] = numVertices;
-					numVertices += m_scene->mMeshes[i]->mNumVertices;
+					numVertices += scene->mMeshes[i]->mNumVertices;
 					numVertices += m_meshInfoArray[i].numIndices;
 				}
 
-				m_skelton->LoadBones(numMeshes, m_scene->mMeshes, baseVertexNoArray, numVertices);
-
+				if (m_skelton)
+				{
+					m_skelton->LoadBones(numMeshes, scene->mMeshes, baseVertexNoArray, numVertices);
+				}
 
 				std::vector<SMesh> dstMeshes;
 				dstMeshes.resize(numMeshes);
 				m_materialNameTable.resize(numMeshes);
 				for (unsigned int meshIdx = 0; meshIdx < numMeshes; meshIdx++)
 				{
-					const auto* srcMesh = m_scene->mMeshes[meshIdx];
+					const auto* srcMesh = scene->mMeshes[meshIdx];
 					auto& dstMesh = dstMeshes.at(meshIdx);
 
 					LoadMesh(&dstMesh, *srcMesh, meshIdx);
-					const auto& srcMaterial = m_scene->mMaterials[0];
-					auto a = m_scene->mNumMaterials;
+					const auto& srcMaterial = scene->mMaterials[0];
+					auto a = scene->mNumMaterials;
 					LoadTexture(&dstMesh, *srcMaterial, modelInitData.modelFilePath, meshIdx);
 				}
 
@@ -201,7 +214,8 @@ namespace nsYMEngine
 				return true;
 			}
 
-			bool CFBXRendererAssimp::ImportScene(const char* modelFilePath)
+			bool CFBXRendererAssimp::ImportScene(
+				const char* modelFilePath, Assimp::Importer*& pImporter, const aiScene*& pScene)
 			{
 				// utf8のファイルパス文字列が必要なため変換。
 
@@ -209,7 +223,7 @@ namespace nsYMEngine
 				auto filePathInWStr = nsUtils::GetWideStringFromString(filePathInChar);
 				auto filePathInUTF8Str = nsUtils::ToUTF8(filePathInWStr);
 
-				m_importer = new Assimp::Importer;
+				pImporter = new Assimp::Importer;
 
 				// インポートのポストプロセス設定。
 				static constexpr int kPostprocessFlag =
@@ -228,14 +242,14 @@ namespace nsYMEngine
 				aiProcess_FlipWindingOrder;				// CCWをCWにする。背面を右回りでカリングする。DirectXの場合必須。
 
 
-				m_scene = m_importer->ReadFile(filePathInUTF8Str, kPostprocessFlag);
+				pScene = pImporter->ReadFile(filePathInUTF8Str, kPostprocessFlag);
 
-				if (m_scene == nullptr)
+				if (pScene == nullptr)
 				{
 					std::wstring wstr = filePathInWStr;
 					wstr += L"\n上記のモデルの読み込みに失敗しました。";
 					nsGameWindow::MessageBoxWarning(wstr.c_str());
-					::OutputDebugStringA(m_importer->GetErrorString());
+					::OutputDebugStringA(pImporter->GetErrorString());
 					::OutputDebugStringA("\n");
 					return false;
 				}
@@ -281,11 +295,14 @@ namespace nsYMEngine
 					dstVertex.uv = { uv.x, uv.y };
 					dstVertex.color = { color.r, color.g, color.b, color.a };
 
-					unsigned int globalVertexID = m_meshInfoArray[meshIdx].baseVertexNo + vertIdx;
-					for (int boneIdx = 0; boneIdx < 4; boneIdx++)
+					if (m_skelton)
 					{
-						dstVertex.boneNo[boneIdx] = m_skelton->GetVertexBoneID(globalVertexID, boneIdx);
-						dstVertex.weights[boneIdx] = m_skelton->GetVertexWeight(globalVertexID, boneIdx);
+						unsigned int globalVertexID = m_meshInfoArray[meshIdx].baseVertexNo + vertIdx;
+						for (int boneIdx = 0; boneIdx < 4; boneIdx++)
+						{
+							dstVertex.boneNo[boneIdx] = m_skelton->GetVertexBoneID(globalVertexID, boneIdx);
+							dstVertex.weights[boneIdx] = m_skelton->GetVertexWeight(globalVertexID, boneIdx);
+						}
 					}
 				}
 
@@ -468,318 +485,11 @@ namespace nsYMEngine
 			}
 
 
-			void CFBXRendererAssimp::GetBoneTransforms(
-				float timeInSeconds,
-				std::vector<nsMath::CMatrix>* transforms,
-				unsigned int animIdx
-			)
-			{
-				if (animIdx >= m_scene->mNumAnimations)
-				{
-					// 指定されたアニメーションインデックスが、アニメーションの数を超えてる。
-#ifdef _DEBUG
-					char buffer[256];
-					sprintf_s(buffer, "Invalid animation index %d, max is %d\n", animIdx, m_scene->mNumAnimations);
-					::OutputDebugStringA(buffer);
-#endif
-					return;
-				}
-
-				float animTimeTicks = CalcAnimationTimeTicks(timeInSeconds, animIdx);
-				const aiAnimation& animation = *m_scene->mAnimations[animIdx];
-
-				ReadNodeHierarchy(
-					animTimeTicks, *m_scene->mRootNode, nsMath::CMatrix::Identity(), animation);
-
-				const auto& boneInfoArray = m_skelton->GetBoneInfoArray();
-				unsigned int numBoneInfoArray = static_cast<unsigned int>(boneInfoArray.size());
-				transforms->resize(numBoneInfoArray);
-
-				for (unsigned int boneIdx = 0; boneIdx < numBoneInfoArray; boneIdx++)
-				{
-					(*transforms)[boneIdx] = boneInfoArray[boneIdx].mFinalTransform;
-				}
-
-				return;
-			}
-
-			float CFBXRendererAssimp::CalcAnimationTimeTicks(
-				float timeInSeconds, unsigned int animIdx)
-			{
-				float ticksPerSecond = 
-					m_scene->mAnimations[animIdx]->mTicksPerSecond != 0 ?
-					static_cast<float>(m_scene->mAnimations[animIdx]->mTicksPerSecond) : 25.0f;
-				float timeInTicks = timeInSeconds * ticksPerSecond;
-
-				// we need to use the integral part of mDuration for the total length of the animation
-				float duration = 0.0f;
-				float fraction = modf(
-					static_cast<float>(m_scene->mAnimations[animIdx]->mDuration),
-					&duration
-				);
-
-				float animTimeTicks = fmod(timeInTicks, duration);
-				return animTimeTicks;
-			}
-
-			void CFBXRendererAssimp::ReadNodeHierarchy(
-				float animTimeTicks,
-				const aiNode& node,
-				const nsMath::CMatrix& parentTransform,
-				const aiAnimation& animation
-			)
-			{
-				nsMath::CMatrix mNodeTransform;
-				nsAssimpCommon::AiMatrixToMyMatrix(node.mTransformation, &mNodeTransform);
-
-				std::string nodeName(node.mName.data);
-				const aiNodeAnim* pNodeAnim = FindNodeAnim(animation, nodeName);
-
-				if (pNodeAnim) 
-				{
-					nsAssimpCommon::SLocalTransform localTransform;
-					CalcLocalTransform(localTransform, animTimeTicks, *pNodeAnim);
-
-					nsMath::CMatrix mScale, mRot, mTrans;
-					mScale.MakeScaling(
-						localTransform.scaling.x,
-						localTransform.scaling.y,
-						localTransform.scaling.z);
-
-					// aiMatrix3x3t から CMatrix の変換は用意してないから、
-					// いったん aiMatrix4x4 に変換してから CMatrix に変換する。
-					const auto& rotM3x3 = localTransform.rotation.GetMatrix();
-					aiMatrix4x4 rotM4x4(rotM3x3);
-					nsAssimpCommon::AiMatrixToMyMatrix(rotM4x4, &mRot);
-
-					mTrans.MakeTranslation(
-						localTransform.translation.x,
-						localTransform.translation.y, 
-						localTransform.translation.z);
-
-					// Combine the above transformations
-					//NodeTransformation = TranslationM * RotationM * ScalingM;
-					mNodeTransform = mScale * mRot * mTrans;
-				}
-
-				//nsMath::CMatrix GlobalTransformation = ParentTransform * NodeTransformation;
-				nsMath::CMatrix mGlobalTransform = mNodeTransform * parentTransform;
-
-				const auto& boneNameToIndexMap = m_skelton->GetBoneNameToIndexMap();
-				if (boneNameToIndexMap.count(nodeName) > 0)
-				{
-					unsigned int boneIdx = boneNameToIndexMap.at(nodeName);
-					/*m_boneInfo[BoneIndex].FinalTransformation = 
-						m_globalInverseTransform * GlobalTransformation * m_boneInfo[BoneIndex].OffsetMatrix;*/
-					m_skelton->SetBoneFinalTransformMatrix(boneIdx, mGlobalTransform);
-				}
-
-				for (unsigned int childIdx = 0; childIdx < node.mNumChildren; childIdx++) 
-				{
-					std::string childName(node.mChildren[childIdx]->mName.data);
-
-					const auto& requiredNodeMap = m_skelton->GetRequiredNodeMap();
-					const auto& it = requiredNodeMap.find(childName);
-
-					if (it == requiredNodeMap.end())
-					{
-#ifdef _DEBUG
-						char buffer[256];
-						sprintf_s(buffer, "Child %s cannot be found in the required node map\n", childName.c_str());
-						::OutputDebugStringA(buffer);
-#endif
-						return;
-					}
-
-					if (it->second.isRequired) 
-					{
-						ReadNodeHierarchy(animTimeTicks, *node.mChildren[childIdx], mGlobalTransform, animation);
-					}
-				}
-
-				return;
-			}
-
-			const aiNodeAnim* CFBXRendererAssimp::FindNodeAnim(const aiAnimation&
-				Animation, const std::string& NodeName)
-			{
-				for (unsigned  channelIdx = 0; channelIdx < Animation.mNumChannels; channelIdx++) 
-				{
-					const aiNodeAnim* pNodeAnim = Animation.mChannels[channelIdx];
-
-					if (std::string(pNodeAnim->mNodeName.data) == NodeName) 
-					{
-						return pNodeAnim;
-					}
-				}
-
-				return nullptr;
-			}
-
-			void CFBXRendererAssimp::CalcLocalTransform(
-				nsAssimpCommon::SLocalTransform& localTransform,
-				float animTimeTicks,
-				const aiNodeAnim& nodeAnim
-			)
-			{
-				CalcInterpolatedScaling(&localTransform.scaling, animTimeTicks, nodeAnim);
-				CalcInterpolatedRotation(&localTransform.rotation, animTimeTicks, nodeAnim);
-				CalcInterpolatedPosition(&localTransform.translation, animTimeTicks, nodeAnim);
-				return;
-			}
-
-			void CFBXRendererAssimp::CalcInterpolatedScaling(
-				aiVector3D* pScaling, float animTimeTicks, const aiNodeAnim& nodeAnim)
-			{
-				// we need at least two values to interpolate...
-				if (nodeAnim.mNumScalingKeys == 1)
-				{
-					*pScaling = nodeAnim.mScalingKeys[0].mValue;
-					return;
-				}
-
-				unsigned int scalingIdx = FindScaling(animTimeTicks, nodeAnim);
-				unsigned int nextScalingIdx = scalingIdx + 1;
-				assert(nextScalingIdx < nodeAnim.mNumScalingKeys);
-
-				float t1 = static_cast<float>(nodeAnim.mScalingKeys[scalingIdx].mTime);
-				if (t1 > animTimeTicks)
-				{
-					*pScaling = nodeAnim.mScalingKeys[scalingIdx].mValue;
-				}
-				else
-				{
-					float t2 = static_cast<float>(nodeAnim.mScalingKeys[nextScalingIdx].mTime);
-					float deltaTime = t2 - t1;
-					float factor = (animTimeTicks - t1) / deltaTime;
-					assert(factor >= 0.0f && factor <= 1.0f);
-					const aiVector3D& start = nodeAnim.mScalingKeys[scalingIdx].mValue;
-					const aiVector3D& end = nodeAnim.mScalingKeys[nextScalingIdx].mValue;
-					aiVector3D delta = end - start;
-					*pScaling = start + factor * delta;
-				}
-
-				return;
-			}
-
-			void CFBXRendererAssimp::CalcInterpolatedRotation(
-				aiQuaternion* pRotation, float animTimeTicks, const aiNodeAnim& nodeAnim)
-			{
-				// we need at least two values to interpolate...
-				if (nodeAnim.mNumRotationKeys == 1)
-				{
-					*pRotation = nodeAnim.mRotationKeys[0].mValue;
-					return;
-				}
-
-				unsigned int rotationIdx = FindRotation(animTimeTicks, nodeAnim);
-				unsigned int nextRotationIdx = rotationIdx + 1;
-				assert(nextRotationIdx < nodeAnim.mNumRotationKeys);
-
-				float t1 = static_cast<float>(nodeAnim.mRotationKeys[rotationIdx].mTime);
-				if (t1 > animTimeTicks)
-				{
-					*pRotation = nodeAnim.mRotationKeys[rotationIdx].mValue;
-				}
-				else 
-				{
-					float t2 = static_cast<float>(nodeAnim.mRotationKeys[nextRotationIdx].mTime);
-					float deltaTime = t2 - t1;
-					float factor = (animTimeTicks - t1) / deltaTime;
-					assert(factor >= 0.0f && factor <= 1.0f);
-					const aiQuaternion& startRotationQ = nodeAnim.mRotationKeys[rotationIdx].mValue;
-					const aiQuaternion& endRotationQ = nodeAnim.mRotationKeys[nextRotationIdx].mValue;
-					aiQuaternion::Interpolate(*pRotation, startRotationQ, endRotationQ, factor);
-				}
-
-				pRotation->Normalize();
-
-				return;
-			}
-
-			void CFBXRendererAssimp::CalcInterpolatedPosition(
-				aiVector3D* pPosition, float animTimeTicks, const aiNodeAnim& nodeAnim)
-			{
-				// we need at least two values to interpolate...
-				if (nodeAnim.mNumPositionKeys == 1)
-				{
-					*pPosition = nodeAnim.mPositionKeys[0].mValue;
-					return;
-				}
-
-				unsigned int positionIdx = FindPosition(animTimeTicks, nodeAnim);
-				unsigned int nextPositionIdx = positionIdx + 1;
-				assert(nextPositionIdx < nodeAnim.mNumPositionKeys);
-
-				float t1 = static_cast<float>(nodeAnim.mPositionKeys[positionIdx].mTime);
-				if (t1 > animTimeTicks)
-				{
-					*pPosition = nodeAnim.mPositionKeys[positionIdx].mValue;
-				}
-				else 
-				{
-					float t2 = static_cast<float>(nodeAnim.mPositionKeys[nextPositionIdx].mTime);
-					float deltaTime = t2 - t1;
-					float factor = (animTimeTicks - t1) / deltaTime;
-					assert(factor >= 0.0f && factor <= 1.0f);
-					const aiVector3D& start = nodeAnim.mPositionKeys[positionIdx].mValue;
-					const aiVector3D& end = nodeAnim.mPositionKeys[nextPositionIdx].mValue;
-					aiVector3D delta = end - start;
-					*pPosition = start + factor * delta;
-				}
-
-				return;
-			}
-
-			unsigned int CFBXRendererAssimp::FindScaling(
-				float animTimeTicks, const aiNodeAnim& nodeAnim)
-			{
-				assert(nodeAnim.mNumScalingKeys > 0);
-
-				for (unsigned int keyIdx = 0; keyIdx < nodeAnim.mNumScalingKeys - 1; keyIdx++)
-				{
-					float t = static_cast<float>(nodeAnim.mScalingKeys[keyIdx + 1].mTime);
-					if (animTimeTicks < t)
-					{
-						return keyIdx;
-					}
-				}
-
-				return 0;
-			}
-
-			unsigned int CFBXRendererAssimp::FindRotation(
-				float animTimeTicks, const aiNodeAnim& nodeAnim)
-			{
-				assert(nodeAnim.mNumRotationKeys > 0);
-
-				for (unsigned int keyIdx = 0; keyIdx < nodeAnim.mNumRotationKeys - 1; keyIdx++)
-				{
-					float t = static_cast<float>(nodeAnim.mRotationKeys[keyIdx + 1].mTime);
-					if (animTimeTicks < t)
-					{
-						return keyIdx;
-					}
-				}
-
-				return 0;
-			}
 
 
-			unsigned int CFBXRendererAssimp::FindPosition(
-				float animTimeTicks, const aiNodeAnim& nodeAnim)
-			{
-				for (unsigned int keyIdx = 0; keyIdx < nodeAnim.mNumPositionKeys - 1; keyIdx++)
-				{
-					float t = static_cast<float>(nodeAnim.mPositionKeys[keyIdx + 1].mTime);
-					if (animTimeTicks < t)
-					{
-						return keyIdx;
-					}
-				}
 
-				return 0;
-			}
+
+
 
 
 

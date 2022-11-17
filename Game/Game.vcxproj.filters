@@ -171,13 +171,7 @@
     <ClCompile Include="YonemaEngine\Graphics\Animations\Skelton.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="YonemaEngine\Graphics\Animations\AnimationExecutor.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="YonemaEngine\Graphics\Animations\Animator.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="YonemaEngine\Graphics\Animations\AnimationController.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -379,13 +373,7 @@
     <ClInclude Include="YonemaEngine\Graphics\Animations\Skelton.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="YonemaEngine\Graphics\Animations\AnimationExecutor.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="YonemaEngine\Graphics\Animations\Animator.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="YonemaEngine\Graphics\Animations\AnimationController.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="YonemaEngine\Graphics\AssimpCommonHeader.h">

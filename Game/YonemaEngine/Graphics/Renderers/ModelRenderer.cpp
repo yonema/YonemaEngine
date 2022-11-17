@@ -24,7 +24,7 @@ namespace nsYMEngine
 				{
 					m_renderer->UpdateWorldMatrix(m_position, m_rotation, m_scale);
 				}
-
+				m_renderer->PlayAnimation(0);
 				return true;
 			}
 

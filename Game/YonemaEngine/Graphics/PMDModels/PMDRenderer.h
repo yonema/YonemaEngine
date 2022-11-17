@@ -160,7 +160,7 @@ namespace nsYMEngine
 
 				void UpdateAnimation(float deltaTime) override final;
 
-				void PlayAnimation() override final;
+				void PlayAnimation(unsigned int animIdx) noexcept override final;
 
 			public:
 				CPMDRenderer(const char* filePath, const char* animFilePath = nullptr);

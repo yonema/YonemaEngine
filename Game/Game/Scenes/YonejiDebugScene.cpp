@@ -15,9 +15,19 @@ namespace nsAWA
 			//modelInitData.modelFilePath = "Assets/Models/SampleBox.fbx";
 			//modelInitData.modelFilePath = "Assets/Models/unitychan.fbx";
 			//modelInitData.vertexBias.SetRotationX(nsMath::YM_PIDIV2);
+
+			constexpr unsigned int kAnimNum = 3;
+			const char* animfilePaths[kAnimNum] = {
+				"Assets/Animations/Rumba_Dancing.fbx",
+				"Assets/Animations/Hip_Hop_Dancing.fbx",
+				"Assets/Animations/Robot_Hip_Hop_Dance.fbx"
+			};
+			SAnimationInitData animInitData(kAnimNum, animfilePaths);
+			modelInitData.animInitData = &animInitData;
 			m_modelRenderer->SetScale(0.1f);
 			m_modelRenderer->SetPosition({ 0.0f, 4.0f, 0.0f });
 			m_modelRenderer->Init(modelInitData);
+			m_modelRenderer->SetIsAnimationLoop(false);
 
 
 
@@ -44,9 +54,20 @@ namespace nsAWA
 			nsMath::CVector3 addPos = { 0.0f, 0.0f, 0.0f };
 			//if (Gamepad()->IsTrigger(EnPadButton::enA))
 			//if (Keyboard()->IsTrigger(EnKeyButton::enA))
-			if (Input()->IsTrigger(EnActionMapping::enJump))
+			if (Input()->IsTrigger(EnActionMapping::enJump) || m_modelRenderer->IsPlaying() != true)
 			{
-				addPos.y += 1.0f;
+				//addPos.y += 1.0f;
+				static unsigned int animIdx = 0;
+				animIdx++;
+				if (animIdx > 2)
+				{
+					animIdx = 0;
+				}
+				float animSpeed[3] = {1.0f,1.5f,2.0f};
+				static bool isAnimLoop = false;
+				isAnimLoop = !isAnimLoop;
+
+				m_modelRenderer->PlayAnimation(animIdx, animSpeed[animIdx], isAnimLoop);
 			}
 			//if (Gamepad()->IsPress(EnPadButton::enB))
 			//if (Keyboard()->IsPress(EnKeyButton::enB))

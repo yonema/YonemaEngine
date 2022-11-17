@@ -87,7 +87,7 @@ namespace nsYMEngine
 
 
 
-			void CPMDRenderer::PlayAnimation()
+			void CPMDRenderer::PlayAnimation(unsigned int animIdx)noexcept
 			{
 
 

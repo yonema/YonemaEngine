@@ -151,9 +151,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="YonemaEngine\Graphics\Animations\AnimationController.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\Animations\Animator.cpp" />
-    <ClCompile Include="YonemaEngine\Graphics\Animations\AnimationExecutor.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\Animations\Skelton.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\Animations\AnimationClip.cpp" />
     <ClCompile Include="Application.cpp" />
@@ -214,9 +212,7 @@
     <Image Include="Assets\Images\StarMan.png" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="YonemaEngine\Graphics\Animations\AnimationController.h" />
     <ClInclude Include="YonemaEngine\Graphics\Animations\Animator.h" />
-    <ClInclude Include="YonemaEngine\Graphics\Animations\AnimationExecutor.h" />
     <ClInclude Include="YonemaEngine\Graphics\Animations\Skelton.h" />
     <ClInclude Include="YonemaEngine\Graphics\Animations\AnimationClip.h" />
     <ClInclude Include="Application.h" />

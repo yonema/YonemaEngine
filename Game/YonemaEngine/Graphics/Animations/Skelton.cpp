@@ -17,9 +17,9 @@ namespace nsYMEngine
 					return;
 				}
 #ifdef _DEBUG
-				char buffer[256];
-				sprintf_s(buffer, "Adding bone %d weight %f at index %i\n", boneID, weight, index);
-				::OutputDebugStringA(buffer);
+				// char buffer[256];
+				// sprintf_s(buffer, "Adding bone %d weight %f at index %i\n", boneID, weight, index);
+				// ::OutputDebugStringA(buffer);
 #endif
 
 				boneIDs[index] = static_cast<unsigned short>(boneID);

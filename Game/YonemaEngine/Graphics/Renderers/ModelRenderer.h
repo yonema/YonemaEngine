@@ -1,17 +1,14 @@
 #pragma once
 #include "RendererTable.h"
+#include "../Renderers/ModelRendererBase.h"
 
 namespace nsYMEngine
 {
 	namespace nsGraphics
 	{
-		namespace nsRenderers
-		{
-			class IModelRendererBase;
-		}
 		namespace nsAnimations
 		{
-			class CAnimator;
+			struct SAnimationInitData;
 		}
 	}
 }
@@ -32,7 +29,7 @@ namespace nsYMEngine
 				enNumModelFormat
 			};
 
-			struct SModelInitData
+			struct SModelInitData : private nsUtils::SNoncopyable
 			{
 				const char* modelFilePath = nullptr;
 				const char* animFilePath = nullptr;
@@ -41,7 +38,7 @@ namespace nsYMEngine
 					CRendererTable::EnRendererType::enNone;
 				nsMath::CQuaternion vertexBias = nsMath::CQuaternion::Identity();
 				bool isVertesTranspos = false;
-				nsAnimations::CAnimator* animator = nullptr;
+				const nsAnimations::SAnimationInitData* animInitData = nullptr;
 			};
 
 			class CModelRenderer : public nsGameObject::IGameObject
@@ -56,6 +53,8 @@ namespace nsYMEngine
 				void Update(float deltaTime) override final;
 
 				void OnDestroy() override final;
+
+
 
 			public:
 				constexpr CModelRenderer() = default;
@@ -92,6 +91,74 @@ namespace nsYMEngine
 				constexpr const nsMath::CVector3& GetScale() const noexcept
 				{
 					return m_scale;
+				}
+
+				/**
+				 * @brief アニメーションを再生する。アニメーションが設定されていなかったら何もしません。
+				 * @param animIdx 再生するアニメーションのインデックス。SAnimationInitDataで設定した順番で登録されています。
+				 * @param animSpeed アニメーションの再生速度。
+				 * @param isLoop アニメーションのループ再生を行うか?trueでループ再生を行います。
+				*/
+				inline void PlayAnimation(unsigned int animIdx, float animSpeed = -1.0f, bool isLoop = true) noexcept
+				{
+					if (m_renderer)
+					{
+						SetAnimationSpeed(animSpeed);
+						SetIsAnimationLoop(isLoop);
+						m_renderer->PlayAnimation(animIdx);
+					}
+				}
+
+				/**
+				 * @brief アニメーションを再生する。アニメーションが設定されていなかったら何もしません。
+				 * @param animIdx 再生するアニメーションのインデックス。SAnimationInitDataで設定した順番で登録されています。
+				 * @param isLoop アニメーションのループ再生を行うか?trueでループ再生を行います
+				 * @param animSpeed アニメーションの再生速度。
+				*/
+				inline void PlayAnimation(unsigned int animIdx, bool isLoop, float animSpeed = -1.0f) noexcept
+				{
+					if (m_renderer)
+					{
+						SetAnimationSpeed(animSpeed);
+						SetIsAnimationLoop(isLoop);
+						m_renderer->PlayAnimation(animIdx);
+					}
+				}
+
+				/**
+				 * @brief アニメーションが再生中か？を得る
+				 * @return アニメーションが再生中か？
+				 * @retval true アニメーション再生中
+				 * @retval false アニメーションが再生されていない
+				*/
+				inline bool IsPlaying() const noexcept
+				{
+					return m_renderer ? m_renderer->IsPlaying() : false;
+				}
+
+				/**
+				 * @brief アニメーションの再生速度を設定します。
+				 * @param animSpeed アニメーションの再生速度
+				*/
+				inline void SetAnimationSpeed(float animSpeed) noexcept
+				{
+					if (m_renderer)
+					{
+						m_renderer->SetAnimationSpeed(animSpeed);
+					}
+				}
+
+				/**
+				 * @brief アニメーションのループ再生を行うかを設定します。
+				 * @param isLoop ループ再生を行うか?trueでループ再生を行います。
+				 * @return
+				*/
+				inline void SetIsAnimationLoop(bool isLoop) noexcept
+				{
+					if (m_renderer)
+					{
+						m_renderer->SetIsAnimationLoop(isLoop);
+					}
 				}
 
 			private:

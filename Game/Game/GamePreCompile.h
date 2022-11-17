@@ -3,6 +3,7 @@
 #include "../YonemaEngine/Graphics/GraphicsEngine.h"
 #include "../YonemaEngine/Input/InputManager.h"
 #include "../YonemaEngine/Graphics/Renderers/ModelRenderer.h"
+#include "../YonemaEngine/Graphics/Animations/Animator.h"
 #include "../YonemaEngine/Graphics/Renderers/SpriteRenderer.h"
 #include "../YonemaEngine/Graphics/2D/Sprite.h"
 
@@ -19,6 +20,7 @@ using EnAxisMapping = nsInput::EnAxisMapping;
 
 using CModelRenderer = nsGraphics::nsRenderers::CModelRenderer;
 using SModelInitData = nsGraphics::nsRenderers::SModelInitData;
+using SAnimationInitData = nsGraphics::nsAnimations::SAnimationInitData;
 using CSpriteRenderer = nsGraphics::nsRenderers::CSpriteRenderer;
 using SSpriteInitData = nsGraphics::ns2D::SSpriteInitData;
 

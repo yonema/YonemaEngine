@@ -1,7 +1,5 @@
 #pragma once
 
-typedef float ai_real;
-
 struct aiNode;
 struct aiBone;
 struct SBasicMeshInfo;
@@ -16,6 +14,10 @@ namespace nsYMEngine
 			class CSkelton : nsUtils::SNoncopyable
 			{
 			private:
+
+				/**
+				 * @attention この構造体はコピーを許可する。
+				*/
 				struct SNodeInfo
 				{
 					constexpr SNodeInfo() = default;
@@ -28,11 +30,14 @@ namespace nsYMEngine
 					bool isRequired = false;
 				};
 
+				/**
+				 * @attention この構造体はコピーを許可する。
+				*/
 				struct SBoneInfo
 				{
 					constexpr SBoneInfo(const nsMath::CMatrix& offset) noexcept
 						:mOffset(offset),
-						mFinalTransform(nsMath::CMatrix::Zero())
+						mFinalTransform(nsMath::CMatrix::Identity())
 					{};
 
 					nsMath::CMatrix mOffset;

@@ -1,5 +1,6 @@
 #pragma once
 #include "../Renderers/ModelRendererBase.h"
+#include "../Animations/Animator.h"
 
 namespace nsYMEngine
 {
@@ -23,20 +24,13 @@ namespace Assimp
 {
 	class Importer;
 }
-typedef float ai_real;
-template <typename TReal>
-class aiVector3t;
-typedef aiVector3t<ai_real> aiVector3D;
-template <typename TReal>
-class aiQuaterniont;
-typedef aiQuaterniont<ai_real> aiQuaternion;
 
+
+struct aiScene;
 struct aiAnimation;
 struct aiMesh;
 struct aiMaterial;
 struct aiNode;
-struct aiBone;
-struct aiScene;
 struct aiNodeAnim;
 
 
@@ -61,7 +55,41 @@ namespace nsYMEngine
 
 				void UpdateAnimation(float deltaTime) override final;
 
+				inline void PlayAnimation(unsigned int animIdx) noexcept override final
+				{
+					if (m_animator)
+					{
+						m_animator->PlayAnimation(animIdx);
+					}
+				}
+
+				inline bool IsPlaying() const noexcept override final
+				{
+					return m_animator ? m_animator->IsPlaying() : false;
+				}
+
+				inline void SetAnimationSpeed(float animSpeed) noexcept override final
+				{
+					if (m_animator)
+					{
+						m_animator->SetAnimationSpeed(animSpeed);
+					}
+				}
+
+				inline void SetIsAnimationLoop(bool isLoop) noexcept override final
+				{
+					if (m_animator)
+					{
+						m_animator->SetIsLoop(isLoop);
+					}
+				}
+
+
 			private:
+
+				/**
+				 * @attention この構造体はコピーを許可する。
+				*/
 				struct SVertex
 				{
 					nsMath::CVector3 position;
@@ -72,6 +100,9 @@ namespace nsYMEngine
 					unsigned short weights[4];
 				};
 
+				/**
+				 * @attention この構造体はコピーを許可する。
+				*/
 				struct SMesh
 				{
 					std::vector<SVertex> vertices;
@@ -79,6 +110,9 @@ namespace nsYMEngine
 					std::string diffuseMapFilePath;
 				};
 
+				/**
+				 * @attention この構造体はコピーを許可する。
+				*/
 				struct SBasicMeshInfo
 				{
 					constexpr SBasicMeshInfo() = default;
@@ -104,11 +138,12 @@ namespace nsYMEngine
 				void Release();
 
 			private:
-				bool Init(const SModelInitData& modelInitData);
+				bool Init(const nsRenderers::SModelInitData& modelInitData);
 
 				void Terminate();
 
-				bool ImportScene(const char* modelFilePath);
+				bool ImportScene(
+					const char* modelFilePath, Assimp::Importer*& pImporter, const aiScene*& pScene);
 
 				void LoadMesh(SMesh* dstMesh, const aiMesh& srcMesh, unsigned int meshIdx);
 
@@ -125,43 +160,12 @@ namespace nsYMEngine
 
 				bool CreateMaterialSRV();
 
-				void GetBoneTransforms(
-					float timeInSeconds,
-					std::vector<nsMath::CMatrix>* transforms,
-					unsigned int animIdx = 0
-				);
 
-				float CalcAnimationTimeTicks(float timeInSeconds, unsigned int animIdx);
 
-				void ReadNodeHierarchy(
-					float animTimeTicks,
-					const aiNode& node,
-					const nsMath::CMatrix& parentTransform, 
-					const aiAnimation& animation
-				);
 
-				const aiNodeAnim* FindNodeAnim(const aiAnimation&
-					Animation, const std::string& NodeName);
 
-				void CalcLocalTransform(
-					nsAssimpCommon::SLocalTransform& localTransform,
-					float animTimeTicks,
-					const aiNodeAnim& nodeAnim
-				);
-				void CalcInterpolatedScaling(
-					aiVector3D* pScaling, float animTimeTicks, const aiNodeAnim& nodeAnim);
 
-				void CalcInterpolatedRotation(
-					aiQuaternion* pRotation, float animTimeTicks, const aiNodeAnim& nodeAnim);
 
-				void CalcInterpolatedPosition(
-					aiVector3D* pPosition, float animTimeTicks, const aiNodeAnim& nodeAnim);
-
-				unsigned int FindScaling(float animTimeTicks, const aiNodeAnim& nodeAnim);
-
-				unsigned int FindRotation(float animTimeTicks, const aiNodeAnim& nodeAnim);
-
-				unsigned int FindPosition(float animTimeTicks, const aiNodeAnim& nodeAnim);
 
 
 			private:
@@ -180,11 +184,9 @@ namespace nsYMEngine
 
 				std::unordered_map<unsigned int, std::unordered_map<std::string, float>> m_boneNameAndWeightListTable;
 				std::vector<SBasicMeshInfo> m_meshInfoArray;
-				Assimp::Importer* m_importer = nullptr;
-				const aiScene* m_scene = nullptr;;
 				std::vector<nsMath::CMatrix> m_boneMatrices;
-				float m_animationTimer = 0.0f;
 				nsAnimations::CSkelton* m_skelton = nullptr;
+				nsAnimations::CAnimator* m_animator = nullptr;
 			};
 
 		}

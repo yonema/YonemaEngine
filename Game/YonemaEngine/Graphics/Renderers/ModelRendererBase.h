@@ -18,7 +18,13 @@ namespace nsYMEngine
 
 				virtual void UpdateAnimation(float deltaTime) {};
 
-				virtual void PlayAnimation() {};
+				virtual inline void PlayAnimation(unsigned int animIdx) noexcept {};
+
+				virtual inline bool IsPlaying() const noexcept { return false; };
+
+				virtual inline void SetAnimationSpeed(float animSpeed) noexcept {};
+
+				virtual inline void SetIsAnimationLoop(bool isLoop) noexcept {};
 
 			public:
 				constexpr IModelRendererBase() = default;
