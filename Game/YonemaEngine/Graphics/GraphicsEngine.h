@@ -200,13 +200,13 @@ namespace nsYMEngine
 			ns2D::CSprite m_mainRenderTargetSprite;
 			nsDx12Wrappers::CRenderTarget m_simplePostEffectRenderTarget;
 			ns2D::CSprite m_simplePostEffectRenderTargetSprite;
-			ns2D::CSprite* m_pBaseRenderTargetSprite;
+			ns2D::CSprite* m_pBaseRenderTargetSprite = nullptr;
 			nsDx12Wrappers::CConstantBuffer m_sceneDataCB;
 			nsDx12Wrappers::CDescriptorHeap m_sceneDataDH;
 			nsRenderers::CRendererTable m_rendererTable;
 			CCamera m_mainCamera;
-			nsDx12Wrappers::CTexture* m_whiteTexture;
-			nsDx12Wrappers::CTexture* m_blackTexture;
+			nsDx12Wrappers::CTexture* m_whiteTexture = nullptr;
+			nsDx12Wrappers::CTexture* m_blackTexture = nullptr;
 			unsigned int m_descriptorSizeOfCbvSrvUav = 0;
 			unsigned int m_descriptorSizeOfRtv = 0;
 

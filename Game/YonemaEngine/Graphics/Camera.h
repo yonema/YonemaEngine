@@ -8,7 +8,7 @@ namespace nsYMEngine
 		{
 		public:
 			
-			enum EnProjectionType
+			enum class EnProjectionType
 			{
 				enPerspective,
 				enOrthographic

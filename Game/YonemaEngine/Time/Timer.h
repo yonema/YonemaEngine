@@ -38,9 +38,9 @@ namespace nsYMEngine
 			std::chrono::system_clock::time_point m_startTimePoint;
 			std::chrono::system_clock::time_point m_endTimePoint;
 			unsigned long long int m_nanoSeconds = 0;
-			double m_microSeconds = 0.0f;
-			double m_milliSeconds = 0.0f;
-			double m_seconds = 0.0f;
+			double m_microSeconds = 0.0;
+			double m_milliSeconds = 0.0;
+			double m_seconds = 0.0;
 		};
 
 		inline void CTimer::StartTimer() noexcept

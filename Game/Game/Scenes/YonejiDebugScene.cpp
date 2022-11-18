@@ -9,12 +9,13 @@ namespace nsAWA
 			m_modelRenderer = NewGO<CModelRenderer>("ynjTestModel");
 			SModelInitData modelInitData;
 			//modelInitData.modelFilePath = "Assets/Models/hoge.fbx";
-			modelInitData.modelFilePath = "Assets/Animations/Rumba_Dancing.fbx";
+			//modelInitData.modelFilePath = "Assets/Animations/Rumba_Dancing.fbx";
 			//modelInitData.modelFilePath = "Assets/Models/testWoldPosAndRotate.fbx";
 			//modelInitData.modelFilePath = "Assets/Models/skeltalBox.fbx";
-			//modelInitData.modelFilePath = "Assets/Models/SampleBox.fbx";
+			//modelInitData.modelFilePath = "Assets/Models/Giyara.fbx";
+			modelInitData.modelFilePath = "Assets/Models/SampleBox.fbx";
 			//modelInitData.modelFilePath = "Assets/Models/unitychan.fbx";
-			//modelInitData.vertexBias.SetRotationX(nsMath::YM_PIDIV2);
+			modelInitData.vertexBias.SetRotationX(nsMath::YM_PIDIV2);
 
 			constexpr unsigned int kAnimNum = 3;
 			const char* animfilePaths[kAnimNum] = {
@@ -23,8 +24,9 @@ namespace nsAWA
 				"Assets/Animations/Robot_Hip_Hop_Dance.fbx"
 			};
 			SAnimationInitData animInitData(kAnimNum, animfilePaths);
-			modelInitData.animInitData = &animInitData;
+			//modelInitData.animInitData = &animInitData;
 			m_modelRenderer->SetScale(0.1f);
+			//m_modelRenderer->SetScale(10.0f);
 			m_modelRenderer->SetPosition({ 0.0f, 4.0f, 0.0f });
 			m_modelRenderer->Init(modelInitData);
 			m_modelRenderer->SetIsAnimationLoop(false);

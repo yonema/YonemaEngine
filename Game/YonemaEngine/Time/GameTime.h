@@ -12,7 +12,7 @@ namespace nsYMEngine
 			static const int m_kMaxDeltaTimeQueSize;
 
 		public:
-			CGameTime() = default;
+			constexpr CGameTime() = default;
 			~CGameTime() = default;
 
 		public:
@@ -33,8 +33,8 @@ namespace nsYMEngine
 
 		private:
 			CTimer m_timer;
-			std::list<float> m_deltaTimeQue;
-			float m_deltaTime;
+			std::list<float> m_deltaTimeQue = {};
+			float m_deltaTime = 0.0f;
 		};
 
 

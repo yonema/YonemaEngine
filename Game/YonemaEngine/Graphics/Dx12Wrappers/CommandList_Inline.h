@@ -160,7 +160,7 @@ namespace nsYMEngine
 				D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle
 			)
 			{
-				D3D12_CPU_DESCRIPTOR_HANDLE rtDescHandles[m_kMaxNumRenderTargets];
+				D3D12_CPU_DESCRIPTOR_HANDLE rtDescHandles[m_kMaxNumRenderTargets] = {0};
 				numRt = std::min(numRt, m_kMaxNumRenderTargets);
 
 				for (unsigned int i = 0; i < numRt; i++)
