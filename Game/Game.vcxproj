@@ -151,7 +151,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="YonemaEngine\Debug\DisplayFPS.cpp" />
+    <ClCompile Include="YonemaEngine\DebugSystem\DisplayFPS.cpp" />
     <ClCompile Include="Game\Samples\FontSample.cpp" />
     <ClCompile Include="Game\Samples\SkeltalAnimationSample.cpp" />
     <ClCompile Include="Game\Samples\SpriteSample.cpp" />
@@ -220,7 +220,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\FontTypeList.h" />
-    <ClInclude Include="YonemaEngine\Debug\DisplayFPS.h" />
+    <ClInclude Include="YonemaEngine\DebugSystem\DisplayFPS.h" />
     <ClInclude Include="Game\Samples\FontSample.h" />
     <ClInclude Include="Game\Samples\SkeltalAnimationSample.h" />
     <ClInclude Include="Game\Samples\SpriteSample.h" />

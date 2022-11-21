@@ -1,7 +1,7 @@
 #include "YonemaEngine.h"
 #include "Graphics/GraphicsEngine.h"
 #include "Input/InputManager.h"
-#include "Debug/DisplayFPS.h"
+#include "DebugSystem/DisplayFPS.h"
 #include "../Game/Game.h"
 #include "../Game/Samples/SampleMain.h"
 
@@ -32,7 +32,7 @@ namespace nsYMEngine
 		NewGO<nsAWA::nsScenes::nsSample::CSampleMain> ("SampleMain");
 
 #ifdef _DEBUG
-		m_displayFPS = NewGO<nsDebug::CDisplayFPS>("DisplayFPS");
+		m_displayFPS = NewGO<nsDebugSystem::CDisplayFPS>("DisplayFPS");
 #endif // _DEBUG
 
 

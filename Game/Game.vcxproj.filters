@@ -192,7 +192,7 @@
     <ClCompile Include="Game\Samples\FontSample.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="YonemaEngine\Debug\DisplayFPS.cpp">
+    <ClCompile Include="YonemaEngine\DebugSystem\DisplayFPS.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -418,7 +418,7 @@
     <ClInclude Include="Game\Samples\FontSample.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="YonemaEngine\Debug\DisplayFPS.h">
+    <ClInclude Include="YonemaEngine\DebugSystem\DisplayFPS.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Game\FontTypeList.h">
