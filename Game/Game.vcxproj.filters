@@ -102,7 +102,7 @@
     <ClCompile Include="YonemaEngine\Graphics\Dx12Wrappers\CommandList.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="YonemaEngine\Graphics\2D\Sprite.cpp">
+    <ClCompile Include="YonemaEngine\Graphics\Sprites\Sprite.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="YonemaEngine\Graphics\Renderers\GenericRenderer.cpp">
@@ -111,10 +111,10 @@
     <ClCompile Include="YonemaEngine\Graphics\SimplePostEffectGenericRenderer.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="YonemaEngine\Graphics\2D\SpriteGenericRenderer.cpp">
+    <ClCompile Include="YonemaEngine\Graphics\Sprites\SpriteGenericRenderer.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="YonemaEngine\Graphics\2D\TransSpriteGenericRenderer.cpp">
+    <ClCompile Include="YonemaEngine\Graphics\Sprites\TransSpriteGenericRenderer.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="YonemaEngine\Graphics\FBXModels\FBXRendererFBX_SDK.cpp">
@@ -153,7 +153,7 @@
     <ClCompile Include="YonemaEngine\Input\InputManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Game\Scenes\YonejiDebugScene.cpp">
+    <ClCompile Include="Game\Samples\SampleMain.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="YonemaEngine\Input\Keyboard.cpp">
@@ -172,6 +172,27 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="YonemaEngine\Graphics\Animations\Animator.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YonemaEngine\Graphics\Fonts\SpriteFontWrapper.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YonemaEngine\Graphics\Fonts\FontEngine.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YonemaEngine\Graphics\Fonts\FontRenderer.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Samples\SkeltalAnimationSample.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Samples\SpriteSample.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Samples\FontSample.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YonemaEngine\Debug\DisplayFPS.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -286,7 +307,7 @@
     <ClInclude Include="YonemaEngine\Graphics\Dx12Wrappers\CommandList_Inline.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="YonemaEngine\Graphics\2D\Sprite.h">
+    <ClInclude Include="YonemaEngine\Graphics\Sprites\Sprite.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="YonemaEngine\Graphics\Renderers\GenericRenderer.h">
@@ -295,10 +316,10 @@
     <ClInclude Include="YonemaEngine\Graphics\SimplePostEffectGenericRenderer.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="YonemaEngine\Graphics\2D\SpriteGenericRenderer.h">
+    <ClInclude Include="YonemaEngine\Graphics\Sprites\SpriteGenericRenderer.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="YonemaEngine\Graphics\2D\TransSpriteGenericRenderer.h">
+    <ClInclude Include="YonemaEngine\Graphics\Sprites\TransSpriteGenericRenderer.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="YonemaEngine\Graphics\FBXModels\FBXRendererFBX_SDK.h">
@@ -349,7 +370,7 @@
     <ClInclude Include="YonemaEngine\Input\InputManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Game\Scenes\YonejiDebugScene.h">
+    <ClInclude Include="Game\Samples\SampleMain.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="YonemaEngine\Input\Keyboard.h">
@@ -377,6 +398,30 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="YonemaEngine\Graphics\AssimpCommonHeader.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YonemaEngine\Graphics\Fonts\SpriteFontWrapper.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YonemaEngine\Graphics\Fonts\FontEngine.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YonemaEngine\Graphics\Fonts\FontRenderer.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Samples\SkeltalAnimationSample.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Samples\SpriteSample.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Samples\FontSample.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YonemaEngine\Debug\DisplayFPS.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\FontTypeList.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

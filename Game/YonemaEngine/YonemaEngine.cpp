@@ -1,8 +1,9 @@
 #include "YonemaEngine.h"
 #include "Graphics/GraphicsEngine.h"
 #include "Input/InputManager.h"
+#include "Debug/DisplayFPS.h"
 #include "../Game/Game.h"
-#include "../Game/Scenes/YonejiDebugScene.h"
+#include "../Game/Samples/SampleMain.h"
 
 namespace nsYMEngine
 {
@@ -28,15 +29,22 @@ namespace nsYMEngine
 		m_inputManager = new nsInput::CInputManager();
 
 		//NewGO<nsAWA::CGame>(EnGOPriority::enMid, "AWAGame");
-		NewGO<nsAWA::nsScenes::CYonejiDebugScene>(EnGOPriority::enMid, "YonejiDebugScene");
+		NewGO<nsAWA::nsScenes::nsSample::CSampleMain> ("SampleMain");
 
-		nsMath::CMatrix mat = nsMath::CMatrix::Identity();
+#ifdef _DEBUG
+		m_displayFPS = NewGO<nsDebug::CDisplayFPS>("DisplayFPS");
+#endif // _DEBUG
+
 
 		return true;
 	}
 
 	void CYonemaEngine::Terminate()
 	{
+#ifdef _DEBUG
+		DeleteGO(m_displayFPS);
+#endif // _DEBUG
+
 		if (m_inputManager)
 		{
 			delete m_inputManager;
@@ -63,16 +71,9 @@ namespace nsYMEngine
 
 		// Draw処理
 
-		// 描画開始処理。更新処理より後、描画処理より前に呼ぶこと。
-		m_graphicsEngine->BeginDraw();
+		m_graphicsEngine->ExecuteDraw();
 
-		m_graphicsEngine->DrawToMainRenderTarget();
 
-		m_graphicsEngine->DrawWithSimplePostEffect();
-
-		m_graphicsEngine->Draw2D();
-
-		m_graphicsEngine->EndDraw();
 
 		m_gameTime.EndTimeMeasurement();
 

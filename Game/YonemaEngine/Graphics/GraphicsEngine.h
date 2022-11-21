@@ -1,6 +1,6 @@
 #pragma once
 #include "Camera.h"
-#include "2D/Sprite.h"
+#include "Sprites/Sprite.h"
 #include "Renderers/RendererTable.h"
 
 namespace nsYMEngine
@@ -10,6 +10,10 @@ namespace nsYMEngine
 		namespace nsDx12Wrappers
 		{
 			class CTexture;
+		}
+		namespace nsFonts
+		{
+			class CFontEngine;
 		}
 	}
 }
@@ -80,18 +84,10 @@ namespace nsYMEngine
 			void Update();
 
 			/**
-			 * @brief 描画開始処理。更新処理より後、描画処理より前に呼ぶこと。
-			 * @return 
+			 * @brief 描画処理。更新処理より後、描画処理より前に呼ぶこと。
 			*/
-			void BeginDraw();
+			void ExecuteDraw();
 
-			void DrawToMainRenderTarget();
-
-			void DrawWithSimplePostEffect();
-
-			void Draw2D();
-
-			void EndDraw();
 
 			constexpr auto GetDevice() noexcept
 			{
@@ -153,9 +149,14 @@ namespace nsYMEngine
 				return m_descriptorSizeOfRtv;
 			}
 
-			constexpr auto GetRendererTable() noexcept
+			constexpr auto* GetRendererTable() noexcept
 			{
 				return &m_rendererTable;
+			}
+			
+			constexpr auto* GetFrameBuffer() noexcept
+			{
+				return &m_frameBuffer;
 			}
 
 		private:
@@ -184,6 +185,16 @@ namespace nsYMEngine
 
 			void WaitForCommandExecutionToComplete();
 
+			void BeginDraw();
+
+			void DrawToMainRenderTarget();
+
+			void DrawWithSimplePostEffect();
+
+			void Draw2D();
+
+			void EndDraw();
+
 		private:
 			static CGraphicsEngine* m_instance;
 
@@ -192,15 +203,17 @@ namespace nsYMEngine
 			nsDx12Wrappers::CCommandList m_commandList;
 			ID3D12CommandQueue* m_commandQueue = nullptr;
 
+			DirectX::GraphicsMemory* m_gfxMemForDirectXTK = nullptr;
+
 			ID3D12Fence* m_fence = nullptr;
 			short int m_fenceVal = 0;
 
 			nsDx12Wrappers::CFrameBuffer m_frameBuffer;
 			nsDx12Wrappers::CRenderTarget m_mainRenderTarget;
-			ns2D::CSprite m_mainRenderTargetSprite;
+			nsSprites::CSprite m_mainRenderTargetSprite;
 			nsDx12Wrappers::CRenderTarget m_simplePostEffectRenderTarget;
-			ns2D::CSprite m_simplePostEffectRenderTargetSprite;
-			ns2D::CSprite* m_pBaseRenderTargetSprite = nullptr;
+			nsSprites::CSprite m_simplePostEffectRenderTargetSprite;
+			nsSprites::CSprite* m_pBaseRenderTargetSprite = nullptr;
 			nsDx12Wrappers::CConstantBuffer m_sceneDataCB;
 			nsDx12Wrappers::CDescriptorHeap m_sceneDataDH;
 			nsRenderers::CRendererTable m_rendererTable;
@@ -210,8 +223,7 @@ namespace nsYMEngine
 			unsigned int m_descriptorSizeOfCbvSrvUav = 0;
 			unsigned int m_descriptorSizeOfRtv = 0;
 
-
-
+			nsFonts::CFontEngine* m_fontEngine = nullptr;
 
 		};
 	}

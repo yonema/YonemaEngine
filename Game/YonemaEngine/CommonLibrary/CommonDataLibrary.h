@@ -40,6 +40,21 @@ namespace nsYMEngine
 		enMax = nsCommonDataLibrary::g_kMaxGameObjectPriority
 	};
 
+	/**
+	 * @brief スプライトやフォントで使用するアンカー
+	*/
+	enum class EnAnchors
+	{
+		enTopLeft,			// 左上
+		enTopCenter,		// 中央上
+		enTopRight,			// 右上
+		enMiddleLeft,		// 左中央
+		enMiddleCenter,		// 中央
+		enMiddleRight,		// 右中央
+		enBottonLeft,		// 左下
+		enBottonCenter,		// 中央下
+		enBottonRight		// 中央右
+	};
 
 
 

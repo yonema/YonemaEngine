@@ -12,6 +12,7 @@ namespace nsYMEngine
 				static const DXGI_FORMAT m_kDepthFormat;
 				static const nsMath::CVector4 m_kRTVClearColor;
 				static const float m_kDsvClearValue;
+				static const bool m_kEnableVerticalSync;
 
 
 			public:
@@ -126,7 +127,7 @@ namespace nsYMEngine
 				D3D12_CPU_DESCRIPTOR_HANDLE m_dsvCpuDescriptorHandle = {};
 				D3D12_VIEWPORT m_viewport = {};
 				D3D12_RECT m_scissorRect = {};
-
+				unsigned int m_syncInterval = 0;
 			};
 
 		}

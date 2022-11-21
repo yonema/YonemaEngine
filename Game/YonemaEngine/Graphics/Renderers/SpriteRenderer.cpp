@@ -1,5 +1,4 @@
 #include "SpriteRenderer.h"
-#include "../2D/Sprite.h"
 
 namespace nsYMEngine
 {
@@ -16,7 +15,8 @@ namespace nsYMEngine
 			{
 				if (m_sprite)
 				{
-					m_sprite->UpdateWorldMatrix(m_position, m_rotation, m_scale, m_pivot);
+					m_sprite->UpdateWorldMatrix(
+						m_position, m_rotation, m_scale, m_pivot, m_anchor);
 				}
 				return;
 			}
@@ -26,13 +26,13 @@ namespace nsYMEngine
 				Terminate();
 				return;
 			}
-			void CSpriteRenderer::Init(const ns2D::SSpriteInitData& spriteInitData)
+			void CSpriteRenderer::Init(const nsSprites::SSpriteInitData& spriteInitData)
 			{
-				m_sprite = new ns2D::CSprite();
+				m_sprite = new nsSprites::CSprite();
 
 				m_sprite->Init(spriteInitData);
 
-				if (spriteInitData.alphaBlendMode == ns2D::EnAlphaBlendMode::enTrans)
+				if (spriteInitData.alphaBlendMode == nsSprites::EnAlphaBlendMode::enTrans)
 				{
 					m_sprite->SetRenderType(CRendererTable::EnRendererType::enTransSprite);
 				}

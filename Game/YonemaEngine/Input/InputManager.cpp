@@ -13,6 +13,7 @@ namespace nsYMEngine
 			if (m_isInstantiated)
 			{
 				nsGameWindow::MessageBoxError(L"InputManager‚ª•¡”¶¬‚³‚ê‚Ü‚µ‚½B");
+				assert(-1);
 			}
 
 			m_isInstantiated = true;

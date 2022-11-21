@@ -1,15 +1,6 @@
 #pragma once
-namespace nsYMEngine
-{
-	namespace nsGraphics
-	{
-		namespace ns2D
-		{
-			class CSprite;
-			struct SSpriteInitData;
-		}
-	}
-}
+#include "../Sprites/Sprite.h"
+
 namespace nsYMEngine
 {
 	namespace nsGraphics
@@ -29,8 +20,13 @@ namespace nsYMEngine
 				constexpr CSpriteRenderer() = default;
 				~CSpriteRenderer() = default;
 
-				void Init(const ns2D::SSpriteInitData& spriteInitData);
+				void Init(const nsSprites::SSpriteInitData& spriteInitData);
 
+				/**
+				 * @brief アンカーからの座標を設定します。
+				 * 座標系は YDown, XRight です。
+				 * @param position 座標
+				*/
 				inline void SetPosition(const nsMath::CVector2& position) noexcept
 				{
 					m_position = position;
@@ -62,6 +58,13 @@ namespace nsYMEngine
 					return m_scale;
 				}
 
+				/**
+				 * @brief スプライトの基点を設定します。
+				 * { 0.0f, 0.0f }が左上、
+				 * { 0.5f, 0.5f }が中央、
+				 * { 1.0f, 1.0f }が右下になります。
+				 * @param pivot 基点
+				*/
 				inline void SetPivot(const nsMath::CVector2& pivot)
 				{
 					m_pivot = pivot;
@@ -70,17 +73,26 @@ namespace nsYMEngine
 				{
 					return m_pivot;
 				}
+				constexpr void SetAnchor(EnAnchors anchor)
+				{
+					m_anchor = anchor;
+				}
+				constexpr EnAnchors GetAnchor() const noexcept
+				{
+					return m_anchor;
+				}
 
 			private:
 				void Terminate();
 
 			private:
-				ns2D::CSprite* m_sprite = nullptr;
+				nsSprites::CSprite* m_sprite = nullptr;
 
 				nsMath::CVector2 m_position = nsMath::CVector2::Zero();
 				nsMath::CQuaternion m_rotation = nsMath::CQuaternion::Identity();
 				nsMath::CVector3 m_scale = nsMath::CVector3::One();
 				nsMath::CVector2 m_pivot = nsMath::CVector2::Center();
+				EnAnchors m_anchor = EnAnchors::enMiddleCenter;
 
 			};
 

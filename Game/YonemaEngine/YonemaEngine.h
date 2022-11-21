@@ -11,6 +11,10 @@ namespace nsYMEngine
 	{
 		class CInputManager;
 	}
+	namespace nsDebug
+	{
+		class CDisplayFPS;
+	}
 }
 
 namespace nsYMEngine
@@ -81,6 +85,8 @@ namespace nsYMEngine
 		nsInput::CInputManager* m_inputManager = nullptr;
 		nsTime::CGameTime m_gameTime;
 		bool m_isExitGame = false;
+
+		nsDebug::CDisplayFPS* m_displayFPS = nullptr;
 	};
 }
 

@@ -1,10 +1,10 @@
 #pragma once
-#include "2D/SpriteGenericRenderer.h"
+#include "Sprites/SpriteGenericRenderer.h"
 namespace nsYMEngine
 {
 	namespace nsGraphics
 	{
-		class CSimplePostEffectGenericRenderer : public ns2D::CSpriteGenericRenderer
+		class CSimplePostEffectGenericRenderer : public nsSprites::CSpriteGenericRenderer
 		{
 		private:
 			static const wchar_t* const m_kVsFilePath;

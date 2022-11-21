@@ -7,6 +7,9 @@ namespace nsYMEngine
 	{
 		namespace nsDx12Wrappers
 		{
+			const bool CFrameBuffer::m_kEnableVerticalSync = true;
+
+
 
 			const DXGI_FORMAT CFrameBuffer::m_kDepthFormat = DXGI_FORMAT_D32_FLOAT;
 			const nsMath::CVector4 CFrameBuffer::m_kRTVClearColor = nsMath::CVector4::Gray();
@@ -91,6 +94,17 @@ namespace nsYMEngine
 				//m_rtvCpuDescriptorHandle = m_rtvDescriptorHeap.GetCPUHandle();
 				SwapBackBuffer();
 				m_dsvCpuDescriptorHandle = m_dsvDescriptorHeap.GetCPUHandle();
+
+				if (m_kEnableVerticalSync)
+				{
+					// ‚’¼“¯Šú‚ ‚è
+					m_syncInterval = 1;
+				}
+				else
+				{
+					// ‚’¼“¯Šú‚È‚µ
+					m_syncInterval = 0;
+				}
 
 				return true;
 			}
@@ -342,11 +356,7 @@ namespace nsYMEngine
 
 			void CFrameBuffer::Present()
 			{
-				// ‚’¼“¯Šú‚ ‚è
-				m_swapChain->Present(1, 0);
-
-				// ‚’¼“¯Šú‚È‚µ
-				//m_swapChain->Present(0, 0);
+				m_swapChain->Present(m_syncInterval, 0);
 
 				return;
 			}

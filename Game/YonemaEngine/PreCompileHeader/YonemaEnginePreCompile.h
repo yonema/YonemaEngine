@@ -10,6 +10,7 @@
 
 #include <DirectXMath.h>
 #include <DirectXTex.h>
+#include <GraphicsMemory.h>
 
 #include <vector>
 #include <list>
@@ -22,11 +23,14 @@
 #include <algorithm>
 #include <bitset>
 #include <limits>
+#include <strsafe.h>
 
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "d3dcompiler.lib")
 #pragma comment(lib, "DirectXTex.lib")
+#pragma comment(lib, "DirectXTK12.lib")
+#pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "libfbxsdk-md.lib")
 #pragma comment(lib, "libxml2-md.lib")
 #pragma comment(lib, "zlib-md.lib")

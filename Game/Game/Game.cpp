@@ -37,7 +37,7 @@ namespace nsAWA
 		SSpriteInitData spriteInitData;
 		spriteInitData.filePath = "Assets/Images/200x200PNG.png";
 		spriteInitData.spriteSize = { 200.0f,200.0f };
-		spriteInitData.alphaBlendMode = nsGraphics::ns2D::EnAlphaBlendMode::enTrans;
+		spriteInitData.alphaBlendMode = nsGraphics::nsSprites::EnAlphaBlendMode::enTrans;
 		hogeSR->SetPosition({ 200.0f,200.0f });
 		hogeSR->Init(spriteInitData);
 

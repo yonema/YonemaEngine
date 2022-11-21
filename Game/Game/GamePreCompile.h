@@ -5,25 +5,37 @@
 #include "../YonemaEngine/Graphics/Renderers/ModelRenderer.h"
 #include "../YonemaEngine/Graphics/Animations/Animator.h"
 #include "../YonemaEngine/Graphics/Renderers/SpriteRenderer.h"
-#include "../YonemaEngine/Graphics/2D/Sprite.h"
+#include "../YonemaEngine/Graphics/Sprites/Sprite.h"
+#include "../YonemaEngine/Graphics/Fonts/FontRenderer.h"
 
 // エイリアス宣言
 
 using namespace nsYMEngine;
 
+// ゲームオブジェクト
 using IGameObject = nsGameObject::IGameObject;
 
+// インプット
 using EnPadButton = nsInput::CGamepad::EnPadButton;
 using EnKeyButton = nsInput::CKeyboard::EnKeyButton;
 using EnActionMapping = nsInput::EnActionMapping;
 using EnAxisMapping = nsInput::EnAxisMapping;
 
+// モデル
 using CModelRenderer = nsGraphics::nsRenderers::CModelRenderer;
 using SModelInitData = nsGraphics::nsRenderers::SModelInitData;
 using SAnimationInitData = nsGraphics::nsAnimations::SAnimationInitData;
-using CSpriteRenderer = nsGraphics::nsRenderers::CSpriteRenderer;
-using SSpriteInitData = nsGraphics::ns2D::SSpriteInitData;
 
+// スプライト
+using CSpriteRenderer = nsGraphics::nsRenderers::CSpriteRenderer;
+using SSpriteInitData = nsGraphics::nsSprites::SSpriteInitData;
+
+// フォント
+using CFontRenderer = nsGraphics::nsFonts::CFontRenderer;
+using SFontParameter = nsGraphics::nsFonts::CFontRenderer::SFontParameter;
+using EnFontType = nsGraphics::nsFonts::EnFontType;
+
+// 数学
 using CVector2 = nsMath::CVector2;
 using CVector3 = nsMath::CVector3;
 using CVector4 = nsMath::CVector4;

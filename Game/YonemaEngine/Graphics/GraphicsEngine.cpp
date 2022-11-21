@@ -3,6 +3,7 @@
 #include "../../Application.h"
 #include "Dx12Wrappers/Texture.h"
 #include "Renderers/Renderer.h"
+#include "Fonts/FontEngine.h"
 
 
 namespace nsYMEngine
@@ -98,7 +99,7 @@ namespace nsYMEngine
 			{
 				return false;
 			}
-			ns2D::SSpriteInitData initData;
+			nsSprites::SSpriteInitData initData;
 			initData.texture = m_mainRenderTarget.GetRenderTargetTexture();
 			initData.spriteSize = initData.texture->GetTextureSize();
 			m_mainRenderTargetSprite.Init(initData);
@@ -122,6 +123,8 @@ namespace nsYMEngine
 			// 初期化が終わったら、DXGIFactoryはもういらないため破棄する。
 			dxgiFactory->Release();
 
+			m_fontEngine = nsFonts::CFontEngine::CreateInstance();
+
 			// 基本となるレンダーターゲットスプライトに設定する
 			m_pBaseRenderTargetSprite = &m_simplePostEffectRenderTargetSprite;
 
@@ -138,7 +141,7 @@ namespace nsYMEngine
 
 			CreateSeceneConstantBuff();
 
-
+			m_gfxMemForDirectXTK = new DirectX::GraphicsMemory(m_device);
 
 			return true;
 		}
@@ -147,6 +150,10 @@ namespace nsYMEngine
 		{
 			// 破棄する前に、コマンドの実行の完了を待つ。
 			WaitForCommandExecutionToComplete();
+			if (m_gfxMemForDirectXTK)
+			{
+				delete m_gfxMemForDirectXTK;
+			}
 			if (m_whiteTexture)
 			{
 				delete m_whiteTexture;
@@ -155,6 +162,7 @@ namespace nsYMEngine
 			{
 				delete m_blackTexture;
 			}
+			nsFonts::CFontEngine::DeleteInstance();
 			m_sceneDataDH.Release();
 			m_sceneDataCB.Release();
 			m_simplePostEffectRenderTargetSprite.Release();
@@ -195,6 +203,25 @@ namespace nsYMEngine
 
 			return;
 		}
+
+		void CGraphicsEngine::ExecuteDraw()
+		{
+			// 描画開始処理。更新処理より後、描画処理より前に呼ぶこと。
+			BeginDraw();
+
+			DrawToMainRenderTarget();
+
+			DrawWithSimplePostEffect();
+
+			Draw2D();
+
+			m_fontEngine->ExecuteDraw(&m_commandList);
+
+			EndDraw();
+
+			return;
+		}
+
 
 		void CGraphicsEngine::BeginDraw()
 		{
@@ -366,6 +393,11 @@ namespace nsYMEngine
 
 			// フリップ
 			m_frameBuffer.Present();
+
+			// フリップ後にコミット
+			m_gfxMemForDirectXTK->Commit(m_commandQueue);
+
+			m_gfxMemForDirectXTK->GarbageCollect();
 
 			return;
 		}

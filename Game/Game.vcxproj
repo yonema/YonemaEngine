@@ -116,7 +116,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../ExLibrary/DirectXTex-main\DirectXTex;YonemaEngine/PreCompileHeader;..\ExLibrary\Autodesk\FBX\FBX SDK\2020.3.2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../ExLibrary/DirectXTex-main\DirectXTex;YonemaEngine/PreCompileHeader;..\ExLibrary\Autodesk\FBX\FBX SDK\2020.3.2\include;..\ExLibrary\DirectXTK12-sept2021\DirectXTK12-sept2021\Inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>YonemaEnginePreCompile.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>YonemaEnginePreCompile.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
@@ -124,7 +124,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../ExLibrary/DirectXTex-main\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug;../ExLibrary\DirectXTex-main\DirectXTex\Bin\Desktop_2019\x64\Debug;..\ExLibrary\Autodesk\FBX\FBX SDK\2020.3.2\lib\vs2019\x64\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../ExLibrary/DirectXTex-main\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug;../ExLibrary\DirectXTex-main\DirectXTex\Bin\Desktop_2019\x64\Debug;..\ExLibrary\Autodesk\FBX\FBX SDK\2020.3.2\lib\vs2019\x64\debug;..\ExLibrary\DirectXTK12-sept2021\DirectXTK12-sept2021\Bin\Desktop_2019_Win10\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>libfbxsdk-md.lib;libxml2-md.lib;zlib-md.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -136,7 +136,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../ExLibrary/DirectXTex-main\DirectXTex;YonemaEngine/PreCompileHeader;..\ExLibrary\Autodesk\FBX\FBX SDK\2020.3.2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../ExLibrary/DirectXTex-main\DirectXTex;YonemaEngine/PreCompileHeader;..\ExLibrary\Autodesk\FBX\FBX SDK\2020.3.2\include;..\ExLibrary\DirectXTK12-sept2021\DirectXTK12-sept2021\Inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>YonemaEnginePreCompile.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>YonemaEnginePreCompile.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
@@ -146,18 +146,25 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../ExLibrary/DirectXTex-main\DirectXTex\Bin\Desktop_2019_Win10\x64\Release;../ExLibrary\DirectXTex-main\DirectXTex\Bin\Desktop_2019\x64\Release;..\ExLibrary\Autodesk\FBX\FBX SDK\2020.3.2\lib\vs2019\x64\release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../ExLibrary/DirectXTex-main\DirectXTex\Bin\Desktop_2019_Win10\x64\Release;../ExLibrary\DirectXTex-main\DirectXTex\Bin\Desktop_2019\x64\Release;..\ExLibrary\Autodesk\FBX\FBX SDK\2020.3.2\lib\vs2019\x64\release;..\ExLibrary\DirectXTK12-sept2021\DirectXTK12-sept2021\Bin\Desktop_2019_Win10\x64\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>libfbxsdk-md.lib;libxml2-md.lib;zlib-md.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="YonemaEngine\Debug\DisplayFPS.cpp" />
+    <ClCompile Include="Game\Samples\FontSample.cpp" />
+    <ClCompile Include="Game\Samples\SkeltalAnimationSample.cpp" />
+    <ClCompile Include="Game\Samples\SpriteSample.cpp" />
+    <ClCompile Include="YonemaEngine\Graphics\Fonts\FontRenderer.cpp" />
+    <ClCompile Include="YonemaEngine\Graphics\Fonts\FontEngine.cpp" />
+    <ClCompile Include="YonemaEngine\Graphics\Fonts\SpriteFontWrapper.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\Animations\Animator.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\Animations\Skelton.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\Animations\AnimationClip.cpp" />
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\FBXModels\FBXGenericRendererAssimp.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\FBXModels\FBXRendererAssimp.cpp" />
-    <ClCompile Include="Game\Scenes\YonejiDebugScene.cpp" />
+    <ClCompile Include="Game\Samples\SampleMain.cpp" />
     <ClCompile Include="YonemaEngine\Input\Keyboard.cpp" />
     <ClCompile Include="YonemaEngine\Input\InputManager.cpp" />
     <ClCompile Include="YonemaEngine\Input\Gamepad.cpp" />
@@ -171,11 +178,11 @@
     <ClCompile Include="YonemaEngine\GameObject\GameObjectManager.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\FBXModels\FBXGenericRendererFBX_SDK.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\FBXModels\FBXRendererFBX_SDK.cpp" />
-    <ClCompile Include="YonemaEngine\Graphics\2D\TransSpriteGenericRenderer.cpp" />
-    <ClCompile Include="YonemaEngine\Graphics\2D\SpriteGenericRenderer.cpp" />
+    <ClCompile Include="YonemaEngine\Graphics\Sprites\TransSpriteGenericRenderer.cpp" />
+    <ClCompile Include="YonemaEngine\Graphics\Sprites\SpriteGenericRenderer.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\SimplePostEffectGenericRenderer.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\Renderers\GenericRenderer.cpp" />
-    <ClCompile Include="YonemaEngine\Graphics\2D\Sprite.cpp" />
+    <ClCompile Include="YonemaEngine\Graphics\Sprites\Sprite.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\Dx12Wrappers\CommandList.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\Dx12Wrappers\Shader.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\Dx12Wrappers\PipelineState.cpp" />
@@ -212,6 +219,14 @@
     <Image Include="Assets\Images\StarMan.png" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Game\FontTypeList.h" />
+    <ClInclude Include="YonemaEngine\Debug\DisplayFPS.h" />
+    <ClInclude Include="Game\Samples\FontSample.h" />
+    <ClInclude Include="Game\Samples\SkeltalAnimationSample.h" />
+    <ClInclude Include="Game\Samples\SpriteSample.h" />
+    <ClInclude Include="YonemaEngine\Graphics\Fonts\FontRenderer.h" />
+    <ClInclude Include="YonemaEngine\Graphics\Fonts\FontEngine.h" />
+    <ClInclude Include="YonemaEngine\Graphics\Fonts\SpriteFontWrapper.h" />
     <ClInclude Include="YonemaEngine\Graphics\Animations\Animator.h" />
     <ClInclude Include="YonemaEngine\Graphics\Animations\Skelton.h" />
     <ClInclude Include="YonemaEngine\Graphics\Animations\AnimationClip.h" />
@@ -220,7 +235,7 @@
     <ClInclude Include="YonemaEngine\Graphics\FBXModels\FBXGenericRendererAssimp.h" />
     <ClInclude Include="YonemaEngine\Graphics\FBXModels\FBXRendererAssimp.h" />
     <ClInclude Include="Game\InputMapping.h" />
-    <ClInclude Include="Game\Scenes\YonejiDebugScene.h" />
+    <ClInclude Include="Game\Samples\SampleMain.h" />
     <ClInclude Include="YonemaEngine\Input\InputManagerData.h" />
     <ClInclude Include="YonemaEngine\Input\Keyboard.h" />
     <ClInclude Include="YonemaEngine\Input\InputManager.h" />
@@ -238,11 +253,11 @@
     <ClInclude Include="YonemaEngine\GameObject\GameObjectManager.h" />
     <ClInclude Include="YonemaEngine\Graphics\FBXModels\FBXGenericRendererFBX_SDK.h" />
     <ClInclude Include="YonemaEngine\Graphics\FBXModels\FBXRendererFBX_SDK.h" />
-    <ClInclude Include="YonemaEngine\Graphics\2D\TransSpriteGenericRenderer.h" />
-    <ClInclude Include="YonemaEngine\Graphics\2D\SpriteGenericRenderer.h" />
+    <ClInclude Include="YonemaEngine\Graphics\Sprites\TransSpriteGenericRenderer.h" />
+    <ClInclude Include="YonemaEngine\Graphics\Sprites\SpriteGenericRenderer.h" />
     <ClInclude Include="YonemaEngine\Graphics\SimplePostEffectGenericRenderer.h" />
     <ClInclude Include="YonemaEngine\Graphics\Renderers\GenericRenderer.h" />
-    <ClInclude Include="YonemaEngine\Graphics\2D\Sprite.h" />
+    <ClInclude Include="YonemaEngine\Graphics\Sprites\Sprite.h" />
     <ClInclude Include="YonemaEngine\Graphics\Dx12Wrappers\CommandList.h" />
     <ClInclude Include="YonemaEngine\Graphics\Dx12Wrappers\CommandList_Inline.h" />
     <ClInclude Include="YonemaEngine\Graphics\Dx12Wrappers\Shader.h" />
