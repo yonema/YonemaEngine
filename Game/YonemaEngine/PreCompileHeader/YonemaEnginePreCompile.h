@@ -24,17 +24,37 @@
 #include <bitset>
 #include <limits>
 #include <strsafe.h>
+#include <typeinfo>
 
+// DirectX12
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "d3dcompiler.lib")
+
+// ‰æ‘œ
 #pragma comment(lib, "DirectXTex.lib")
+
+// ƒtƒHƒ“ƒg‚È‚Ç
 #pragma comment(lib, "DirectXTK12.lib")
 #pragma comment(lib, "dxguid.lib")
+
+// fbxsdk
 #pragma comment(lib, "libfbxsdk-md.lib")
 #pragma comment(lib, "libxml2-md.lib")
 #pragma comment(lib, "zlib-md.lib")
+
+// “ü—Í
 #pragma comment(lib, "xinput.lib")
+
+
+// •¨—(PhysX)
+#pragma comment (lib, "PhysXCommon_64.lib")
+#pragma comment (lib, "PhysX_64.lib")
+#pragma comment (lib, "PhysXFoundation_64.lib")
+#pragma comment (lib, "PhysXCooking_64.lib")
+#pragma comment (lib, "PhysXExtensions_static_64.lib")
+#pragma comment (lib, "PhysXPvdSDK_static_64.lib")
+#pragma comment (lib, "SnippetUtils_static_64.lib")
 
 #include "../Utils/Noncopyable.h"
 #include "../Math/Math.h"

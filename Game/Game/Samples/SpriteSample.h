@@ -1,30 +1,26 @@
 #pragma once
 namespace nsAWA
 {
-	namespace nsScenes
+	namespace nsSamples
 	{
-		namespace nsSample
+		class CSpriteSample : public IGameObject
 		{
-			class CSpriteSample : public IGameObject
-			{
-			private:
-				static const char* m_kSpriteFilePath;
+		private:
+			static const char* m_kSpriteFilePath;
 
-			public:
-				bool Start() override final;
+		public:
+			bool Start() override final;
 
-				void OnDestroy() override final;
+			void OnDestroy() override final;
 
-				void Update(float deltaTime) override final;
+			void Update(float deltaTime) override final;
 
-			public:
-				constexpr CSpriteSample() = default;
-				~CSpriteSample() = default;
+		public:
+			constexpr CSpriteSample() = default;
+			~CSpriteSample() = default;
 
-			private:
-				CSpriteRenderer* m_spriteRenderer = nullptr;
-			};
-		}
-
+		private:
+			CSpriteRenderer* m_spriteRenderer = nullptr;
+		};
 	}
 }

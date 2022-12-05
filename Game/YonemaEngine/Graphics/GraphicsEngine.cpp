@@ -95,7 +95,7 @@ namespace nsYMEngine
 
 			m_rendererTable.Init();
 
-			if (CreatePeraRenderTarget() != true)
+			if (CreateMainRenderTarget() != true)
 			{
 				return false;
 			}
@@ -117,8 +117,7 @@ namespace nsYMEngine
 			initData.texture = m_simplePostEffectRenderTarget.GetRenderTargetTexture();
 			initData.spriteSize = initData.texture->GetTextureSize();
 			m_simplePostEffectRenderTargetSprite.Init(initData);
-			m_rendererTable.RegistRenderer(RendererType::enSimplePostEffect, &m_mainRenderTargetSprite);
-			
+			m_rendererTable.RegisterRenderer(RendererType::enSimplePostEffect, &m_mainRenderTargetSprite);
 
 			// 初期化が終わったら、DXGIFactoryはもういらないため破棄する。
 			dxgiFactory->Release();
@@ -212,6 +211,8 @@ namespace nsYMEngine
 			DrawToMainRenderTarget();
 
 			DrawWithSimplePostEffect();
+
+			DrawCollision();
 
 			Draw2D();
 
@@ -325,6 +326,46 @@ namespace nsYMEngine
 
 			return;
 		}
+
+		void CGraphicsEngine::DrawCollision()
+		{
+#ifdef _DEBUG
+			// 深度バッファはフレームバッファと同じものを使用。
+			auto dsvH = m_frameBuffer.GetDsvCpuDescriptorHandle();
+			const nsDx12Wrappers::CRenderTarget* rtArray[] = { &m_simplePostEffectRenderTarget };
+
+			// 描画先を設定
+			m_commandList.TransitionFromShaderResourceToRenderTarget(m_simplePostEffectRenderTarget);
+			m_commandList.SetRenderTargets(1, rtArray, dsvH);
+
+			// 画面クリア
+			//m_commandList.ClearRenderTargetViews(1, rtArray);
+
+			// ビューポートとシザリング矩形はフレームバッファと同じものを使用。
+			m_commandList.SetViewportAndScissorRect(
+				m_frameBuffer.GetViewport(), m_frameBuffer.GetScissorRect());
+
+			m_commandList.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
+
+
+			m_commandList.SetGraphicsRootSignatureAndPipelineState(
+				m_rendererTable.GetRootSignature(
+					RendererType::enCollisionRenderer),
+				m_rendererTable.GetPipelineState(
+					RendererType::enCollisionRenderer)
+			);
+
+			for (auto renderer : m_rendererTable.GetRendererList(RendererType::enCollisionRenderer))
+			{
+				renderer->DrawWrapper(&m_commandList);
+			}
+
+			// 描画終了
+			m_commandList.TransitionFromRenderTargetToPresent(m_simplePostEffectRenderTarget);
+#endif // _DEBUG
+			return;
+		}
+
 
 		void CGraphicsEngine::Draw2D()
 		{
@@ -625,7 +666,7 @@ namespace nsYMEngine
 			return true;
 		}
 
-		bool CGraphicsEngine::CreatePeraRenderTarget()
+		bool CGraphicsEngine::CreateMainRenderTarget()
 		{
 			auto frameBuffResDesc = m_frameBuffer.GetResourceDesc();
 			auto res = m_mainRenderTarget.Init(

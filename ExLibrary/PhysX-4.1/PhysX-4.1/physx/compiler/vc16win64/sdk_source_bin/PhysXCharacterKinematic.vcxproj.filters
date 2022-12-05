@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\physxcharacterkinematic\src\CctBoxController.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\physxcharacterkinematic\src\CctCapsuleController.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\physxcharacterkinematic\src\CctCharacterController.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\physxcharacterkinematic\src\CctCharacterControllerCallbacks.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\physxcharacterkinematic\src\CctCharacterControllerManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\physxcharacterkinematic\src\CctController.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\physxcharacterkinematic\src\CctObstacleContext.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\physxcharacterkinematic\src\CctSweptBox.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\physxcharacterkinematic\src\CctSweptCapsule.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\physxcharacterkinematic\src\CctSweptVolume.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\include\characterkinematic\PxBoxController.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\include\characterkinematic\PxCapsuleController.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\include\characterkinematic\PxController.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\include\characterkinematic\PxControllerBehavior.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\include\characterkinematic\PxControllerManager.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\include\characterkinematic\PxControllerObstacles.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\include\characterkinematic\PxExtended.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\physxcharacterkinematic\src\CctBoxController.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\physxcharacterkinematic\src\CctCapsuleController.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\physxcharacterkinematic\src\CctCharacterController.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\physxcharacterkinematic\src\CctCharacterControllerManager.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\physxcharacterkinematic\src\CctController.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\physxcharacterkinematic\src\CctInternalStructs.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\physxcharacterkinematic\src\CctObstacleContext.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\physxcharacterkinematic\src\CctSweptBox.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\physxcharacterkinematic\src\CctSweptCapsule.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\physxcharacterkinematic\src\CctSweptVolume.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\physxcharacterkinematic\src\CctUtils.h">
+      <Filter>src</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{C5789AD7-B85A-3BAA-B4D4-DBF765879B4D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{94201134-AA63-3AB8-82C3-35954E9D8DAF}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

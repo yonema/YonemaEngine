@@ -18,7 +18,7 @@ namespace nsYMEngine
 					return;
 				}
 
-				CGraphicsEngine::GetInstance()->GetRendererTable()->RegistRenderer(
+				CGraphicsEngine::GetInstance()->GetRendererTable()->RegisterRenderer(
 					GetRenderType(), this);
 
 				m_isEnableDrawing = true;

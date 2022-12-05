@@ -72,7 +72,11 @@ namespace nsYMEngine
 					m_srvDescHeap.GetGPUHandle()
 				);
 
-				resUploadBatch.End(commandQueue);
+				auto feature = resUploadBatch.End(commandQueue);
+
+				CGraphicsEngine::GetInstance()->WaitForCommandExecutionToComplete();
+
+				feature.wait();
 
 				// –¢‰Šú‰»‚È‚ç‰Šú‰»‚·‚é
 				if (m_frameBufferHalfSize.x <= 0.0f)

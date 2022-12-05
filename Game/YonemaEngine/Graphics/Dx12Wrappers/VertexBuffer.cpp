@@ -77,15 +77,16 @@ namespace nsYMEngine
 				return true;
 			}
 
-			void CVertexBuffer::Copy(const void* srcData)
+			void CVertexBuffer::Copy(const void* srcData, unsigned int size)
 			{
+				const unsigned int copySize = std::min(size, m_vertexBufferView.SizeInBytes);
 				uint8_t* mappedData;
 				{
 					CD3DX12_RANGE readRange(0, 0);
 					m_vertexBuffer->Map(0, &readRange, (void**)&mappedData);
 				}
 
-				memcpy(mappedData, srcData, m_vertexBufferView.SizeInBytes);
+				memcpy(mappedData, srcData, copySize);
 
 				{
 					CD3DX12_RANGE readRange(0, 0);

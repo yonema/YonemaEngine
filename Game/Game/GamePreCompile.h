@@ -7,6 +7,12 @@
 #include "../YonemaEngine/Graphics/Renderers/SpriteRenderer.h"
 #include "../YonemaEngine/Graphics/Sprites/Sprite.h"
 #include "../YonemaEngine/Graphics/Fonts/FontRenderer.h"
+#include "../YonemaEngine/Physics/PhysicsEngine.h"
+#include "../YonemaEngine/Physics/PhysicsStaticObject.h"
+#include "../YonemaEngine/Physics/PhysicsDynamicObject.h"
+#include "../YonemaEngine/Physics/PhysicsTriggerObject.h"
+#include "../YonemaEngine/Physics/ContactEvent.h"
+#include "../YonemaEngine/Physics/ExtendedDataForRigidActor.h"
 
 // エイリアス宣言
 
@@ -35,6 +41,14 @@ using CFontRenderer = nsGraphics::nsFonts::CFontRenderer;
 using SFontParameter = nsGraphics::nsFonts::CFontRenderer::SFontParameter;
 using EnFontType = nsGraphics::nsFonts::EnFontType;
 
+// 物理
+using CPhysicsStaticObject = nsPhysics::CPhysicsStaticObject;
+using CPhysicsDynamicObject = nsPhysics::CPhysicsDynamicObject;
+using CPhysicsTriggerObject = nsPhysics::CPhysicsTriggerObject;
+using SContactEvent = nsPhysics::SContactEvent;
+using CExtendedDataForRigidActor = nsPhysics::CExtendedDataForRigidActor;
+using EnPhysicsAttributes = nsPhysics::EnPhysicsAttributes;
+
 // 数学
 using CVector2 = nsMath::CVector2;
 using CVector3 = nsMath::CVector3;
@@ -62,6 +76,9 @@ static constexpr auto MainCamera()
 	return nsGraphics::CGraphicsEngine::GetInstance()->GetMainCamera();
 }
 
+
+//////// 入力 ////////
+
 /**
  * @brief ゲームパッド入力のインターフェースを取得します。
  * @return ゲームパッド入力のインターフェース
@@ -79,4 +96,38 @@ static constexpr const nsInput::CKeyboard* const Keyboard()
 static constexpr const nsInput::CInputManager* const Input()
 {
 	return CYonemaEngine::GetInstance()->GetInput();
+}
+
+
+//////// 物理 ////////
+
+static void EnableDebugDrawPhysicsLine() noexcept
+{
+	nsPhysics::CPhysicsEngine::GetInstance()->EnableDebugDrawLine();
+}
+static void DisableDebugDrawPhysicsLine() noexcept
+{
+	nsPhysics::CPhysicsEngine::GetInstance()->DisableDebugDrawLine();
+}
+static bool IsEnableDebugDrawPhysicsLine() noexcept
+{
+	return nsPhysics::CPhysicsEngine::GetInstance()->IsEnableDebugDrawLine();
+}
+
+static void SetCullingBoxForDebugDrawLine(float halfExtent, const nsMath::CVector3& center) noexcept
+{
+	nsPhysics::CPhysicsEngine::GetInstance()->SetCullingBoxForDebugDrawLine(halfExtent, center);
+}
+
+static void EnableAutoFitCullingBoxToMainCamera() noexcept
+{
+	nsPhysics::CPhysicsEngine::GetInstance()->EnableAutoFitCullingBoxToMainCamera();
+}
+static void DisableAutoFitCullingBoxToMainCamera() noexcept
+{
+	nsPhysics::CPhysicsEngine::GetInstance()->DisableAutoFitCullingBoxToMainCamera();
+}
+static bool IsEnableAutoFitCullingBoxToMainCamera() noexcept
+{
+	return nsPhysics::CPhysicsEngine::GetInstance()->IsEnableAutoFitCullingBoxToMainCamera();
 }

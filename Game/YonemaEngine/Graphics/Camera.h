@@ -102,6 +102,7 @@ namespace nsYMEngine
 			}
 			constexpr void SetAspectRatio(float aspect) noexcept
 			{
+				m_isDirtyProjectionMatrix = true;
 				m_aspectRatio = aspect;
 			}
 			constexpr float GetAspectRatio() const noexcept
@@ -120,6 +121,11 @@ namespace nsYMEngine
 
 			constexpr void SetNearClip(float nearClip) noexcept
 			{
+				if (nearClip >= m_farClip)
+				{
+					return;
+				}
+				m_isDirtyProjectionMatrix = true;
 				m_nearClip = nearClip;
 			}
 			constexpr float GetNearClip() const noexcept
@@ -129,6 +135,11 @@ namespace nsYMEngine
 
 			constexpr void SetFarClip(float farClip) noexcept
 			{
+				if (farClip <= m_nearClip)
+				{
+					return;
+				}
+				m_isDirtyProjectionMatrix = true;
 				m_farClip = farClip;
 			}
 			constexpr float GetFarClip() const noexcept

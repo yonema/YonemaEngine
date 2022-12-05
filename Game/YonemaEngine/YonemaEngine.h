@@ -15,6 +15,10 @@ namespace nsYMEngine
 	{
 		class CDisplayFPS;
 	}
+	namespace nsPhysics
+	{
+		class CPhysicsEngine;
+	}
 }
 
 namespace nsYMEngine
@@ -83,6 +87,7 @@ namespace nsYMEngine
 		nsGraphics::CGraphicsEngine* m_graphicsEngine = nullptr;
 		nsGameObject::CGameObjectManager* m_gameObjectManager = nullptr;
 		nsInput::CInputManager* m_inputManager = nullptr;
+		nsPhysics::CPhysicsEngine* m_physicsWorld = nullptr;
 		nsTime::CGameTime m_gameTime;
 		bool m_isExitGame = false;
 

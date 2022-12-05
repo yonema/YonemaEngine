@@ -159,6 +159,8 @@ namespace nsYMEngine
 				return &m_frameBuffer;
 			}
 
+			void WaitForCommandExecutionToComplete();
+
 		private:
 
 			void Terminate();
@@ -179,17 +181,18 @@ namespace nsYMEngine
 
 			bool CreateFence();
 
-			bool CreatePeraRenderTarget();
+			bool CreateMainRenderTarget();
 
 			bool CreateSeceneConstantBuff();
 
-			void WaitForCommandExecutionToComplete();
 
 			void BeginDraw();
 
 			void DrawToMainRenderTarget();
 
 			void DrawWithSimplePostEffect();
+
+			void DrawCollision();
 
 			void Draw2D();
 

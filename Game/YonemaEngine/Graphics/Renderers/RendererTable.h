@@ -26,6 +26,7 @@ namespace nsYMEngine
 					enNone = -1,
 					enPMDModel,
 					enFBXModel,
+					enCollisionRenderer,
 					enSimplePostEffect,
 					enSprite,
 					enTransSprite,
@@ -60,7 +61,7 @@ namespace nsYMEngine
 					return m_rendererListTable[static_cast<int>(rendererType)];
 				}
 
-				inline void RegistRenderer(EnRendererType rendererType, IRenderer* renderer)
+				inline void RegisterRenderer(EnRendererType rendererType, IRenderer* renderer)
 				{
 					GetRendererList(rendererType).emplace_back(renderer);
 				}

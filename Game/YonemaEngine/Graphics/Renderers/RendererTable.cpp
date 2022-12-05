@@ -2,6 +2,7 @@
 #include "../PMDModels/PMDGenericRenderer.h"
 #include "../FBXModels/FBXGenericRendererFBX_SDK.h"
 #include "../FBXModels/FBXGenericRendererAssimp.h"
+#include "../DebugRenderers/PhysicsDebugLineGenericRenderer.h"
 #include "../Sprites/SpriteGenericRenderer.h"
 #include "../Sprites/TransSpriteGenericRenderer.h"
 #include "../SimplePostEffectGenericRenderer.h"
@@ -32,6 +33,8 @@ namespace nsYMEngine
 				m_genericRendererTable[static_cast<int>(EnRendererType::enFBXModel)] =
 					//new nsFBXModels::CFBXGenericRendererFBX_SDK();
 					new nsFBXModels::CFBXGenericRendererAssimp();
+				m_genericRendererTable[static_cast<int>(EnRendererType::enCollisionRenderer)] =
+					new nsDebugRenderers::CPhysicsDebugLineGenericRenderer();
 				m_genericRendererTable[static_cast<int>(EnRendererType::enSimplePostEffect)] =
 					new CSimplePostEffectGenericRenderer();
 				m_genericRendererTable[static_cast<int>(EnRendererType::enSprite)] =

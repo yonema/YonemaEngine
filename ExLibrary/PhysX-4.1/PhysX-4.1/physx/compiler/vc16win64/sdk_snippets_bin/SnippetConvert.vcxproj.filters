@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\snippets\snippetcommon\ClassicMain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\snippets\snippetconvert\SnippetConvert.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\snippets\snippetcommon\SnippetPrint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\snippets\snippetcommon\SnippetPVD.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\snippets\compiler\cmake\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{D1E6D32B-171C-3977-8FEA-BB64F61084EE}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{E8EF0F41-F042-3ACD-A664-4C9564869CB1}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

@@ -11,6 +11,11 @@ namespace nsYMEngine
 			struct SAnimationInitData;
 		}
 	}
+	namespace nsPhysics
+	{
+		class IPhysicsObject;
+		struct SMeshGeometryBuffer;
+	}
 }
 
 
@@ -39,6 +44,7 @@ namespace nsYMEngine
 				nsMath::CQuaternion vertexBias = nsMath::CQuaternion::Identity();
 				bool isVertesTranspos = false;
 				const nsAnimations::SAnimationInitData* animInitData = nullptr;
+				nsPhysics::SMeshGeometryBuffer* physicsMeshGeomBuffer = nullptr;
 			};
 
 			class CModelRenderer : public nsGameObject::IGameObject
@@ -159,6 +165,11 @@ namespace nsYMEngine
 					{
 						m_renderer->SetIsAnimationLoop(isLoop);
 					}
+				}
+
+				const auto& GetRenderer() const noexcept
+				{
+					return m_renderer;
 				}
 
 			private:

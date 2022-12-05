@@ -124,13 +124,6 @@ namespace nsYMEngine
 				};
 
 
-
-
-
-
-
-
-
 			public:
 				CFBXRendererAssimp(const SModelInitData& modelInitData);
 				~CFBXRendererAssimp();
@@ -156,16 +149,16 @@ namespace nsYMEngine
 
 				bool CreateVertexAndIndexBuffer(const std::vector<SMesh>& meshes);
 
+				void CopyToPhysicsMeshGeometryBuffer(
+					const std::vector<SMesh>& meshes,
+					const nsRenderers::SModelInitData& modelInitData,
+					unsigned int numVertices,
+					unsigned int numIndices
+					);
+
 				bool CreateModelCBV();
 
 				bool CreateMaterialSRV();
-
-
-
-
-
-
-
 
 
 			private:

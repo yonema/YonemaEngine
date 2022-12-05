@@ -229,7 +229,13 @@ namespace nsYMEngine
 
 					if (pParent)
 					{
-						nodeName = std::string(pParent->mName.C_Str());
+						auto tmpName = std::string(pParent->mName.C_Str());
+						if (nodeName == tmpName)
+						{
+							// 親に自分自身を設定してあった場合、無限ループになるのでbreakする。
+							break;
+						}
+						nodeName = tmpName;
 					}
 
 				} while (pParent);

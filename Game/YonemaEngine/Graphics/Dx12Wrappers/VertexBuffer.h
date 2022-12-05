@@ -25,13 +25,13 @@ namespace nsYMEngine
 				bool Init(
 					unsigned int size,
 					unsigned int stride,
-					const void* srcData,
+					const void* srcData = nullptr,
 					const wchar_t* objectName = nullptr
 				);
 
 				void Release();
 
-				void Copy(const void* srcData);
+				void Copy(const void* srcData, unsigned int size = INT_MAX);
 
 				constexpr const auto Get() const noexcept
 				{

@@ -2,50 +2,59 @@
 #include "SkeltalAnimationSample.h"
 #include "SpriteSample.h"
 #include "FontSample.h"
+#include "PhysicsSample.h"
+#include "TriggerSample.h"
+#include "CharacterControllerSample.h"
 
 namespace nsAWA
 {
-	namespace nsScenes
+	namespace nsSamples
 	{
-		namespace nsSample
+		bool CSampleMain::Start()
 		{
-			bool CSampleMain::Start()
-			{
-				constexpr int kSampleIdx = 2;
-				
-				switch (kSampleIdx)
-				{
-				case 0:
-					NewGO<CSkeltalAnimationSample>(EnGOPriority::enMid, "SkeltalAnimationSample");
-					break;
-				case 1:
-					NewGO<CSpriteSample>(EnGOPriority::enMid, "SpriteSample");
-					break;
-				case 2:
-					NewGO<CFontSample>(EnGOPriority::enMid, "FontSample");
-					break;
-				default:
-					NewGO<CSkeltalAnimationSample>(EnGOPriority::enMid, "SkeltalAnimationSample");
-					break;
-				}
+			constexpr int kSampleIdx = 3;
 
-				return true;
+			switch (kSampleIdx)
+			{
+			case 0:
+				NewGO<CSkeltalAnimationSample>(EnGOPriority::enMid, "SkeltalAnimationSample");
+				break;
+			case 1:
+				NewGO<CSpriteSample>(EnGOPriority::enMid, "SpriteSample");
+				break;
+			case 2:
+				NewGO<CFontSample>(EnGOPriority::enMid, "FontSample");
+				break;
+			case 3:
+				NewGO<CPhysicsSample>(EnGOPriority::enMid, "PhysicsSample");
+				break;
+			case 4:
+				NewGO<CTriggerSample>(EnGOPriority::enMid, "TriggerSample");
+				break;
+			case 5:
+				NewGO<CCharacterControllerSample>(EnGOPriority::enMid, "CharacterControllerSample");
+				break;
+			default:
+				NewGO<CSkeltalAnimationSample>(EnGOPriority::enMid, "SkeltalAnimationSample");
+				break;
 			}
 
-			void CSampleMain::OnDestroy()
-			{
+			return true;
+		}
 
-				return;
-			}
+		void CSampleMain::OnDestroy()
+		{
 
-			void CSampleMain::Update(float deltaTime)
+			return;
+		}
+
+		void CSampleMain::Update(float deltaTime)
+		{
+			if (Keyboard()->IsTrigger(EnKeyButton::enEscape))
 			{
-				if (Keyboard()->IsTrigger(EnKeyButton::enEscape))
-				{
-					ExitGame();
-				}
-				return;
+				ExitGame();
 			}
+			return;
 		}
 	}
 }

@@ -181,7 +181,7 @@ namespace nsYMEngine
 					m_meshInfoArray[i].baseIndexNo = numIndices;
 					baseVertexNoArray[i] = numVertices;
 					numVertices += scene->mMeshes[i]->mNumVertices;
-					numVertices += m_meshInfoArray[i].numIndices;
+					numIndices += m_meshInfoArray[i].numIndices;
 				}
 
 				if (m_skelton)
@@ -204,6 +204,8 @@ namespace nsYMEngine
 				}
 
 				CreateVertexAndIndexBuffer(dstMeshes);
+
+				CopyToPhysicsMeshGeometryBuffer(dstMeshes, modelInitData, numVertices, numIndices);
 
 				CreateModelCBV();
 
@@ -403,6 +405,49 @@ namespace nsYMEngine
 
 				return true;
 			}
+
+			void CFBXRendererAssimp::CopyToPhysicsMeshGeometryBuffer(
+				const std::vector<SMesh>& meshes, 
+				const nsRenderers::SModelInitData& modelInitData,
+				unsigned int numVertices,
+				unsigned int numIndices
+			)
+			{
+				if (modelInitData.physicsMeshGeomBuffer == nullptr)
+				{
+					return;
+				}
+				auto& bufferVertices = modelInitData.physicsMeshGeomBuffer->m_vertices;
+				auto& bufferIndices = modelInitData.physicsMeshGeomBuffer->m_indices;
+
+				bufferVertices.reserve(numVertices);
+				bufferIndices.reserve(numIndices);
+
+				const unsigned int numMeshes = static_cast<unsigned int>(meshes.size());
+				for (unsigned int meshIdx = 0; meshIdx < numMeshes; meshIdx++)
+				{
+					const auto& mesh = meshes.at(meshIdx);
+					unsigned int numVerticesInMesh = static_cast<unsigned int>(mesh.vertices.size());
+					unsigned int numIndicesInMesh = static_cast<unsigned int>(mesh.indices.size());
+
+					for (const auto& vertex :  mesh.vertices)
+					{
+						bufferVertices.emplace_back(vertex.position);
+					}
+					for (const auto& index : mesh.indices)
+					{
+						bufferIndices.emplace_back(index);
+					}
+
+				}
+
+
+				// モデルのバイアスに合わせて、物理メッシュ用の頂点も回しておく。
+				modelInitData.physicsMeshGeomBuffer->RotateVertices(modelInitData.vertexBias);
+
+				return;
+			}
+
 
 			bool CFBXRendererAssimp::CreateModelCBV()
 			{

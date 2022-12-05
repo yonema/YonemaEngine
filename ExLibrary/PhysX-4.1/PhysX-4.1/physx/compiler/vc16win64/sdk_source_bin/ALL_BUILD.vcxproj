@@ -1,0 +1,242 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ResolveNugetPackages>false</ResolveNugetPackages>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="debug|x64">
+      <Configuration>debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="checked|x64">
+      <Configuration>checked</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="profile|x64">
+      <Configuration>profile</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="release|x64">
+      <Configuration>release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{E1903C90-D1AB-3AE5-A744-09CA1F5FE47F}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.20348.0</WindowsTargetPlatformVersion>
+    <Platform>x64</Platform>
+    <ProjectName>ALL_BUILD</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='checked|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='profile|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='debug|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='checked|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='profile|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='release|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='checked|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='profile|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\CMakeLists.txt">
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='debug|x64'">Building Custom Rule D:/GitClones/YonemaEngine/ExLibrary/PhysX-4.1/PhysX-4.1/physx/source/compiler/cmake/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='debug|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SD:/GitClones/YonemaEngine/ExLibrary/PhysX-4.1/PhysX-4.1/physx/compiler/public -BD:/GitClones/YonemaEngine/ExLibrary/PhysX-4.1/PhysX-4.1/physx/compiler/vc16win64 --check-stamp-file D:/GitClones/YonemaEngine/ExLibrary/PhysX-4.1/PhysX-4.1/physx/compiler/vc16win64/sdk_source_bin/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='debug|x64'">D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\externals\cmakemodules\GetCompilerAndPlatform.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\externals\cmakemodules\NvidiaBuildOptions.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\externals\cmakemodules\SetOutputPaths.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\externals\cmakemodules\template\PxIncludeTemplate.h;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\FastXml.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\LowLevel.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\LowLevelAABB.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\LowLevelDynamics.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\PhysX.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\PhysXCharacterKinematic.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\PhysXCommon.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\PhysXCooking.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\PhysXExtensions.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\PhysXFoundation.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\PhysXPvdSDK.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\PhysXTask.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\PhysXVehicle.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\SceneQuery.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\SimulationController.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\CMakeLists.txt;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\FastXml.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\LowLevel.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\LowLevelAABB.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\LowLevelDynamics.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\PhysX.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\PhysXCharacterKinematic.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\PhysXCommon.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\PhysXCooking.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\PhysXExtensions.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\PhysXFoundation.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\PhysXPvdSDK.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\PhysXTask.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\PhysXVehicle.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\SceneQuery.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\SimulationController.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='debug|x64'">D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\compiler\vc16win64\sdk_source_bin\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='checked|x64'">Building Custom Rule D:/GitClones/YonemaEngine/ExLibrary/PhysX-4.1/PhysX-4.1/physx/source/compiler/cmake/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='checked|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SD:/GitClones/YonemaEngine/ExLibrary/PhysX-4.1/PhysX-4.1/physx/compiler/public -BD:/GitClones/YonemaEngine/ExLibrary/PhysX-4.1/PhysX-4.1/physx/compiler/vc16win64 --check-stamp-file D:/GitClones/YonemaEngine/ExLibrary/PhysX-4.1/PhysX-4.1/physx/compiler/vc16win64/sdk_source_bin/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='checked|x64'">D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\externals\cmakemodules\GetCompilerAndPlatform.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\externals\cmakemodules\NvidiaBuildOptions.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\externals\cmakemodules\SetOutputPaths.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\externals\cmakemodules\template\PxIncludeTemplate.h;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\FastXml.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\LowLevel.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\LowLevelAABB.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\LowLevelDynamics.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\PhysX.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\PhysXCharacterKinematic.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\PhysXCommon.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\PhysXCooking.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\PhysXExtensions.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\PhysXFoundation.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\PhysXPvdSDK.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\PhysXTask.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\PhysXVehicle.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\SceneQuery.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\SimulationController.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\CMakeLists.txt;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\FastXml.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\LowLevel.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\LowLevelAABB.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\LowLevelDynamics.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\PhysX.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\PhysXCharacterKinematic.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\PhysXCommon.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\PhysXCooking.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\PhysXExtensions.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\PhysXFoundation.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\PhysXPvdSDK.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\PhysXTask.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\PhysXVehicle.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\SceneQuery.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\SimulationController.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='checked|x64'">D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\compiler\vc16win64\sdk_source_bin\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='checked|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='profile|x64'">Building Custom Rule D:/GitClones/YonemaEngine/ExLibrary/PhysX-4.1/PhysX-4.1/physx/source/compiler/cmake/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='profile|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SD:/GitClones/YonemaEngine/ExLibrary/PhysX-4.1/PhysX-4.1/physx/compiler/public -BD:/GitClones/YonemaEngine/ExLibrary/PhysX-4.1/PhysX-4.1/physx/compiler/vc16win64 --check-stamp-file D:/GitClones/YonemaEngine/ExLibrary/PhysX-4.1/PhysX-4.1/physx/compiler/vc16win64/sdk_source_bin/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='profile|x64'">D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\externals\cmakemodules\GetCompilerAndPlatform.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\externals\cmakemodules\NvidiaBuildOptions.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\externals\cmakemodules\SetOutputPaths.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\externals\cmakemodules\template\PxIncludeTemplate.h;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\FastXml.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\LowLevel.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\LowLevelAABB.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\LowLevelDynamics.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\PhysX.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\PhysXCharacterKinematic.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\PhysXCommon.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\PhysXCooking.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\PhysXExtensions.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\PhysXFoundation.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\PhysXPvdSDK.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\PhysXTask.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\PhysXVehicle.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\SceneQuery.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\SimulationController.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\CMakeLists.txt;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\FastXml.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\LowLevel.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\LowLevelAABB.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\LowLevelDynamics.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\PhysX.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\PhysXCharacterKinematic.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\PhysXCommon.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\PhysXCooking.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\PhysXExtensions.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\PhysXFoundation.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\PhysXPvdSDK.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\PhysXTask.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\PhysXVehicle.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\SceneQuery.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\SimulationController.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='profile|x64'">D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\compiler\vc16win64\sdk_source_bin\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='profile|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='release|x64'">Building Custom Rule D:/GitClones/YonemaEngine/ExLibrary/PhysX-4.1/PhysX-4.1/physx/source/compiler/cmake/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SD:/GitClones/YonemaEngine/ExLibrary/PhysX-4.1/PhysX-4.1/physx/compiler/public -BD:/GitClones/YonemaEngine/ExLibrary/PhysX-4.1/PhysX-4.1/physx/compiler/vc16win64 --check-stamp-file D:/GitClones/YonemaEngine/ExLibrary/PhysX-4.1/PhysX-4.1/physx/compiler/vc16win64/sdk_source_bin/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='release|x64'">D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\externals\cmakemodules\GetCompilerAndPlatform.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\externals\cmakemodules\NvidiaBuildOptions.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\externals\cmakemodules\SetOutputPaths.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\externals\cmakemodules\template\PxIncludeTemplate.h;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\FastXml.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\LowLevel.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\LowLevelAABB.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\LowLevelDynamics.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\PhysX.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\PhysXCharacterKinematic.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\PhysXCommon.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\PhysXCooking.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\PhysXExtensions.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\PhysXFoundation.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\PhysXPvdSDK.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\PhysXTask.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\PhysXVehicle.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\SceneQuery.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\SimulationController.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\CMakeLists.txt;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\FastXml.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\LowLevel.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\LowLevelAABB.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\LowLevelDynamics.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\PhysX.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\PhysXCharacterKinematic.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\PhysXCommon.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\PhysXCooking.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\PhysXExtensions.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\PhysXFoundation.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\PhysXPvdSDK.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\PhysXTask.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\PhysXVehicle.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\SceneQuery.cmake;D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\source\compiler\cmake\windows\SimulationController.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release|x64'">D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\compiler\vc16win64\sdk_source_bin\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='release|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\compiler\vc16win64\ZERO_CHECK.vcxproj">
+      <Project>{EB525DFC-C5D1-311D-8011-EDDB509AEDFA}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\compiler\vc16win64\sdk_source_bin\FastXml.vcxproj">
+      <Project>{066FDAF1-B986-3DF9-AB81-927D84360C43}</Project>
+      <Name>FastXml</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\compiler\vc16win64\sdk_source_bin\LowLevel.vcxproj">
+      <Project>{5F6552D5-B456-37B0-B54C-02FA41FE7E02}</Project>
+      <Name>LowLevel</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\compiler\vc16win64\sdk_source_bin\LowLevelAABB.vcxproj">
+      <Project>{3D5FE57A-3E75-3001-AAB1-FB9F5D751E56}</Project>
+      <Name>LowLevelAABB</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\compiler\vc16win64\sdk_source_bin\LowLevelDynamics.vcxproj">
+      <Project>{51077C6A-21D2-3CE1-87CD-ADEA6EC9F004}</Project>
+      <Name>LowLevelDynamics</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\compiler\vc16win64\sdk_source_bin\PhysX.vcxproj">
+      <Project>{AE4763B1-75D4-39F0-9833-7A0DDB5B4018}</Project>
+      <Name>PhysX</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\compiler\vc16win64\sdk_source_bin\PhysXCharacterKinematic.vcxproj">
+      <Project>{A6BFD20B-4A53-3688-842C-79DC968B9B87}</Project>
+      <Name>PhysXCharacterKinematic</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\compiler\vc16win64\sdk_source_bin\PhysXCommon.vcxproj">
+      <Project>{78E3B7E6-21C7-3AD7-986C-989B7E0B1C90}</Project>
+      <Name>PhysXCommon</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\compiler\vc16win64\sdk_source_bin\PhysXCooking.vcxproj">
+      <Project>{80279712-6CFD-365B-A31E-9F187E703FD0}</Project>
+      <Name>PhysXCooking</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\compiler\vc16win64\sdk_source_bin\PhysXExtensions.vcxproj">
+      <Project>{DC7DE021-8C01-3D4C-8AA9-DD4A823EEBD3}</Project>
+      <Name>PhysXExtensions</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\compiler\vc16win64\sdk_source_bin\PhysXFoundation.vcxproj">
+      <Project>{F582C745-271B-3272-A4BC-3496CE53105C}</Project>
+      <Name>PhysXFoundation</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\compiler\vc16win64\sdk_source_bin\PhysXPvdSDK.vcxproj">
+      <Project>{D4B7724C-D096-3043-8909-D8D1EDB19ED8}</Project>
+      <Name>PhysXPvdSDK</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\compiler\vc16win64\sdk_source_bin\PhysXTask.vcxproj">
+      <Project>{EB717157-7916-3E31-9C5C-B07D55A12627}</Project>
+      <Name>PhysXTask</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\compiler\vc16win64\sdk_source_bin\PhysXVehicle.vcxproj">
+      <Project>{B8744647-61FD-37C6-AD75-7AC64640A212}</Project>
+      <Name>PhysXVehicle</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\compiler\vc16win64\sdk_source_bin\SceneQuery.vcxproj">
+      <Project>{F4F7A9FF-AE54-35CB-8C5D-DD60DF030894}</Project>
+      <Name>SceneQuery</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\GitClones\YonemaEngine\ExLibrary\PhysX-4.1\PhysX-4.1\physx\compiler\vc16win64\sdk_source_bin\SimulationController.vcxproj">
+      <Project>{AE345650-C919-3675-A08A-654582D89E76}</Project>
+      <Name>SimulationController</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
