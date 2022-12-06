@@ -202,6 +202,8 @@ namespace nsYMEngine
 
 				EnModelFormat FindMatchExtension(const char* extension);
 
+				void UpdateWorldMatrix() noexcept;
+
 			private:
 				IModelRendererBase* m_renderer = nullptr;
 				CRendererTable::EnRendererType m_rendererType =

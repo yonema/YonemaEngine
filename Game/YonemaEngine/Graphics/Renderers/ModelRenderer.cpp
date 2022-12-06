@@ -20,17 +20,14 @@ namespace nsYMEngine
 
 			bool CModelRenderer::Start()
 			{
-				if (m_renderer)
-				{
-					m_renderer->UpdateWorldMatrix(m_position, m_rotation, m_scale);
-				}
+				UpdateWorldMatrix();
 				m_renderer->PlayAnimation(0);
 				return true;
 			}
 
 			void CModelRenderer::Update(float deltaTime)
 			{
-				m_renderer->UpdateWorldMatrix(m_position, m_rotation, m_scale);
+				UpdateWorldMatrix();
 
 				m_renderer->UpdateAnimation(deltaTime);
 
@@ -53,6 +50,8 @@ namespace nsYMEngine
 				CreateRenderer(&modelFormat, modelInitData);
 
 				RegistToRendererTable(modelFormat, modelInitData);
+
+				UpdateWorldMatrix();
 
 				return;
 			}
@@ -172,6 +171,16 @@ namespace nsYMEngine
 				}
 				
 				return format;
+			}
+
+			void CModelRenderer::UpdateWorldMatrix() noexcept
+			{
+				if (m_renderer)
+				{
+					m_renderer->UpdateWorldMatrix(m_position, m_rotation, m_scale);
+				}
+
+				return;
 			}
 		}
 	}
