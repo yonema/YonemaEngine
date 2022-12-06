@@ -84,6 +84,25 @@ namespace nsYMEngine
 					}
 				}
 
+				inline void ReserveAnimationEventFuncArray(
+					unsigned int animIdx, unsigned int size) override final
+				{
+					if (m_animator)
+					{
+						m_animator->ReserveAnimationEventFuncArray(animIdx, size);
+					}
+				}
+
+				inline void AddAnimationEventFunc(
+					unsigned int animIdx,
+					const std::function<void(void)>& animationEventFunc) override final
+				{
+					if (m_animator)
+					{
+						m_animator->AddAnimationEventFunc(animIdx, animationEventFunc);
+					}
+				}
+
 
 			private:
 

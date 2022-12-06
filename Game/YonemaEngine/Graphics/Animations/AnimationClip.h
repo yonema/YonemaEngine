@@ -41,6 +41,9 @@ namespace nsYMEngine
 		{
 			class CAnimationClip : nsUtils::SNoncopyable
 			{
+			private:
+				static const std::string m_kAnimEventKeyNodeName;
+
 			public:
 				constexpr CAnimationClip() = default;
 				~CAnimationClip();
@@ -59,6 +62,24 @@ namespace nsYMEngine
 				constexpr bool IsPlayedAnimationToEnd() const noexcept
 				{
 					return m_isPlayedAnimationToEnd;
+				}
+
+				constexpr void ResetAnimationParam() noexcept
+				{
+					m_prevAnimEventIdx = 0;
+					m_isPlayedAnimationToEnd = false;
+					m_animLoopCounter = 0;
+				}
+
+				_CONSTEXPR20_CONTAINER void ReserveAnimationEventFuncArray(unsigned int size)
+				{
+					m_animationEventFuncArray.reserve(static_cast<size_t>(size));
+				}
+
+				_CONSTEXPR20_CONTAINER void AddAnimationEventFunc(
+					const std::function<void(void)>& animationEventFunc)
+				{
+					m_animationEventFuncArray.emplace_back(animationEventFunc);
 				}
 
 			private:
@@ -100,11 +121,22 @@ namespace nsYMEngine
 
 				unsigned int FindPosition(float animTimeTicks, const aiNodeAnim& nodeAnim) const noexcept;
 
+
+
+				void ReadAnimKeyEventNode(
+					float animTimeTicks,
+					const aiNode& node,
+					const aiAnimation& animation
+				) noexcept;
+
 			private:
 				Assimp::Importer* m_importer = nullptr;
 				const aiScene* m_scene = nullptr;
 				CSkelton* m_skeltonRef = nullptr;
 				bool m_isPlayedAnimationToEnd = false;
+				unsigned int m_prevAnimEventIdx = 0;
+				int m_animLoopCounter = 0;
+				std::vector<std::function<void(void)>> m_animationEventFuncArray = {};
 			};
 
 		}

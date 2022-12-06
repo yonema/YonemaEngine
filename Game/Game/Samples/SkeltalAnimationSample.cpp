@@ -11,7 +11,7 @@ namespace nsAWA
 		{
 			"Assets/Animations/Rumba_Dancing.fbx",
 			"Assets/Animations/Hip_Hop_Dancing.fbx",
-			"Assets/Animations/Robot_Hip_Hop_Dance.fbx"
+			"Assets/Animations/Robot_Hip_Hop_Dance.fbx",
 		};
 
 
@@ -29,7 +29,6 @@ namespace nsAWA
 			m_modelRenderer->Init(modelInitData);
 			m_modelRenderer->SetPosition({ 0.0f, 4.0f, 0.0f });
 			m_modelRenderer->SetScale(0.1f);
-			//m_modelRenderer->SetScale(10.0f);
 			m_modelRenderer->SetIsAnimationLoop(false);
 
 			return true;

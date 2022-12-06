@@ -135,6 +135,14 @@ namespace nsYMEngine
 
 			void RemovePhysicsTriggerObject(CPhysicsTriggerObject* object);
 
+			inline void SetGravity(const nsMath::CVector3& gravity)
+			{
+				if (m_scene)
+				{
+					m_scene->setGravity({ gravity.x, gravity.y, gravity.z });
+				}
+			}
+
 
 			// DebugSystem
 

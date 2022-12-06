@@ -226,9 +226,19 @@ namespace nsYMEngine
 				auto filePathInUTF8Str = nsUtils::ToUTF8(filePathInWStr);
 
 				pImporter = new Assimp::Importer;
+				unsigned int removeFlags =
+					aiComponent_CAMERAS |
+					aiComponent_LIGHTS |
+					aiComponent_ANIMATIONS;
+
+				pImporter->SetPropertyInteger(AI_CONFIG_PP_RVC_FLAGS, removeFlags);
+
+				pImporter->SetPropertyInteger(
+					AI_CONFIG_PP_SBP_REMOVE, aiPrimitiveType_LINE | aiPrimitiveType_POINT);
 
 				// インポートのポストプロセス設定。
 				static constexpr int kPostprocessFlag =
+				aiProcess_RemoveComponent			|	// コンポーネントの一部を消去する
 				aiProcess_CalcTangentSpace			|	// 接線と従法線を計算する
 				aiProcess_JoinIdenticalVertices		|	// メッシュ内の同一頂点の結合
 				aiProcess_MakeLeftHanded			|	// 左手座標系に変換。DirectXの場合必須。

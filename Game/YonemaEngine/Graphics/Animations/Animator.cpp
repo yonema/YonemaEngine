@@ -74,13 +74,13 @@ namespace nsYMEngine
 					// 指定されたアニメーションインデックスが、アニメーション数を超えている。
 					return;
 				}
-				if (m_animationIndex == animIdx && m_isPlaying == true)
+				if (m_animationIndex == animIdx/* && m_isPlaying == true*/)
 				{
 					// 現在のアニメーションと指定されたアニメーションが一緒なら変更無し。
 					return;
 				}
 
-
+				m_animationClips[m_animationIndex]->ResetAnimationParam();
 				m_animationIndex = animIdx;
 				m_animationTimer = 0.0f;
 				m_isPlaying = true;

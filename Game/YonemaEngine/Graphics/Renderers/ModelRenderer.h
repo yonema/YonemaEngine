@@ -172,6 +172,25 @@ namespace nsYMEngine
 					return m_renderer;
 				}
 
+				inline void ReserveAnimationEventFuncArray(unsigned int animIdx, unsigned int size)
+				{
+					if (m_renderer)
+					{
+						m_renderer->ReserveAnimationEventFuncArray(animIdx, size);
+					}
+				}
+
+				inline void AddAnimationEventFunc(
+					unsigned int animIdx,
+					const std::function<void(void)>& animationEventFunc)
+				{
+					if (m_renderer)
+					{
+						m_renderer->AddAnimationEventFunc(animIdx, animationEventFunc);
+					}
+				}
+
+
 			private:
 				void Terminate();
 

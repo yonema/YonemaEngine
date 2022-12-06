@@ -71,8 +71,7 @@ namespace nsYMEngine
 
 		m_gameObjectManager->Update(deltaTime);
 
-		constexpr float kPhysicsTimeStep = 1.0f / 60.0f;
-		m_physicsWorld->Update(kPhysicsTimeStep);
+		m_physicsWorld->Update(deltaTime);
 
 		m_graphicsEngine->Update();
 

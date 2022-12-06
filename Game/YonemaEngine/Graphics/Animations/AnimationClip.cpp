@@ -10,6 +10,9 @@ namespace nsYMEngine
 	{
 		namespace nsAnimations
 		{
+			const std::string CAnimationClip::m_kAnimEventKeyNodeName = "AnimEventKey";
+
+
 			CAnimationClip::~CAnimationClip()
 			{
 				Terminate();
@@ -52,9 +55,23 @@ namespace nsYMEngine
 				auto filePathInUTF8Str = nsUtils::ToUTF8(filePathInWStr);
 
 				m_importer = new Assimp::Importer;
+				unsigned int removeFlags =
+					aiComponent_COLORS |
+					aiComponent_TEXCOORDS |
+					aiComponent_BONEWEIGHTS |
+					aiComponent_TEXTURES |
+					aiComponent_LIGHTS |
+					aiComponent_CAMERAS |
+					aiComponent_MESHES |
+					aiComponent_MATERIALS;
+				m_importer->SetPropertyInteger(AI_CONFIG_PP_RVC_FLAGS, removeFlags);
+
+				m_importer->SetPropertyInteger(
+					AI_CONFIG_PP_SBP_REMOVE, aiPrimitiveType_LINE | aiPrimitiveType_POINT);
 
 				// インポートのポストプロセス設定。
 				static constexpr int kPostprocessFlag =
+					aiProcess_RemoveComponent | 
 					aiProcess_MakeLeftHanded;
 
 
@@ -63,7 +80,7 @@ namespace nsYMEngine
 				if (m_scene == nullptr)
 				{
 					std::wstring wstr = filePathInWStr;
-					wstr += L"\n上記のモデルの読み込みに失敗しました。";
+					wstr += L"のモデルの読み込みに失敗しました。";
 					nsGameWindow::MessageBoxWarning(wstr.c_str());
 					::OutputDebugStringA(m_importer->GetErrorString());
 					::OutputDebugStringA("\n");
@@ -130,17 +147,35 @@ namespace nsYMEngine
 				);
 
 				float animTimeTicks = 0.0f;
-				if (isLoop != true && timeInTicks > duration)
-				{
-					// ワンショット再生
-					animTimeTicks = std::min(timeInTicks, duration);
-					m_isPlayedAnimationToEnd = true;
-				}
-				else
+				if (isLoop)
 				{
 					// ループ再生
 					animTimeTicks = fmod(timeInTicks, duration);
+
+					int animLoopCount = static_cast<int>(timeInTicks / duration);
+					if (animLoopCount != m_animLoopCounter)
+					{
+						// 終端まで再生した。
+						m_animLoopCounter = animLoopCount;
+						m_prevAnimEventIdx = 0;
+					}
+
 					m_isPlayedAnimationToEnd = false;
+				}
+				else
+				{
+					// ワンショット再生
+					animTimeTicks = std::min(timeInTicks, duration);
+
+					if (timeInTicks > duration)
+					{
+						m_prevAnimEventIdx = 0;
+						m_isPlayedAnimationToEnd = true;
+					}
+					else
+					{
+						m_isPlayedAnimationToEnd = false;
+					}
 				}
 
 				return animTimeTicks;
@@ -207,6 +242,13 @@ namespace nsYMEngine
 
 					if (it == requiredNodeMap.end())
 					{
+						if (childName == m_kAnimEventKeyNodeName)
+						{
+							int a = 1;
+							ReadAnimKeyEventNode(animTimeTicks, *node.mChildren[childIdx], animation);
+
+							continue;
+						}
 #ifdef _DEBUG
 						char buffer[256];
 						sprintf_s(buffer, "Child %s cannot be found in the required node map\n", childName.c_str());
@@ -415,6 +457,60 @@ namespace nsYMEngine
 				}
 
 				return finalKeyIdx;
+			}
+
+
+
+
+
+			void CAnimationClip::ReadAnimKeyEventNode(
+				float animTimeTicks,
+				const aiNode& node,
+				const aiAnimation& animation
+			) noexcept
+			{
+				if (IsPlayedAnimationToEnd())
+				{
+					// 最後まで再生し終わったら、イベントは実行されない。
+					return;
+				}
+
+				std::string nodeName(node.mName.data);
+				const aiNodeAnim* pNodeAnim = FindNodeAnim(animation, nodeName);
+
+				if (pNodeAnim == nullptr)
+				{
+					// アニメーションイベントのアニメーションチャンネルがない。
+					return;
+				}
+
+				// we need at least two values to interpolate...
+				if (pNodeAnim->mNumPositionKeys == 1)
+				{
+					return;
+				}
+
+				// 現在のアニメーションのタイムから最も近い、かつ、
+				// まだ過ぎていないキーインデックスを探す。
+				unsigned int animEventKeyIdx = FindPosition(animTimeTicks, *pNodeAnim);
+
+				if (animEventKeyIdx <= m_prevAnimEventIdx * 2)
+				{
+					// すでに実行したことがあるアニメーションイベント。
+					return;
+				}
+
+				// アニメーションイベント実行。
+				if (m_prevAnimEventIdx < m_animationEventFuncArray.size())
+				{
+					m_animationEventFuncArray[m_prevAnimEventIdx]();
+				}
+
+				// アニメーションイベントを呼ぶタイミングは、キーとキーの間に挟まれているため、
+				// イベントを1つ実行したら、2つ進める。
+				m_prevAnimEventIdx++;
+
+				return;
 			}
 
 

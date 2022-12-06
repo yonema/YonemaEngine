@@ -26,6 +26,14 @@ namespace nsYMEngine
 
 				virtual inline void SetIsAnimationLoop(bool isLoop) noexcept {};
 
+				virtual inline void ReserveAnimationEventFuncArray(
+					unsigned int animIdx, unsigned int size) {};
+
+				virtual inline void AddAnimationEventFunc(
+					unsigned int animIdx,
+					const std::function<void(void)>& animationEventFunc) {};
+
+
 			public:
 				constexpr IModelRendererBase() = default;
 				virtual ~IModelRendererBase() = default;

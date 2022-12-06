@@ -71,6 +71,26 @@ namespace nsYMEngine
 					return m_animationClips[m_animationIndex]->IsPlayedAnimationToEnd();
 				}
 
+				inline void ReserveAnimationEventFuncArray(unsigned int animIdx, unsigned int size)
+				{
+					if (animIdx >= m_animationClips.size())
+					{
+						return;
+					}
+					m_animationClips[animIdx]->ReserveAnimationEventFuncArray(size);
+				}
+
+				inline void AddAnimationEventFunc(
+					unsigned int animIdx,
+					const std::function<void(void)>& animationEventFunc)
+				{
+					if (animIdx >= m_animationClips.size())
+					{
+						return;
+					}
+					m_animationClips[animIdx]->AddAnimationEventFunc(animationEventFunc);
+				}
+
 			private:
 
 				void Terminate();
@@ -82,7 +102,7 @@ namespace nsYMEngine
 				std::vector<CAnimationClip*> m_animationClips = {};
 				unsigned int m_animationIndex = 0;
 				float m_animationTimer = 0.0f;
-				bool m_isPlaying = false;
+				bool m_isPlaying = true;	// çÏê¨ÇµÇΩèuä‘Ç©ÇÁçƒê∂äJén
 				float m_animationSpeed = 1.0f;
 				bool m_isLoop = true;
 			};

@@ -17,6 +17,8 @@ namespace nsAWA
 			// ラインのカリングボックスの自動カメラフィット機能の有効化。
 			EnableAutoFitCullingBoxToMainCamera();
 
+			//nsPhysics::CPhysicsEngine::GetInstance()->SetGravity({ 0.0f,-30.0f,0.0f });
+
 
 			// プレイヤーの作成
 			m_simpleMover = NewGO<nsYMEngine::nsDebugSystem::CSimpleMover>();

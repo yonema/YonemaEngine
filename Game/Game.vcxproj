@@ -151,6 +151,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Game\Samples\AnimationEventSample.cpp" />
     <ClCompile Include="Game\Samples\PhysicsSample.cpp" />
     <ClCompile Include="Game\Samples\CharacterControllerSample.cpp" />
     <ClCompile Include="YonemaEngine\DebugSystem\SimpleMover.cpp" />
@@ -234,6 +235,7 @@
     <Image Include="Assets\Images\StarMan.png" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Game\Samples\AnimationEventSample.h" />
     <ClInclude Include="Game\Samples\PhysicsSample.h" />
     <ClInclude Include="Game\Samples\CharacterControllerSample.h" />
     <ClInclude Include="Game\PhysicsAttributes.h" />
