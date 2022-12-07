@@ -21,7 +21,7 @@ namespace nsAWA
 		const char* CGetBoneMatrixSample::
 			m_kMonsterAnimFilePaths[static_cast<int>(EnMonsterAnimType::enNum)] =
 		{
-			"Assets/Animations/Giyara_Idle.fbx"
+			"Assets/Animations/Monster/Giyara/Giyara_Idle.fbx"
 		};
 		const char* const CGetBoneMatrixSample::m_kMonsterRightHandBoneName = "hand_r";
 
