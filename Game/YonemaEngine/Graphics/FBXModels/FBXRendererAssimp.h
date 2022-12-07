@@ -1,6 +1,7 @@
 #pragma once
 #include "../Renderers/ModelRendererBase.h"
 #include "../Animations/Animator.h"
+#include "../Animations/Skelton.h"
 
 namespace nsYMEngine
 {
@@ -103,6 +104,21 @@ namespace nsYMEngine
 					}
 				}
 
+				unsigned int FindBoneId(const std::string& boneName) const noexcept override final;
+
+				inline const nsMath::CMatrix& GetBoneMatrix(
+					unsigned int boneId) const noexcept override final
+				{
+					return m_skelton ? 
+						m_skelton->GetBoneInfoArray()[boneId].mGlobalTransform :
+						nsMath::CMatrix::Identity();
+				}
+
+				inline const nsMath::CMatrix& GetWorldMatrix() const noexcept override final
+				{
+					return m_worldMatrix;
+				}
+
 
 			private:
 
@@ -192,7 +208,8 @@ namespace nsYMEngine
 				std::unordered_map <std::string, nsDx12Wrappers::CTexture*> m_diffuseTextures;
 				std::unordered_map <std::string, nsDx12Wrappers::CDescriptorHeap*> m_materialDHs;
 
-				nsMath::CMatrix m_bias;
+				nsMath::CMatrix m_bias = nsMath::CMatrix::Identity();
+				nsMath::CMatrix m_worldMatrix = nsMath::CMatrix::Identity();
 
 				std::unordered_map<unsigned int, std::unordered_map<std::string, float>> m_boneNameAndWeightListTable;
 				std::vector<SBasicMeshInfo> m_meshInfoArray;

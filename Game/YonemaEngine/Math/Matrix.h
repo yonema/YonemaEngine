@@ -99,6 +99,17 @@ namespace nsYMEngine
 		static inline CMatrix operator*(const CMatrix& m0, const CMatrix& m1) noexcept;
 
 
+
+		static inline void CalcTranslateFromMatrix(
+			CVector3& transOut, const CMatrix& srcMat) noexcept;
+		void CalcRotationFromMatrix(
+			CQuaternion& rotOut, const CMatrix& srcMat) noexcept;
+		static inline void CalcScaleFromMatrix(CVector3& scaleOut, const CMatrix& srcMat) noexcept;
+
+		void CalcTRSFromMatrix(
+			CVector3& transOut, CQuaternion& rotOut, CVector3& scaleOut, const CMatrix& srcMat
+		) noexcept;
+
 		//////////////// ä÷êîíËã` ////////////////
 
 
@@ -359,6 +370,20 @@ namespace nsYMEngine
 			return mRet;
 		}
 
+		inline void CalcTranslateFromMatrix(
+			CVector3& transOut, const CMatrix& srcMat) noexcept
+		{
+			transOut = { srcMat.m_fMat[3][0], srcMat.m_fMat[3][1], srcMat.m_fMat[3][2] };
+			return;
+		}
+
+		inline void CalcScaleFromMatrix(CVector3& scaleOut, const CMatrix& srcMat) noexcept
+		{
+			scaleOut.x = srcMat.m_vec4Mat[0].Length();
+			scaleOut.y = srcMat.m_vec4Mat[1].Length();
+			scaleOut.z = srcMat.m_vec4Mat[2].Length();
+			return;
+		}
 
 
 	}

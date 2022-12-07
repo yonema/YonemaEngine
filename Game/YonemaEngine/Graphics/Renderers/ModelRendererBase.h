@@ -33,6 +33,16 @@ namespace nsYMEngine
 					unsigned int animIdx,
 					const std::function<void(void)>& animationEventFunc) {};
 
+				virtual unsigned int FindBoneId(const std::string& boneName) const noexcept
+				{ return 0; };
+
+				virtual inline const nsMath::CMatrix& GetBoneMatrix(
+					unsigned int boneId) const noexcept
+				{ return nsMath::CMatrix::Identity(); };
+
+				virtual inline const nsMath::CMatrix& GetWorldMatrix() const noexcept
+				{ return nsMath::CMatrix::Identity(); };
+
 
 			public:
 				constexpr IModelRendererBase() = default;

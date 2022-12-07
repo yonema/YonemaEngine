@@ -6,6 +6,7 @@
 #include "TriggerSample.h"
 #include "CharacterControllerSample.h"
 #include "AnimationEventSample.h"
+#include "GetBoneMatrixSample.h"
 
 namespace nsAWA
 {
@@ -13,7 +14,7 @@ namespace nsAWA
 	{
 		bool CSampleMain::Start()
 		{
-			constexpr int kSampleIdx = 6;
+			constexpr int kSampleIdx = 7;
 
 			switch (kSampleIdx)
 			{
@@ -37,6 +38,9 @@ namespace nsAWA
 				break;
 			case 6:
 				NewGO<CAnimationEventSample>(EnGOPriority::enMid, "AnimationEventSample");
+				break;
+			case 7:
+				NewGO<CGetBoneMatrixSample>(EnGOPriority::enMid, "GetBoneMatrixSample");
 				break;
 			default:
 				NewGO<CSkeltalAnimationSample>(EnGOPriority::enMid, "SkeltalAnimationSample");

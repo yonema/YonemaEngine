@@ -41,6 +41,7 @@ namespace nsYMEngine
 					{};
 
 					nsMath::CMatrix mOffset;
+					nsMath::CMatrix mGlobalTransform;
 					nsMath::CMatrix mFinalTransform;
 				};
 
@@ -108,6 +109,11 @@ namespace nsYMEngine
 				inline void SetBoneFinalTransformMatrix(
 					unsigned int boneIdx, const nsMath::CMatrix& mGlobalTransform) noexcept
 				{
+					m_boneInfoArray[boneIdx].mGlobalTransform = mGlobalTransform;
+					nsMath::CVector3 scale;
+					scale.x = mGlobalTransform.m_vec4Mat[0].Length();
+					scale.y = mGlobalTransform.m_vec4Mat[1].Length();
+					scale.z = mGlobalTransform.m_vec4Mat[2].Length();
 					m_boneInfoArray[boneIdx].mFinalTransform = 
 						m_boneInfoArray[boneIdx].mOffset * 
 						mGlobalTransform * 

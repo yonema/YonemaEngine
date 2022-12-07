@@ -54,18 +54,18 @@ namespace nsYMEngine
 
 			{
 				// ワールド行列作成。
-				nsMath::CMatrix mTrans, mRot, mScale, mWorld;
+				nsMath::CMatrix mTrans, mRot, mScale;
 				mTrans.MakeTranslation(position);
 				mRot.MakeRotationFromQuaternion(rotation);
 				mScale.MakeScaling(scale);
-				mWorld = m_bias * mScale * mRot * mTrans;
+				m_worldMatrix = m_bias * mScale * mRot * mTrans;
 
 				// 定数バッファにコピー。
 				auto mappedCB =
 					static_cast<nsMath::CMatrix*>(m_modelCB.GetMappedConstantBuffer());
-				mappedCB[0] = mWorld;
+				mappedCB[0] = m_worldMatrix;
 				auto mViewProj = CGraphicsEngine::GetInstance()->GetMatrixViewProj();
-				mappedCB[1] = mWorld * mViewProj;
+				mappedCB[1] = m_worldMatrix * mViewProj;
 
 				return;
 			}
@@ -539,13 +539,26 @@ namespace nsYMEngine
 				return true;
 			}
 
+			unsigned int CFBXRendererAssimp::FindBoneId(const std::string& boneName) const noexcept
+			{
+				if (m_skelton == nullptr)
+				{
+					// スケルトンがない
+					return 0;
+				}
 
+				// ボーン名からボーンIDを検索
+				const auto& boneNameToIndexMap = m_skelton->GetBoneNameToIndexMap();
+				const auto& boneNameToIdx = boneNameToIndexMap.find(boneName);
 
+				if (boneNameToIdx == boneNameToIndexMap.end())
+				{
+					// 指定された名前のボーンが見つからなかった
+					return 0;
+				}
 
-
-
-
-
+				return boneNameToIdx->second;
+			}
 
 
 		}

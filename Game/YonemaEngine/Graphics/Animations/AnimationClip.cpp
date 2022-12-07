@@ -121,7 +121,12 @@ namespace nsYMEngine
 
 				const auto& boneInfoArray = m_skeltonRef->GetBoneInfoArray();
 				unsigned int numBoneInfoArray = static_cast<unsigned int>(boneInfoArray.size());
-				pMTransforms->resize(numBoneInfoArray);
+				
+				if (pMTransforms->size() < numBoneInfoArray)
+				{
+					pMTransforms->resize(numBoneInfoArray);
+				}
+
 
 				for (unsigned int boneIdx = 0; boneIdx < numBoneInfoArray; boneIdx++)
 				{
@@ -244,7 +249,6 @@ namespace nsYMEngine
 					{
 						if (childName == m_kAnimEventKeyNodeName)
 						{
-							int a = 1;
 							ReadAnimKeyEventNode(animTimeTicks, *node.mChildren[childIdx], animation);
 
 							continue;

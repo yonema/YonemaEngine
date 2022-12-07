@@ -105,7 +105,7 @@ namespace nsYMEngine
 				 * @param animSpeed アニメーションの再生速度。
 				 * @param isLoop アニメーションのループ再生を行うか?trueでループ再生を行います。
 				*/
-				inline void PlayAnimation(unsigned int animIdx, float animSpeed = -1.0f, bool isLoop = true) noexcept
+				constexpr void PlayAnimation(unsigned int animIdx, float animSpeed = -1.0f, bool isLoop = true) noexcept
 				{
 					if (m_renderer)
 					{
@@ -121,7 +121,7 @@ namespace nsYMEngine
 				 * @param isLoop アニメーションのループ再生を行うか?trueでループ再生を行います
 				 * @param animSpeed アニメーションの再生速度。
 				*/
-				inline void PlayAnimation(unsigned int animIdx, bool isLoop, float animSpeed = -1.0f) noexcept
+				constexpr void PlayAnimation(unsigned int animIdx, bool isLoop, float animSpeed = -1.0f) noexcept
 				{
 					if (m_renderer)
 					{
@@ -137,7 +137,7 @@ namespace nsYMEngine
 				 * @retval true アニメーション再生中
 				 * @retval false アニメーションが再生されていない
 				*/
-				inline bool IsPlaying() const noexcept
+				constexpr bool IsPlaying() const noexcept
 				{
 					return m_renderer ? m_renderer->IsPlaying() : false;
 				}
@@ -146,7 +146,7 @@ namespace nsYMEngine
 				 * @brief アニメーションの再生速度を設定します。
 				 * @param animSpeed アニメーションの再生速度
 				*/
-				inline void SetAnimationSpeed(float animSpeed) noexcept
+				constexpr void SetAnimationSpeed(float animSpeed) noexcept
 				{
 					if (m_renderer)
 					{
@@ -159,7 +159,7 @@ namespace nsYMEngine
 				 * @param isLoop ループ再生を行うか?trueでループ再生を行います。
 				 * @return
 				*/
-				inline void SetIsAnimationLoop(bool isLoop) noexcept
+				constexpr void SetIsAnimationLoop(bool isLoop) noexcept
 				{
 					if (m_renderer)
 					{
@@ -188,6 +188,38 @@ namespace nsYMEngine
 					{
 						m_renderer->AddAnimationEventFunc(animIdx, animationEventFunc);
 					}
+				}
+
+				unsigned int FindBoneId(const std::string& boneName) const noexcept
+				{
+					return m_renderer ? m_renderer->FindBoneId(boneName) : 0;
+				}
+
+				constexpr inline const nsMath::CMatrix& GetBoneMatixMS(unsigned int boneId) const noexcept
+				{
+					return m_renderer ? 
+						m_renderer->GetBoneMatrix(boneId) : nsMath::CMatrix::Identity();
+				}
+
+				inline const nsMath::CMatrix GetBoneMatixWS(
+					unsigned int boneId, float scaleBias = 1.0f) const noexcept
+				{
+					if (m_renderer == nullptr)
+					{
+						return nsMath::CMatrix::Identity();
+					}
+
+					auto mBoneWS = GetBoneMatixMS(boneId);
+					mBoneWS.m_vec4Mat[3].Scale(scaleBias);
+					mBoneWS.m_vec4Mat[3].w = 1.0f;
+					mBoneWS *= GetWorldMatrix();
+
+					return mBoneWS;
+				}
+
+				constexpr const nsMath::CMatrix& GetWorldMatrix() const noexcept
+				{
+					return m_renderer ? m_renderer->GetWorldMatrix() : nsMath::CMatrix::Identity();
 				}
 
 
