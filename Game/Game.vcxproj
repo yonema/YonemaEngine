@@ -155,6 +155,7 @@
     <ClCompile Include="Game\Samples\PhysicsSample.cpp" />
     <ClCompile Include="Game\Samples\CharacterControllerSample.cpp" />
     <ClCompile Include="Game\Samples\GetBoneMatrixSample.cpp" />
+    <ClCompile Include="YonemaEngine\Utils\Random.cpp" />
     <ClCompile Include="YonemaEngine\DebugSystem\SimpleMover.cpp" />
     <ClCompile Include="YonemaEngine\Physics\ExtendedDataForRigidActor.cpp" />
     <ClCompile Include="YonemaEngine\Physics\ContactEvent.cpp" />
@@ -241,6 +242,7 @@
     <ClInclude Include="Game\Samples\CharacterControllerSample.h" />
     <ClInclude Include="Game\PhysicsAttributes.h" />
     <ClInclude Include="Game\Samples\GetBoneMatrixSample.h" />
+    <ClInclude Include="YonemaEngine\Utils\Random.h" />
     <ClInclude Include="YonemaEngine\DebugSystem\SimpleMover.h" />
     <ClInclude Include="YonemaEngine\Physics\RayCast.h" />
     <ClInclude Include="YonemaEngine\Physics\ExtendedDataForRigidActor.h" />

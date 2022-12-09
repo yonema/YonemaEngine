@@ -25,6 +25,7 @@
 #include <limits>
 #include <strsafe.h>
 #include <typeinfo>
+#include <random>
 
 // DirectX12
 #pragma comment(lib, "d3d12.lib")

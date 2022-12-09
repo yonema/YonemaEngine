@@ -1,6 +1,5 @@
 #include "PhysicsSample.h"
 #include "../../YonemaEngine/DebugSystem/SimpleMover.h"
-#include <random>
 
 namespace nsAWA
 {
@@ -34,9 +33,6 @@ namespace nsAWA
 
 			// 乱数生成
 			constexpr float distribute = 200.0f;	// 乱数の範囲
-			std::random_device rnd;     // 非決定的な乱数生成器を生成
-			std::mt19937 mt(rnd());     //  メルセンヌ・ツイスタの32ビット版、引数は初期シード値
-			std::uniform_real_distribution<> rand(-distribute * 0.5f, distribute * 0.5f); // 範囲の一様乱数
 
 
 			// 大量の物理オブジェクトの生成
@@ -46,16 +42,28 @@ namespace nsAWA
 			{
 				m_dynamicBox[i].InitAsBox(
 					{ shapeSize, shapeSize, shapeSize },
-					{ static_cast<float>(rand(mt)), heightPos, static_cast<float>(rand(mt))}
+					{ 
+						Random()->GetRangeFloat(-distribute, distribute),
+						heightPos,
+						Random()->GetRangeFloat(-distribute, distribute)
+					}
 				);
 				m_dynamicSphere[i].InitAsSphere(
 					shapeSize,
-					{ static_cast<float>(rand(mt)), heightPos, static_cast<float>(rand(mt)) }
+					{ 
+						Random()->GetRangeFloat(-distribute, distribute),
+						heightPos,
+						Random()->GetRangeFloat(-distribute, distribute)
+					}
 				);
 				m_dynamicCapusule[i].InitAsCapsule(
 					shapeSize,
 					shapeSize,
-					{ static_cast<float>(rand(mt)), heightPos, static_cast<float>(rand(mt)) }
+					{
+						Random()->GetRangeFloat(-distribute, distribute),
+						heightPos,
+						Random()->GetRangeFloat(-distribute, distribute)
+					}
 				);
 			}
 

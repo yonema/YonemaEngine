@@ -19,6 +19,10 @@ namespace nsYMEngine
 	{
 		class CPhysicsEngine;
 	}
+	namespace nsUtils
+	{
+		class CRandom;
+	}
 }
 
 namespace nsYMEngine
@@ -78,6 +82,11 @@ namespace nsYMEngine
 			return m_inputManager;
 		}
 
+		constexpr nsUtils::CRandom* GetRandom() noexcept
+		{
+			return m_random;
+		}
+
 	private:
 
 		void Terminate();
@@ -89,6 +98,7 @@ namespace nsYMEngine
 		nsInput::CInputManager* m_inputManager = nullptr;
 		nsPhysics::CPhysicsEngine* m_physicsWorld = nullptr;
 		nsTime::CGameTime m_gameTime;
+		nsUtils::CRandom* m_random = nullptr;
 		bool m_isExitGame = false;
 
 		nsDebugSystem::CDisplayFPS* m_displayFPS = nullptr;

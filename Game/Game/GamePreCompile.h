@@ -13,6 +13,7 @@
 #include "../YonemaEngine/Physics/PhysicsTriggerObject.h"
 #include "../YonemaEngine/Physics/ContactEvent.h"
 #include "../YonemaEngine/Physics/ExtendedDataForRigidActor.h"
+#include "../YonemaEngine/Utils/Random.h"
 
 // エイリアス宣言
 
@@ -130,4 +131,11 @@ static void DisableAutoFitCullingBoxToMainCamera() noexcept
 static bool IsEnableAutoFitCullingBoxToMainCamera() noexcept
 {
 	return nsPhysics::CPhysicsEngine::GetInstance()->IsEnableAutoFitCullingBoxToMainCamera();
+}
+
+
+// 乱数
+static nsUtils::CRandom* Random() noexcept
+{
+	return CYonemaEngine::GetInstance()->GetRandom();
 }

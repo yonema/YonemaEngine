@@ -2,6 +2,7 @@
 #include "Graphics/GraphicsEngine.h"
 #include "Input/InputManager.h"
 #include "Physics/PhysicsEngine.h"
+#include "Utils/Random.h"
 #include "DebugSystem/DisplayFPS.h"
 #include "../Game/Game.h"
 #include "../Game/Samples/SampleMain.h"
@@ -31,6 +32,8 @@ namespace nsYMEngine
 		//NewGO<nsAWA::CGame>(EnGOPriority::enMid, "AWAGame");
 		NewGO<nsAWA::nsSamples::CSampleMain> ("SampleMain");
 
+		m_random = new nsUtils::CRandom();
+
 #ifdef _DEBUG
 		m_displayFPS = NewGO<nsDebugSystem::CDisplayFPS>("DisplayFPS");
 #endif // _DEBUG
@@ -44,6 +47,9 @@ namespace nsYMEngine
 #ifdef _DEBUG
 		DeleteGO(m_displayFPS);
 #endif // _DEBUG
+
+		delete m_random;
+		m_random = nullptr;
 
 		// GameObjectManagerを先に消して、ゲームオブジェクトを全て破棄しておく。
 		// ゲームオブジェクトのOnDestroyで各種エンジンを使用する処理を書いている場合があるため。
