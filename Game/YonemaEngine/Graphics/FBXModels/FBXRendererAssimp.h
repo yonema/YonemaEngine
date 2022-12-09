@@ -178,7 +178,7 @@ namespace nsYMEngine
 				void LoadTexture(
 					SMesh* dxtMesh, 
 					const aiMaterial& srcMaterial,
-					const char* modelFilePath, 
+					const nsRenderers::SModelInitData& modelInitData,
 					unsigned int meshIdx
 				);
 
@@ -205,8 +205,10 @@ namespace nsYMEngine
 				nsDx12Wrappers::CDescriptorHeap m_modelDH;
 
 				std::vector<std::string> m_materialNameTable;
-				std::unordered_map <std::string, nsDx12Wrappers::CTexture*> m_diffuseTextures;
-				std::unordered_map <std::string, nsDx12Wrappers::CDescriptorHeap*> m_materialDHs;
+				//std::unordered_map <std::string, nsDx12Wrappers::CTexture*> m_diffuseTextures;
+				std::vector <nsDx12Wrappers::CTexture*> m_diffuseTextures;
+				//std::unordered_map <std::string, nsDx12Wrappers::CDescriptorHeap*> m_materialDHs;
+				std::vector <nsDx12Wrappers::CDescriptorHeap*> m_materialDHs;
 
 				nsMath::CMatrix m_bias = nsMath::CMatrix::Identity();
 				nsMath::CMatrix m_worldMatrix = nsMath::CMatrix::Identity();

@@ -15,7 +15,7 @@ namespace nsYMEngine
 			{
 				"pmd",
 				"fbx",
-				"vrm"
+				"glb"
 			};
 
 			bool CModelRenderer::Start()
@@ -88,14 +88,14 @@ namespace nsYMEngine
 						modelInitData.modelFilePath, modelInitData.animFilePath);
 					break;
 				case EnModelFormat::enFBX:
+				case EnModelFormat::enVRM:
 					//m_renderer = new nsFBXModels::CFBXRendererFBX_SDK(modelInitData);
 					m_renderer = new nsFBXModels::CFBXRendererAssimp(modelInitData);
 					break;
-				case EnModelFormat::enVRM:
-					msg = "モデルのロードに失敗しました。\nごめんなさい、この拡張子はまだ対応していません。\n";
-					msg += modelInitData.modelFilePath;
-					nsGameWindow::MessageBoxError(nsUtils::GetWideStringFromString(msg).c_str());
-					break;
+					//msg = "モデルのロードに失敗しました。\nごめんなさい、この拡張子はまだ対応していません。\n";
+					//msg += modelInitData.modelFilePath;
+					//nsGameWindow::MessageBoxError(nsUtils::GetWideStringFromString(msg).c_str());
+					//break;
 				default:
 					msg = "モデルのロードに失敗しました。\nファイルパスが間違っている、または、拡張子が対応していません。\n";
 					msg += modelInitData.modelFilePath;
@@ -126,15 +126,15 @@ namespace nsYMEngine
 							m_renderer->SetRenderType(CRendererTable::EnRendererType::enPMDModel);
 							break;
 						case EnModelFormat::enFBX:
+						case EnModelFormat::enVRM:
 							m_renderer->SetRenderType(CRendererTable::EnRendererType::enFBXModel);
 							break;
-						case EnModelFormat::enVRM:
-							m_renderer->SetRenderType(CRendererTable::EnRendererType::enNone);
+							//m_renderer->SetRenderType(CRendererTable::EnRendererType::enNone);
 
-							msg = "レンダラーの登録に失敗しました。\nごめんなさい、このレンダラーはまだ対応していません。\n";
-							msg += modelInitData.modelFilePath;
-							nsGameWindow::MessageBoxError(nsUtils::GetWideStringFromString(msg).c_str());
-							break;
+							//msg = "レンダラーの登録に失敗しました。\nごめんなさい、このレンダラーはまだ対応していません。\n";
+							//msg += modelInitData.modelFilePath;
+							//nsGameWindow::MessageBoxError(nsUtils::GetWideStringFromString(msg).c_str());
+							//break;
 						default:
 							m_renderer->SetRenderType(CRendererTable::EnRendererType::enNone);
 

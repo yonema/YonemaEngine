@@ -7,11 +7,11 @@ namespace nsAWA
 	{
 		// HumanData
 		const char* CGetBoneMatrixSample::m_kHumanModelFilePath = 
-			"Assets/Animations/Rumba_Dancing.fbx";
+			"Assets/Models/player.fbx";
 		const char* CGetBoneMatrixSample::
 			m_kHumanAnimFilePaths[static_cast<int>(EnHumanAnimType::enNum)] = 
 		{
-			"Assets/Animations/Rumba_Dancing.fbx"
+			"Assets/Animations/Sword_Idle.fbx"
 		};
 		const char* const CGetBoneMatrixSample::m_kHumanRightHandBoneName = "J_Bip_R_Hand";
 
@@ -38,6 +38,8 @@ namespace nsAWA
 				SModelInitData modelInitData;
 				modelInitData.modelFilePath = m_kHumanModelFilePath;
 				modelInitData.animInitData = &animInitData;
+				modelInitData.textureRootPath = "player";
+				modelInitData.vertexBias.SetRotationXDeg(90.0f);
 
 				m_humanMR = NewGO<CModelRenderer>();
 				m_humanMR->SetPosition({ 5.0f, 4.0f, 3.0f });
@@ -57,6 +59,7 @@ namespace nsAWA
 				SModelInitData modelInitData;
 				modelInitData.modelFilePath = m_kMonsterModelFilePath;
 				modelInitData.animInitData = &animInitData;
+				modelInitData.textureRootPath = "monster";
 				modelInitData.vertexBias.SetRotationXDeg(90.0f);
 
 				m_monsterMR = NewGO<CModelRenderer>();
@@ -73,7 +76,7 @@ namespace nsAWA
 			{
 				// GetBoneMatrix
 				m_humanBoneId = m_humanMR->FindBoneId(m_kHumanRightHandBoneName);
-				const auto& mBone = m_humanMR->GetBoneMatixWS(m_humanBoneId, 0.5f);
+				const auto& mBone = m_humanMR->GetBoneMatixWS(m_humanBoneId);
 
 				// GetTRS
 				nsMath::CVector3 bonePos;
@@ -135,7 +138,7 @@ namespace nsAWA
 			// GetHumanBoneMatrix
 			{
 				// GetBoneMatrix
-				const auto& mBone = m_humanMR->GetBoneMatixWS(m_humanBoneId, 0.5f);
+				const auto& mBone = m_humanMR->GetBoneMatixWS(m_humanBoneId);
 
 				// GetTRS
 				nsMath::CVector3 bonePos;

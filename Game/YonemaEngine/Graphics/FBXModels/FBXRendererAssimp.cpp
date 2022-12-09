@@ -29,8 +29,10 @@ namespace nsYMEngine
 					const auto* indexBuffer = m_indexBuffers.at(meshIdx);
 					const auto* vertexBuffer = m_vertexBuffers.at(meshIdx);
 					const auto numIndeices = m_numIndicesArray.at(meshIdx);
-					const auto& materialName = m_materialNameTable.at(meshIdx);
-					const auto* materialDH = m_materialDHs.at(materialName);
+					//const auto& materialName = m_materialNameTable.at(meshIdx);
+
+					const auto matIdx = m_meshInfoArray.at(meshIdx).materialIndex;
+					const auto* materialDH = m_materialDHs.at(matIdx);
 
 					ID3D12DescriptorHeap* materialDescHeaps[] = { materialDH->Get() };
 					commandList->SetDescriptorHeaps(1, materialDescHeaps);
@@ -119,11 +121,11 @@ namespace nsYMEngine
 				m_materialNameTable.clear();
 				for (auto& materialDH : m_materialDHs)
 				{
-					materialDH.second->Release();
+					materialDH->Release();
 				}
 				for (auto& diffuseTexture : m_diffuseTextures)
 				{
-					diffuseTexture.second->Release();
+					diffuseTexture->Release();
 				}
 				m_modelDH.Release();
 				m_modelCB.Release();
@@ -198,9 +200,18 @@ namespace nsYMEngine
 					auto& dstMesh = dstMeshes.at(meshIdx);
 
 					LoadMesh(&dstMesh, *srcMesh, meshIdx);
-					const auto& srcMaterial = scene->mMaterials[0];
-					auto a = scene->mNumMaterials;
-					LoadTexture(&dstMesh, *srcMaterial, modelInitData.modelFilePath, meshIdx);
+					//const auto& srcMaterial = scene->mMaterials[0];
+					//auto a = scene->mNumMaterials;
+					//LoadTexture(&dstMesh, *srcMaterial, modelInitData.modelFilePath, meshIdx);
+				}
+
+				const unsigned int numMaterials = scene->mNumMaterials;
+				m_diffuseTextures.reserve(numMaterials);
+				m_materialDHs.reserve(numMaterials);
+				for (unsigned int matIdx = 0; matIdx < numMaterials; matIdx++)
+				{
+					const auto& srcMaterial = scene->mMaterials[matIdx];
+					LoadTexture(nullptr, *srcMaterial, modelInitData, matIdx);
 				}
 
 				CreateVertexAndIndexBuffer(dstMeshes);
@@ -340,7 +351,7 @@ namespace nsYMEngine
 			void CFBXRendererAssimp::LoadTexture(
 				SMesh* dxtMesh,
 				const aiMaterial& srcMaterial,
-				const char* modelFilePath,
+				const nsRenderers::SModelInitData& modelInitData,
 				unsigned int meshIdx
 			)
 			{
@@ -350,25 +361,41 @@ namespace nsYMEngine
 					auto texFileName = 
 						nsUtils::GetFileNameFromFilePath(relativeTexFilePath.C_Str());
 
+					if (texFileName == "")
+					{
+						m_diffuseTextures.emplace_back(new nsDx12Wrappers::CTexture());
+						m_diffuseTextures.at(meshIdx)->InitFromTexture(
+							CGraphicsEngine::GetInstance()->GetWhiteTexture());
+						return;
+					}
+					if (modelInitData.textureRootPath)
+					{
+						texFileName = "/" + texFileName;
+						texFileName = modelInitData.textureRootPath + texFileName;
+					}
 					texFileName = "Textures/" + texFileName;
 
 					auto texFilePath = nsUtils::GetTexturePathFromModelAndTexPath(
-							modelFilePath, texFileName.c_str());
+							modelInitData.modelFilePath, texFileName.c_str());
 
-					dxtMesh->diffuseMapFilePath = texFilePath;
+					//dxtMesh->diffuseMapFilePath = texFilePath;
 
-					if (m_diffuseTextures.count(texFilePath) == 0)
+					//if (m_diffuseTextures.count(texFilePath) == 0)
 					{
-						m_diffuseTextures.emplace(texFilePath, new nsDx12Wrappers::CTexture());
-						m_diffuseTextures.at(texFilePath)->Init(texFilePath.c_str());
+						m_diffuseTextures.emplace_back(new nsDx12Wrappers::CTexture());
+						m_diffuseTextures.at(meshIdx)->Init(texFilePath.c_str());
 					}
 				}
 				else
 				{
-					dxtMesh->diffuseMapFilePath = "";
+					m_diffuseTextures.emplace_back(new nsDx12Wrappers::CTexture());
+					m_diffuseTextures.at(meshIdx)->InitFromTexture(
+						CGraphicsEngine::GetInstance()->GetWhiteTexture());
+					
+					//dxtMesh->diffuseMapFilePath = "";
 				}
 
-				m_materialNameTable.at(meshIdx) = dxtMesh->diffuseMapFilePath;
+				//m_materialNameTable.at(meshIdx) = dxtMesh->diffuseMapFilePath;
 
 				return;
 			}
@@ -502,23 +529,25 @@ namespace nsYMEngine
 				matSRVDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 				matSRVDesc.Texture2D.MipLevels = 1;
 
+				
 				for (const auto& diffuseTexture : m_diffuseTextures)
 				{
 					auto* materialDH = new nsDx12Wrappers::CDescriptorHeap();
 					materialDH->InitAsCbvSrvUav(numDescHeaps, L"FbxMaterialDH");
 					auto matDescHandle = materialDH->GetCPUHandle();
 
-					matSRVDesc.Format = diffuseTexture.second->GetResource()->GetDesc().Format;
+					matSRVDesc.Format = diffuseTexture->GetResource()->GetDesc().Format;
 					device->CreateShaderResourceView(
-						diffuseTexture.second->GetResource(),
+						diffuseTexture->GetResource(),
 						&matSRVDesc,
 						matDescHandle
 					);
 
-					m_materialDHs.emplace(diffuseTexture.first, materialDH);
+					m_materialDHs.emplace_back(materialDH);
 
 				}
 
+				if (m_diffuseTextures.empty())
 				{
 					auto* materialDH = new nsDx12Wrappers::CDescriptorHeap();
 					materialDH->InitAsCbvSrvUav(numDescHeaps, L"FbxMaterialDH");
@@ -533,7 +562,7 @@ namespace nsYMEngine
 						matDescHandle
 					);
 
-					m_materialDHs.emplace("", materialDH);
+					m_materialDHs.emplace_back(materialDH);
 				}
 
 				return true;

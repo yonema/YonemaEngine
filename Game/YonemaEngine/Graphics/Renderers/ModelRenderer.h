@@ -45,6 +45,7 @@ namespace nsYMEngine
 				bool isVertesTranspos = false;
 				const nsAnimations::SAnimationInitData* animInitData = nullptr;
 				nsPhysics::SMeshGeometryBuffer* physicsMeshGeomBuffer = nullptr;
+				const char* textureRootPath = nullptr;
 			};
 
 			class CModelRenderer : public nsGameObject::IGameObject
@@ -202,19 +203,9 @@ namespace nsYMEngine
 				}
 
 				inline const nsMath::CMatrix GetBoneMatixWS(
-					unsigned int boneId, float scaleBias = 1.0f) const noexcept
+					unsigned int boneId) const noexcept
 				{
-					if (m_renderer == nullptr)
-					{
-						return nsMath::CMatrix::Identity();
-					}
-
-					auto mBoneWS = GetBoneMatixMS(boneId);
-					mBoneWS.m_vec4Mat[3].Scale(scaleBias);
-					mBoneWS.m_vec4Mat[3].w = 1.0f;
-					mBoneWS *= GetWorldMatrix();
-
-					return mBoneWS;
+					return GetBoneMatixMS(boneId) * GetWorldMatrix();
 				}
 
 				constexpr const nsMath::CMatrix& GetWorldMatrix() const noexcept

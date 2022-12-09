@@ -6,6 +6,7 @@ namespace nsAWA
 	{
 		const char* CSkeltalAnimationSample::m_kModelFilePath =
 			"Assets/Animations/Rumba_Dancing.fbx";
+			//"Assets/Models/unitychan.fbx";
 		const char* CSkeltalAnimationSample::
 			m_kAnimFilePaths[static_cast<int>(EnAnimType::enNum)] =
 		{
@@ -26,9 +27,9 @@ namespace nsAWA
 			modelInitData.animInitData = &animInitData;
 
 			m_modelRenderer = NewGO<CModelRenderer>("SkeltalAnimationSampleModel");
-			m_modelRenderer->Init(modelInitData);
 			m_modelRenderer->SetPosition({ 0.0f, 4.0f, 0.0f });
 			m_modelRenderer->SetScale(0.1f);
+			m_modelRenderer->Init(modelInitData);
 			m_modelRenderer->SetIsAnimationLoop(false);
 
 			return true;
