@@ -20,8 +20,6 @@ namespace nsYMEngine
 
 			void VirtualActivate() noexcept override final;
 
-			void VirtualDeactivate() noexcept override final;
-
 		public:
 			constexpr CPhysicsTriggerObject() = default;
 			~CPhysicsTriggerObject();

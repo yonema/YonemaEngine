@@ -241,6 +241,10 @@ namespace nsYMEngine
 
 			for (auto& physicsTriggerObject : m_physicsTriggerObjectList)
 			{
+				if (physicsTriggerObject->IsActive() != true)
+				{
+					continue;
+				}
 				physicsTriggerObject->UpdateContactEvent();
 			}
 

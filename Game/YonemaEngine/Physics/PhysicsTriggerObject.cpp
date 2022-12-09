@@ -50,12 +50,6 @@ namespace nsYMEngine
 			return;
 		}
 
-		void CPhysicsTriggerObject::VirtualDeactivate() noexcept
-		{
-			CPhysicsEngine::GetInstance()->RemovePhysicsTriggerObject(this);
-			return;
-		}
-
 		CPhysicsTriggerObject::~CPhysicsTriggerObject()
 		{
 			Terminate();

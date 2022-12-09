@@ -222,7 +222,6 @@ namespace nsYMEngine
 			}
 
 			CPhysicsEngine::GetInstance()->RemoveActor(m_rigidActor);
-			VirtualDeactivate();
 			m_isActive = false;
 
 			return;
