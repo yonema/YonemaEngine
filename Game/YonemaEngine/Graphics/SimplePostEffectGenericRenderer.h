@@ -12,17 +12,24 @@ namespace nsYMEngine
 			static const wchar_t* const m_kPsFilePath;
 			static const char* const m_kPsEntryFuncName;
 
+		private:
+			inline std::wstring CreateRootSignatureName() const noexcept override
+			{
+				return L"SimplePostEffectGenericRenderer";
+			}
+			bool CreateShader(
+				nsDx12Wrappers::CBlob* pVsBlob,
+				nsDx12Wrappers::CBlob* pPsBlob
+			) const noexcept override;
+
+			inline std::wstring CreatePipelineStateName() const noexcept override
+			{
+				return L"SimplePostEffectGenericRenderer";
+			}
+
 		public:
 			constexpr CSimplePostEffectGenericRenderer() = default;
 			~CSimplePostEffectGenericRenderer() = default;
-
-		private:
-			void OverrideShader(
-				const wchar_t** pVsFilePath,
-				const char** pVsEntryFuncName,
-				const wchar_t** pPsFilePath,
-				const char** pPsEntryFuncName
-			) override final;
 
 		private:
 

@@ -42,6 +42,11 @@ namespace nsYMEngine
 				Release();
 				m_texture = LoadTextureFromFile(filePath);
 
+				if (m_texture == nullptr)
+				{
+					this->InitFromTexture(CGraphicsEngine::GetInstance()->GetWhiteTexture());
+				}
+
 				SetDefaultName(filePath);
 
 				return;
@@ -225,16 +230,16 @@ namespace nsYMEngine
 
 				if (roaded != true)
 				{
-					std::string msg = "テクスチャのロードに失敗しました。\n拡張子が対応していません。\n";
-					msg += filePath;
+					std::string msg = filePath;
+					msg += "のテクスチャのロードに失敗しました。拡張子を確認してください。";
 					nsGameWindow::MessageBoxError(nsUtils::GetWideStringFromString(msg).c_str());
 					return false;
 				}
 
 				if (FAILED(result))
 				{
-					std::string msg = "テクスチャのロードに失敗しました。\nファイルパスを確認してください。\n";
-					msg += filePath;
+					std::string msg = filePath;
+					msg += "のテクスチャのロードに失敗しました。ファイルパスを確認してください。";
 					nsGameWindow::MessageBoxError(nsUtils::GetWideStringFromString(msg).c_str());
 					return false;
 				}

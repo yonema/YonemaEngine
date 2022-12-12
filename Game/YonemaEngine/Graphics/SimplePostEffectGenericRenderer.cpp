@@ -12,19 +12,21 @@ namespace nsYMEngine
 			L"Assets/Shaders/PeraPolygonPixelShader.hlsl";
 		const char* const CSimplePostEffectGenericRenderer::m_kPsEntryFuncName = "PSMain";
 
-		void CSimplePostEffectGenericRenderer::OverrideShader(
-			const wchar_t** pVsFilePath,
-			const char** pVsEntryFuncName,
-			const wchar_t** pPsFilePath,
-			const char** pPsEntryFuncName
-		)
+		bool CSimplePostEffectGenericRenderer::CreateShader(
+			nsDx12Wrappers::CBlob* pVsBlob,
+			nsDx12Wrappers::CBlob* pPsBlob
+		) const noexcept
 		{
-			*pVsFilePath = m_kVsFilePath;
-			*pVsEntryFuncName = m_kVsEntryFuncName;
-			*pPsFilePath = m_kPsFilePath;
-			*pPsEntryFuncName = m_kPsEntryFuncName;
-
-			return;
+			return LoadShader(
+				m_kVsFilePath,
+				m_kVsEntryFuncName,
+				pVsBlob,
+				m_kPsFilePath,
+				m_kPsEntryFuncName,
+				pPsBlob
+			);
 		}
+
+
 	}
 }

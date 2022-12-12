@@ -129,7 +129,7 @@ namespace nsYMEngine
 				return m_blackTexture;
 			}
 
-			constexpr nsMath::CMatrix GetMatrixViewProj() const noexcept
+			constexpr const nsMath::CMatrix& GetMatrixViewProj() const noexcept
 			{
 				return m_mainCamera.GetViewProjectionMatirx();
 			}

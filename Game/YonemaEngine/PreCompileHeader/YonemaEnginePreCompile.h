@@ -39,11 +39,6 @@
 #pragma comment(lib, "DirectXTK12.lib")
 #pragma comment(lib, "dxguid.lib")
 
-// fbxsdk
-#pragma comment(lib, "libfbxsdk-md.lib")
-#pragma comment(lib, "libxml2-md.lib")
-#pragma comment(lib, "zlib-md.lib")
-
 // “ü—Í
 #pragma comment(lib, "xinput.lib")
 

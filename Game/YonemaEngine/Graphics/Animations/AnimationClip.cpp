@@ -1,5 +1,5 @@
 #include "AnimationClip.h"
-#include "../AssimpCommonHeader.h"
+#include "../Models/AssimpCommon.h"
 #include "Skelton.h"
 #include "../../Utils/StringManipulation.h"
 #include "../../Utils/AlignSize.h"

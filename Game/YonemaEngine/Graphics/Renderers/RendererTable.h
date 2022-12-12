@@ -24,8 +24,9 @@ namespace nsYMEngine
 				enum class EnRendererType
 				{
 					enNone = -1,
-					enPMDModel,
-					enFBXModel,
+					enBasicModel,
+					enSkinModel,
+					enSkyCube,
 					enCollisionRenderer,
 					enSimplePostEffect,
 					enSprite,

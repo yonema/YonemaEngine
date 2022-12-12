@@ -1,7 +1,6 @@
 #include "RendererTable.h"
-#include "../PMDModels/PMDGenericRenderer.h"
-#include "../FBXModels/FBXGenericRendererFBX_SDK.h"
-#include "../FBXModels/FBXGenericRendererAssimp.h"
+#include "../Models/BasicGenericRenderer.h"
+#include "../Models/SkinGenericRenderer.h"
 #include "../DebugRenderers/PhysicsDebugLineGenericRenderer.h"
 #include "../Sprites/SpriteGenericRenderer.h"
 #include "../Sprites/TransSpriteGenericRenderer.h"
@@ -28,11 +27,10 @@ namespace nsYMEngine
 
 			void CRendererTable::InitGenericRenderTable()
 			{
-				m_genericRendererTable[static_cast<int>(EnRendererType::enPMDModel)] =
-					new nsPMDModels::CPMDGenericRenderer();
-				m_genericRendererTable[static_cast<int>(EnRendererType::enFBXModel)] =
-					//new nsFBXModels::CFBXGenericRendererFBX_SDK();
-					new nsFBXModels::CFBXGenericRendererAssimp();
+				m_genericRendererTable[static_cast<int>(EnRendererType::enBasicModel)] =
+					new nsModels::CBasicGenericRenderer();
+				m_genericRendererTable[static_cast<int>(EnRendererType::enSkinModel)] =
+					new nsModels::CSkinGenericRenderer();
 				m_genericRendererTable[static_cast<int>(EnRendererType::enCollisionRenderer)] =
 					new nsDebugRenderers::CPhysicsDebugLineGenericRenderer();
 				m_genericRendererTable[static_cast<int>(EnRendererType::enSimplePostEffect)] =
@@ -44,7 +42,10 @@ namespace nsYMEngine
 
 				for (auto genericRenderer : m_genericRendererTable)
 				{
-					genericRenderer->Init();
+					if (genericRenderer)
+					{
+						genericRenderer->Init();
+					}
 				}
 
 				return;

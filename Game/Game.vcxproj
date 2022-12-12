@@ -116,7 +116,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../ExLibrary/DirectXTex-main\DirectXTex;YonemaEngine/PreCompileHeader;..\ExLibrary\Autodesk\FBX\FBX SDK\2020.3.2\include;..\ExLibrary\DirectXTK12-sept2021\DirectXTK12-sept2021\Inc;..\ExLibrary\PhysX-4.1\PhysX-4.1\physx\include;..\ExLibrary\PhysX-4.1\PhysX-4.1\pxshared\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../ExLibrary/DirectXTex-main\DirectXTex;YonemaEngine/PreCompileHeader;..\ExLibrary\DirectXTK12-sept2021\DirectXTK12-sept2021\Inc;..\ExLibrary\PhysX-4.1\PhysX-4.1\physx\include;..\ExLibrary\PhysX-4.1\PhysX-4.1\pxshared\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>YonemaEnginePreCompile.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>YonemaEnginePreCompile.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
@@ -124,8 +124,8 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../ExLibrary/DirectXTex-main\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug;../ExLibrary\DirectXTex-main\DirectXTex\Bin\Desktop_2019\x64\Debug;..\ExLibrary\Autodesk\FBX\FBX SDK\2020.3.2\lib\vs2019\x64\debug;..\ExLibrary\DirectXTK12-sept2021\DirectXTK12-sept2021\Bin\Desktop_2019_Win10\x64\Debug;..\ExLibrary\PhysX-4.1\PhysX-4.1\physx\bin\win.x86_64.vc142.md\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libfbxsdk-md.lib;libxml2-md.lib;zlib-md.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../ExLibrary/DirectXTex-main\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug;../ExLibrary\DirectXTex-main\DirectXTex\Bin\Desktop_2019\x64\Debug;..\ExLibrary\DirectXTK12-sept2021\DirectXTK12-sept2021\Bin\Desktop_2019_Win10\x64\Debug;..\ExLibrary\PhysX-4.1\PhysX-4.1\physx\bin\win.x86_64.vc142.md\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -136,7 +136,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../ExLibrary/DirectXTex-main\DirectXTex;YonemaEngine/PreCompileHeader;..\ExLibrary\Autodesk\FBX\FBX SDK\2020.3.2\include;..\ExLibrary\DirectXTK12-sept2021\DirectXTK12-sept2021\Inc;..\ExLibrary\PhysX-4.1\PhysX-4.1\physx\include;..\ExLibrary\PhysX-4.1\PhysX-4.1\pxshared\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../ExLibrary/DirectXTex-main\DirectXTex;YonemaEngine/PreCompileHeader;..\ExLibrary\DirectXTK12-sept2021\DirectXTK12-sept2021\Inc;..\ExLibrary\PhysX-4.1\PhysX-4.1\physx\include;..\ExLibrary\PhysX-4.1\PhysX-4.1\pxshared\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>YonemaEnginePreCompile.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>YonemaEnginePreCompile.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
@@ -146,11 +146,14 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../ExLibrary/DirectXTex-main\DirectXTex\Bin\Desktop_2019_Win10\x64\Release;../ExLibrary\DirectXTex-main\DirectXTex\Bin\Desktop_2019\x64\Release;..\ExLibrary\Autodesk\FBX\FBX SDK\2020.3.2\lib\vs2019\x64\release;..\ExLibrary\DirectXTK12-sept2021\DirectXTK12-sept2021\Bin\Desktop_2019_Win10\x64\Release;..\ExLibrary\PhysX-4.1\PhysX-4.1\physx\bin\win.x86_64.vc142.md\release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libfbxsdk-md.lib;libxml2-md.lib;zlib-md.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../ExLibrary/DirectXTex-main\DirectXTex\Bin\Desktop_2019_Win10\x64\Release;../ExLibrary\DirectXTex-main\DirectXTex\Bin\Desktop_2019\x64\Release;..\ExLibrary\DirectXTK12-sept2021\DirectXTK12-sept2021\Bin\Desktop_2019_Win10\x64\Release;..\ExLibrary\PhysX-4.1\PhysX-4.1\physx\bin\win.x86_64.vc142.md\release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="YonemaEngine\Graphics\Models\SkinGenericRenderer.cpp" />
+    <ClCompile Include="YonemaEngine\Graphics\Models\AssimpCommon.cpp" />
+    <ClCompile Include="YonemaEngine\Graphics\Models\BasicModelRenderer.cpp" />
     <ClCompile Include="Game\Samples\AnimationEventSample.cpp" />
     <ClCompile Include="Game\Samples\PhysicsSample.cpp" />
     <ClCompile Include="Game\Samples\CharacterControllerSample.cpp" />
@@ -179,8 +182,7 @@
     <ClCompile Include="YonemaEngine\Graphics\Animations\Skelton.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\Animations\AnimationClip.cpp" />
     <ClCompile Include="Application.cpp" />
-    <ClCompile Include="YonemaEngine\Graphics\FBXModels\FBXGenericRendererAssimp.cpp" />
-    <ClCompile Include="YonemaEngine\Graphics\FBXModels\FBXRendererAssimp.cpp" />
+    <ClCompile Include="YonemaEngine\Graphics\Models\BasicGenericRenderer.cpp" />
     <ClCompile Include="Game\Samples\SampleMain.cpp" />
     <ClCompile Include="YonemaEngine\Input\Keyboard.cpp" />
     <ClCompile Include="YonemaEngine\Input\InputManager.cpp" />
@@ -193,8 +195,6 @@
     <ClCompile Include="YonemaEngine\Graphics\Renderers\Renderer.cpp" />
     <ClCompile Include="YonemaEngine\GameObject\GameObject.cpp" />
     <ClCompile Include="YonemaEngine\GameObject\GameObjectManager.cpp" />
-    <ClCompile Include="YonemaEngine\Graphics\FBXModels\FBXGenericRendererFBX_SDK.cpp" />
-    <ClCompile Include="YonemaEngine\Graphics\FBXModels\FBXRendererFBX_SDK.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\Sprites\TransSpriteGenericRenderer.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\Sprites\SpriteGenericRenderer.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\SimplePostEffectGenericRenderer.cpp" />
@@ -219,8 +219,6 @@
     <ClCompile Include="YonemaEngine\Math\Vector3.cpp" />
     <ClCompile Include="YonemaEngine\Math\Matrix.cpp" />
     <ClCompile Include="YonemaEngine\Math\Vector4.cpp" />
-    <ClCompile Include="YonemaEngine\Graphics\PMDModels\PMDGenericRenderer.cpp" />
-    <ClCompile Include="YonemaEngine\Graphics\PMDModels\PMDRenderer.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\Dx12Wrappers\Texture.cpp" />
     <ClCompile Include="YonemaEngine\GameWindow\MessageBox.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\GraphicsEngine.cpp" />
@@ -237,6 +235,8 @@
     <Image Include="Assets\Images\StarMan.png" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="YonemaEngine\Graphics\Models\SkinGenericRenderer.h" />
+    <ClInclude Include="YonemaEngine\Graphics\Models\BasicModelRenderer.h" />
     <ClInclude Include="Game\Samples\AnimationEventSample.h" />
     <ClInclude Include="Game\Samples\PhysicsSample.h" />
     <ClInclude Include="Game\Samples\CharacterControllerSample.h" />
@@ -269,9 +269,8 @@
     <ClInclude Include="YonemaEngine\Graphics\Animations\Skelton.h" />
     <ClInclude Include="YonemaEngine\Graphics\Animations\AnimationClip.h" />
     <ClInclude Include="Application.h" />
-    <ClInclude Include="YonemaEngine\Graphics\AssimpCommonHeader.h" />
-    <ClInclude Include="YonemaEngine\Graphics\FBXModels\FBXGenericRendererAssimp.h" />
-    <ClInclude Include="YonemaEngine\Graphics\FBXModels\FBXRendererAssimp.h" />
+    <ClInclude Include="YonemaEngine\Graphics\Models\AssimpCommon.h" />
+    <ClInclude Include="YonemaEngine\Graphics\Models\BasicGenericRenderer.h" />
     <ClInclude Include="Game\InputMapping.h" />
     <ClInclude Include="Game\Samples\SampleMain.h" />
     <ClInclude Include="YonemaEngine\Input\InputManagerData.h" />
@@ -289,8 +288,6 @@
     <ClInclude Include="YonemaEngine\CommonLibrary\CommonLibrary.h" />
     <ClInclude Include="YonemaEngine\GameObject\GameObject.h" />
     <ClInclude Include="YonemaEngine\GameObject\GameObjectManager.h" />
-    <ClInclude Include="YonemaEngine\Graphics\FBXModels\FBXGenericRendererFBX_SDK.h" />
-    <ClInclude Include="YonemaEngine\Graphics\FBXModels\FBXRendererFBX_SDK.h" />
     <ClInclude Include="YonemaEngine\Graphics\Sprites\TransSpriteGenericRenderer.h" />
     <ClInclude Include="YonemaEngine\Graphics\Sprites\SpriteGenericRenderer.h" />
     <ClInclude Include="YonemaEngine\Graphics\SimplePostEffectGenericRenderer.h" />
@@ -317,8 +314,6 @@
     <ClInclude Include="YonemaEngine\Math\Vector3.h" />
     <ClInclude Include="YonemaEngine\Math\Matrix.h" />
     <ClInclude Include="YonemaEngine\Math\Vector4.h" />
-    <ClInclude Include="YonemaEngine\Graphics\PMDModels\PMDGenericRenderer.h" />
-    <ClInclude Include="YonemaEngine\Graphics\PMDModels\PMDRenderer.h" />
     <ClInclude Include="YonemaEngine\Graphics\Dx12Wrappers\Texture.h" />
     <ClInclude Include="YonemaEngine\GameWindow\MessageBox.h" />
     <ClInclude Include="YonemaEngine\Time\Timer.h" />
@@ -333,13 +328,10 @@
     <ClInclude Include="YonemaEngine\CommonLibrary\CommonFunctionLibrary.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\Shaders\BasicHeader.hlsli">
+    <None Include="Assets\Shaders\PhysicsDebugLine\PhysicsDebugLineHeader.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </None>
-    <None Include="Assets\Shaders\CollisionRendererHeader.hlsli">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </None>
-    <None Include="Assets\Shaders\FbxTestHeader.hlsli">
+    <None Include="Assets\Shaders\Models\BasicModelHeader.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </None>
@@ -355,39 +347,25 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Assets\Shaders\BasicPixelShader.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </FxCompile>
-    <FxCompile Include="Assets\Shaders\BasicVertexShader.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </FxCompile>
-    <FxCompile Include="Assets\Shaders\CollisionRendererPixelShader.hlsl">
+    <FxCompile Include="Assets\Shaders\PhysicsDebugLine\PhysicsDebugLinePixelShader.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="Assets\Shaders\CollisionRendererVertexShader.hlsl">
+    <FxCompile Include="Assets\Shaders\PhysicsDebugLine\PhysicsDebugLineVertexShader.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="Assets\Shaders\FbxTestPixelShader.hlsl">
+    <FxCompile Include="Assets\Shaders\Models\BasicModelPixelShader.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </FxCompile>
-    <FxCompile Include="Assets\Shaders\FbxTestVertexShader.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>

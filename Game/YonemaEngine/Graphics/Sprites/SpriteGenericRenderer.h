@@ -21,51 +21,54 @@ namespace nsYMEngine
 					enSceneTexture,
 					enNumRootParamerterTypes
 				};
-				enum class EnSamplerType : unsigned int
-				{
-					enNormal,
-					enNumSamplerTypes
-				};
 
 				static const wchar_t* const m_kVsFilePath;
 				static const char* const m_kVsEntryFuncName;
 				static const wchar_t* const m_kPsFilePath;
 				static const char* const m_kPsEntryFuncName;
 
-			public:
-				constexpr CSpriteGenericRenderer() = default;
-				~CSpriteGenericRenderer() = default;
-				bool Init() override;
-
-			protected:
-
-				/**
-				 * @brief シェーダーをデフォルトと変えたいときは、このクラスを継承したクラスで
-				 * この関数をオーバーライドし、変更点を書く。
-				 * @param[out] pVsFilePath [出力用]頂点シェーダーファイルパス
-				 * @param[out] pVsEntryFuncName [出力用]頂点シェーダーエントリー関数名
-				 * @param[out] pPsFilePath [出力用]ピクセルシェーダーファイルパス
-				 * @param[out] pPsEntryFuncName [出力用]ピクセルシェーダーエントリー関数名
-				*/
-				virtual void OverrideShader(
-					const wchar_t** pVsFilePath,
-					const char** pVsEntryFuncName,
-					const wchar_t** pPsFilePath,
-					const char** pPsEntryFuncName
-				) {};
-
-				/**
-				 * @brief グラフィックスパイプラインステートの設定をデフォルトと変えたいときは、
-				 * このクラスを継承したクラスでこの関数をオーバーライドし、変更点を書く。
-				 * @param[out] pPipelineDesc [出力用]パイプライン設定
-				*/
-				virtual void OverrideGraphicsPipelineStateDesc(
-					D3D12_GRAPHICS_PIPELINE_STATE_DESC* pPipelineDesc) {};
 
 			private:
+				void CreateRootParameter(
+					std::vector<CD3DX12_DESCRIPTOR_RANGE1>* pDescTblRanges,
+					std::vector<CD3DX12_ROOT_PARAMETER1>* pRootParameters
+				) const noexcept override;
 
-				bool CreateRootSignature(ID3D12Device5* device) override;
-				bool CreatePipelineState(ID3D12Device5* device) override;
+				inline std::wstring CreateRootSignatureName() const noexcept override
+				{
+					return L"SpriteGenericRenderer";
+				}
+
+
+				bool CreateShader(
+					nsDx12Wrappers::CBlob* pVsBlob,
+					nsDx12Wrappers::CBlob* pPsBlob
+				) const noexcept override;
+
+				void CreateInputLayout(
+					std::vector<D3D12_INPUT_ELEMENT_DESC>* pInputLayout) const noexcept override;
+
+				inline std::wstring CreatePipelineStateName() const noexcept override
+				{
+					return L"SpriteGenericRenderer";
+				}
+
+				inline void CreateDepthStencilState(
+					D3D12_DEPTH_STENCIL_DESC* pDepthStencilState,
+					DXGI_FORMAT* pDSVFormat
+				) const noexcept override
+				{
+					pDepthStencilState->DepthEnable = FALSE;
+					pDepthStencilState->DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+					pDepthStencilState->DepthFunc = D3D12_COMPARISON_FUNC_LESS;
+					pDepthStencilState->StencilEnable = FALSE;
+					*pDSVFormat = DXGI_FORMAT_D32_FLOAT;
+					return;
+				}
+
+			public:
+				constexpr CSpriteGenericRenderer() = default;
+				virtual ~CSpriteGenericRenderer() = default;
 
 			private:
 

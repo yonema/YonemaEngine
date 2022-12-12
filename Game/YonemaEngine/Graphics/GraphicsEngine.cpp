@@ -130,8 +130,8 @@ namespace nsYMEngine
 
 			m_whiteTexture = new nsDx12Wrappers::CTexture();
 			m_blackTexture = new nsDx12Wrappers::CTexture();
-			m_whiteTexture->Init("Assets/Models/white.jpg");
-			m_blackTexture->Init("Assets/Models/black.jpg");
+			m_whiteTexture->Init("Assets/Images/Presets/white.jpg");
+			m_blackTexture->Init("Assets/Images/Presets/black.jpg");
 
 			m_mainCamera.SetPosition({ 0.0f,10.0f,-25.0f });
 			m_mainCamera.SetTargetPosition({ 0.0f,10.0f,0.0f });
@@ -253,35 +253,31 @@ namespace nsYMEngine
 
 			m_commandList.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-			// PMDƒ‚ƒfƒ‹‚Ì•`‰æÝ’è
+
+			// Basicƒ‚ƒfƒ‹‚Ì•`‰æÝ’è
 			m_commandList.SetGraphicsRootSignatureAndPipelineState(
 				m_rendererTable.GetRootSignature(
-					RendererType::enPMDModel),
+					RendererType::enBasicModel),
 				m_rendererTable.GetPipelineState(
-					RendererType::enPMDModel)
+					RendererType::enBasicModel)
 			);
 
-			m_commandList.SetDescriptorHeap(m_sceneDataDH);
-			m_commandList.SetGraphicsRootDescriptorTable(0, m_sceneDataDH);
-
-
-			// PMDƒ‚ƒfƒ‹•`‰æ
-			for (auto renderer : m_rendererTable.GetRendererList(RendererType::enPMDModel))
+			// Basicƒ‚ƒfƒ‹•`‰æ
+			for (auto renderer : m_rendererTable.GetRendererList(RendererType::enBasicModel))
 			{
 				renderer->DrawWrapper(&m_commandList);
 			}
 
-
-			// FBXƒ‚ƒfƒ‹‚Ì•`‰æÝ’è
+			// Skinƒ‚ƒfƒ‹‚Ì•`‰æÝ’è
 			m_commandList.SetGraphicsRootSignatureAndPipelineState(
 				m_rendererTable.GetRootSignature(
-					RendererType::enFBXModel),
+					RendererType::enSkinModel),
 				m_rendererTable.GetPipelineState(
-					RendererType::enFBXModel)
+					RendererType::enSkinModel)
 			);
 
-			// FBXƒ‚ƒfƒ‹•`‰æ
-			for (auto renderer : m_rendererTable.GetRendererList(RendererType::enFBXModel))
+			// Skinƒ‚ƒfƒ‹•`‰æ
+			for (auto renderer : m_rendererTable.GetRendererList(RendererType::enSkinModel))
 			{
 				renderer->DrawWrapper(&m_commandList);
 			}

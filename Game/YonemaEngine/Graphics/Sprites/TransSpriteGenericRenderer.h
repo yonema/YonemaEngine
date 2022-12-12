@@ -10,18 +10,27 @@ namespace nsYMEngine
 			class CTransSpriteGenericRenderer : public CSpriteGenericRenderer
 			{
 			private:
-				static const wchar_t* const m_kVsFilePath;
-				static const char* const m_kVsEntryFuncName;
-				static const wchar_t* const m_kPsFilePath;
-				static const char* const m_kPsEntryFuncName;
+				inline std::wstring CreateRootSignatureName() const noexcept override
+				{
+					return L"TransSpriteGenericRenderer";
+				}
+				void OverrideBlendState(D3D12_BLEND_DESC* pBlendState) const noexcept override
+				{
+					// ”¼“§–¾‡¬—p‚ÌÝ’è‚Åã‘‚«
+					pBlendState->RenderTarget[0].BlendEnable = true;
+					pBlendState->RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+					pBlendState->RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+					pBlendState->RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+				}
+
+				inline std::wstring CreatePipelineStateName() const noexcept override
+				{
+					return L"TransSpriteGenericRenderer";
+				}
 
 			public:
 				constexpr CTransSpriteGenericRenderer() = default;
 				~CTransSpriteGenericRenderer() = default;
-
-			private:
-				void OverrideGraphicsPipelineStateDesc(
-					D3D12_GRAPHICS_PIPELINE_STATE_DESC* pPipelineDesc)override final;
 
 			private:
 

@@ -39,12 +39,6 @@
     <ClCompile Include="YonemaEngine\Graphics\Dx12Wrappers\Texture.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="YonemaEngine\Graphics\PMDModels\PMDGenericRenderer.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="YonemaEngine\Graphics\PMDModels\PMDRenderer.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="YonemaEngine\Utils\StringManipulation.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -117,12 +111,6 @@
     <ClCompile Include="YonemaEngine\Graphics\Sprites\TransSpriteGenericRenderer.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="YonemaEngine\Graphics\FBXModels\FBXRendererFBX_SDK.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="YonemaEngine\Graphics\FBXModels\FBXGenericRendererFBX_SDK.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="YonemaEngine\GameObject\GameObjectManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -159,10 +147,7 @@
     <ClCompile Include="YonemaEngine\Input\Keyboard.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="YonemaEngine\Graphics\FBXModels\FBXRendererAssimp.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="YonemaEngine\Graphics\FBXModels\FBXGenericRendererAssimp.cpp">
+    <ClCompile Include="YonemaEngine\Graphics\Models\BasicGenericRenderer.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="YonemaEngine\Graphics\Animations\AnimationClip.cpp">
@@ -249,6 +234,15 @@
     <ClCompile Include="YonemaEngine\Utils\Random.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="YonemaEngine\Graphics\Models\BasicModelRenderer.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YonemaEngine\Graphics\Models\AssimpCommon.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YonemaEngine\Graphics\Models\SkinGenericRenderer.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Images\StarMan.png">
@@ -287,12 +281,6 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="YonemaEngine\Utils\AlignSize.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="YonemaEngine\Graphics\PMDModels\PMDGenericRenderer.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="YonemaEngine\Graphics\PMDModels\PMDRenderer.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="YonemaEngine\Math\Vector4.h">
@@ -376,12 +364,6 @@
     <ClInclude Include="YonemaEngine\Graphics\Sprites\TransSpriteGenericRenderer.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="YonemaEngine\Graphics\FBXModels\FBXRendererFBX_SDK.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="YonemaEngine\Graphics\FBXModels\FBXGenericRendererFBX_SDK.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="YonemaEngine\GameObject\GameObjectManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
@@ -436,10 +418,7 @@
     <ClInclude Include="YonemaEngine\Input\InputManagerData.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="YonemaEngine\Graphics\FBXModels\FBXRendererAssimp.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="YonemaEngine\Graphics\FBXModels\FBXGenericRendererAssimp.h">
+    <ClInclude Include="YonemaEngine\Graphics\Models\BasicGenericRenderer.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="YonemaEngine\Graphics\Animations\AnimationClip.h">
@@ -451,7 +430,7 @@
     <ClInclude Include="YonemaEngine\Graphics\Animations\Animator.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="YonemaEngine\Graphics\AssimpCommonHeader.h">
+    <ClInclude Include="YonemaEngine\Graphics\Models\AssimpCommon.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="YonemaEngine\Graphics\Fonts\SpriteFontWrapper.h">
@@ -538,26 +517,28 @@
     <ClInclude Include="YonemaEngine\Utils\Random.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="YonemaEngine\Graphics\Models\BasicModelRenderer.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YonemaEngine\Graphics\Models\SkinGenericRenderer.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\SpriteHeader.hlsli" />
     <None Include="Assets\Shaders\SimplePostEffectHeader.hlsli" />
-    <None Include="Assets\Shaders\BasicHeader.hlsli" />
     <None Include="Assets\Shaders\PeraPolygonHeader.hlsli" />
-    <None Include="Assets\Shaders\FbxTestHeader.hlsli" />
+    <None Include="Assets\Shaders\Models\BasicModelHeader.hlsli" />
     <None Include="packages.config" />
-    <None Include="Assets\Shaders\CollisionRendererHeader.hlsli" />
+    <None Include="Assets\Shaders\PhysicsDebugLine\PhysicsDebugLineHeader.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Assets\Shaders\SpriteVertexShader.hlsl" />
     <FxCompile Include="Assets\Shaders\SpritePixelShader.hlsl" />
-    <FxCompile Include="Assets\Shaders\BasicPixelShader.hlsl" />
-    <FxCompile Include="Assets\Shaders\BasicVertexShader.hlsl" />
     <FxCompile Include="Assets\Shaders\PeraPolygonPixelShader.hlsl" />
     <FxCompile Include="Assets\Shaders\PeraPolygonVertexShader.hlsl" />
-    <FxCompile Include="Assets\Shaders\FbxTestPixelShader.hlsl" />
-    <FxCompile Include="Assets\Shaders\FbxTestVertexShader.hlsl" />
-    <FxCompile Include="Assets\Shaders\CollisionRendererVertexShader.hlsl" />
-    <FxCompile Include="Assets\Shaders\CollisionRendererPixelShader.hlsl" />
+    <FxCompile Include="Assets\Shaders\Models\BasicModelPixelShader.hlsl" />
+    <FxCompile Include="Assets\Shaders\PhysicsDebugLine\PhysicsDebugLineVertexShader.hlsl" />
+    <FxCompile Include="Assets\Shaders\PhysicsDebugLine\PhysicsDebugLinePixelShader.hlsl" />
   </ItemGroup>
 </Project>

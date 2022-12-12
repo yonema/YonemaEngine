@@ -1,4 +1,11 @@
 #pragma once
+namespace nsYMEngine
+{
+	namespace nsDebugSystem
+	{
+		class CSimpleMover;
+	}
+}
 namespace nsAWA
 {
 	namespace nsSamples
@@ -19,6 +26,8 @@ namespace nsAWA
 		private:
 			CPhysicsStaticObject m_staticGround;
 			CModelRenderer* m_modelRenderer = nullptr;
+			nsYMEngine::nsDebugSystem::CSimpleMover* m_simpleMover = nullptr;
+
 		};
 
 	}

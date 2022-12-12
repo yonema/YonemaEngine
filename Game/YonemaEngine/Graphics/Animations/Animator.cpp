@@ -1,5 +1,5 @@
 #include "Animator.h"
-#include "../AssimpCommonHeader.h"
+#include "../Models/AssimpCommon.h"
 
 namespace nsYMEngine
 {

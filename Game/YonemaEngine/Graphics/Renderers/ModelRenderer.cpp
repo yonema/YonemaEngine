@@ -1,8 +1,6 @@
 #include "ModelRenderer.h"
 #include "../Utils/StringManipulation.h"
-#include "../PMDModels/PMDRenderer.h"
-#include "../FBXModels/FBXRendererFBX_SDK.h"
-#include "../FBXModels/FBXRendererAssimp.h"
+
 
 namespace nsYMEngine
 {
@@ -10,14 +8,6 @@ namespace nsYMEngine
 	{
 		namespace nsRenderers
 		{
-			const char* CModelRenderer::m_kModelFormatExtensions
-				[static_cast<int>(EnModelFormat::enNumModelFormat)] = 
-			{
-				"pmd",
-				"fbx",
-				"glb"
-			};
-
 			bool CModelRenderer::Start()
 			{
 				UpdateWorldMatrix();
@@ -42,21 +32,16 @@ namespace nsYMEngine
 			}
 
 
-			void CModelRenderer::Init(const SModelInitData& modelInitData)
+			void CModelRenderer::Init(const SModelInitData& modelInitData) noexcept
 			{
-
-				EnModelFormat modelFormat;
-
-				CreateRenderer(&modelFormat, modelInitData);
-
-				RegistToRendererTable(modelFormat, modelInitData);
+				CreateRenderer(modelInitData);
 
 				UpdateWorldMatrix();
 
 				return;
 			}
 
-			void CModelRenderer::Terminate()
+			void CModelRenderer::Terminate() noexcept
 			{
 				if (m_renderer)
 				{
@@ -67,110 +52,25 @@ namespace nsYMEngine
 				return;
 			}
 
-			void CModelRenderer::CreateRenderer(
-				EnModelFormat* pModelFormat, const SModelInitData& modelInitData)
+			void CModelRenderer::CreateRenderer(const SModelInitData& modelInitData) noexcept
 			{
-				std::string msg;
+				std::string msg = {};
 
-				*pModelFormat = modelInitData.modelFormat;
-
-				if (*pModelFormat == EnModelFormat::enNone)
+				switch (modelInitData.rendererType)
 				{
-					// モデルのフォーマットが指定されていなかったら、ファイルパスから調べる。
-					auto extension = nsUtils::GetExtension(modelInitData.modelFilePath);
-					*pModelFormat = FindMatchExtension(extension);
-				}
-
-				switch (*pModelFormat)
-				{
-				case EnModelFormat::enPMD:
-					m_renderer = new nsPMDModels::CPMDRenderer(
-						modelInitData.modelFilePath, modelInitData.animFilePath);
+				case CRendererTable::EnRendererType::enBasicModel:
+					m_renderer = new nsModels::CBasicModelRenderer(modelInitData);
 					break;
-				case EnModelFormat::enFBX:
-				case EnModelFormat::enVRM:
-					//m_renderer = new nsFBXModels::CFBXRendererFBX_SDK(modelInitData);
-					m_renderer = new nsFBXModels::CFBXRendererAssimp(modelInitData);
+				case CRendererTable::EnRendererType::enSkyCube:
 					break;
-					//msg = "モデルのロードに失敗しました。\nごめんなさい、この拡張子はまだ対応していません。\n";
-					//msg += modelInitData.modelFilePath;
-					//nsGameWindow::MessageBoxError(nsUtils::GetWideStringFromString(msg).c_str());
-					//break;
 				default:
-					msg = "モデルのロードに失敗しました。\nファイルパスが間違っている、または、拡張子が対応していません。\n";
-					msg += modelInitData.modelFilePath;
+					msg = modelInitData.modelFilePath;
+					msg += "のモデルのロードに失敗しました。SModelInitDataのrendererTypeが間違っています。";
 					nsGameWindow::MessageBoxError(nsUtils::GetWideStringFromString(msg).c_str());
 					break;
 				}
 
 				return;
-			}
-
-			void CModelRenderer::RegistToRendererTable(
-				EnModelFormat modelFormat, const SModelInitData& modelInitData)
-			{
-				std::string msg;
-
-				if (m_renderer == nullptr)
-				{
-					return;
-				}
-
-				m_renderer->SetRenderType(modelInitData.rendererType);
-
-				if (m_renderer->GetRenderType() == CRendererTable::EnRendererType::enNone)
-				{
-					switch (modelFormat)
-					{
-						case EnModelFormat::enPMD:
-							m_renderer->SetRenderType(CRendererTable::EnRendererType::enPMDModel);
-							break;
-						case EnModelFormat::enFBX:
-						case EnModelFormat::enVRM:
-							m_renderer->SetRenderType(CRendererTable::EnRendererType::enFBXModel);
-							break;
-							//m_renderer->SetRenderType(CRendererTable::EnRendererType::enNone);
-
-							//msg = "レンダラーの登録に失敗しました。\nごめんなさい、このレンダラーはまだ対応していません。\n";
-							//msg += modelInitData.modelFilePath;
-							//nsGameWindow::MessageBoxError(nsUtils::GetWideStringFromString(msg).c_str());
-							//break;
-						default:
-							m_renderer->SetRenderType(CRendererTable::EnRendererType::enNone);
-
-							msg = "レンダラーの登録に失敗しました。\nごめんなさい、このレンダラーはまだ対応していません。\n";
-							msg += modelInitData.modelFilePath;
-							nsGameWindow::MessageBoxError(nsUtils::GetWideStringFromString(msg).c_str());
-							break;
-					}
-				}
-
-				if (m_renderer->GetRenderType() != CRendererTable::EnRendererType::enNone)
-				{
-					m_renderer->EnableDrawing();
-				}
-
-				return;
-			}
-
-			EnModelFormat CModelRenderer::FindMatchExtension(const char* extension)
-			{
-				EnModelFormat format = EnModelFormat::enNone;
-				if (extension == nullptr)
-				{
-					return format;
-				}
-
-				for (int i = 0; i < static_cast<int>(EnModelFormat::enNumModelFormat); i++)
-				{
-					if (strcmp(extension, m_kModelFormatExtensions[i]) == 0)
-					{
-						format = static_cast<EnModelFormat>(i);
-						break;
-					}
-				}
-				
-				return format;
 			}
 
 			void CModelRenderer::UpdateWorldMatrix() noexcept

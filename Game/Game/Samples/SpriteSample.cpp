@@ -3,7 +3,7 @@ namespace nsAWA
 {
 	namespace nsSamples
 	{
-		const char* CSpriteSample::m_kSpriteFilePath = "Assets/Images/200x200PNG.png";
+		const char* CSpriteSample::m_kSpriteFilePath = "Assets/Images/Sapmles/200x200PNG.png";
 
 		bool CSpriteSample::Start()
 		{

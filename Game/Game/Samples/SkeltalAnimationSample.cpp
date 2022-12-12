@@ -5,14 +5,14 @@ namespace nsAWA
 	namespace nsSamples
 	{
 		const char* CSkeltalAnimationSample::m_kModelFilePath =
-			"Assets/Animations/Rumba_Dancing.fbx";
+			"Assets/Animations/Samples/Rumba_Dancing.fbx";
 			//"Assets/Models/unitychan.fbx";
 		const char* CSkeltalAnimationSample::
 			m_kAnimFilePaths[static_cast<int>(EnAnimType::enNum)] =
 		{
-			"Assets/Animations/Rumba_Dancing.fbx",
-			"Assets/Animations/Hip_Hop_Dancing.fbx",
-			"Assets/Animations/Robot_Hip_Hop_Dance.fbx",
+			"Assets/Animations/Samples/Rumba_Dancing.fbx",
+			"Assets/Animations/Samples/Hip_Hop_Dancing.fbx",
+			"Assets/Animations/Samples/Robot_Hip_Hop_Dance.fbx",
 		};
 
 

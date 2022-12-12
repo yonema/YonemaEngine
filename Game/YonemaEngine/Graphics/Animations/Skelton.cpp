@@ -1,5 +1,5 @@
 #include "Skelton.h"
-#include "../AssimpCommonHeader.h"
+#include "../Models/AssimpCommon.h"
 
 
 namespace nsYMEngine

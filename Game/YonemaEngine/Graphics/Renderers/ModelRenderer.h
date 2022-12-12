@@ -1,11 +1,15 @@
 #pragma once
 #include "RendererTable.h"
-#include "../Renderers/ModelRendererBase.h"
+#include "../Models/BasicModelRenderer.h"
 
 namespace nsYMEngine
 {
 	namespace nsGraphics
 	{
+		namespace nsAssimp
+		{
+			class CAssimpRenderer;
+		}
 		namespace nsAnimations
 		{
 			struct SAnimationInitData;
@@ -25,24 +29,12 @@ namespace nsYMEngine
 	{
 		namespace nsRenderers
 		{
-			enum class EnModelFormat
-			{
-				enNone = -1,
-				enPMD,
-				enFBX,
-				enVRM,
-				enNumModelFormat
-			};
-
 			struct SModelInitData : private nsUtils::SNoncopyable
 			{
 				const char* modelFilePath = nullptr;
-				const char* animFilePath = nullptr;
-				EnModelFormat modelFormat = EnModelFormat::enNone;
 				CRendererTable::EnRendererType rendererType = 
-					CRendererTable::EnRendererType::enNone;
+					CRendererTable::EnRendererType::enBasicModel;
 				nsMath::CQuaternion vertexBias = nsMath::CQuaternion::Identity();
-				bool isVertesTranspos = false;
 				const nsAnimations::SAnimationInitData* animInitData = nullptr;
 				nsPhysics::SMeshGeometryBuffer* physicsMeshGeomBuffer = nullptr;
 				const char* textureRootPath = nullptr;
@@ -50,10 +42,6 @@ namespace nsYMEngine
 
 			class CModelRenderer : public nsGameObject::IGameObject
 			{
-			private:
-				static const char* 
-					m_kModelFormatExtensions[static_cast<int>(EnModelFormat::enNumModelFormat)];
-
 			public:
 				bool Start() override final;
 
@@ -67,7 +55,7 @@ namespace nsYMEngine
 				constexpr CModelRenderer() = default;
 				~CModelRenderer() = default;
 
-				void Init(const SModelInitData& modelInitData);
+				void Init(const SModelInitData& modelInitData) noexcept;
 
 				inline void SetPosition(const nsMath::CVector3& position) noexcept
 				{
@@ -193,7 +181,7 @@ namespace nsYMEngine
 
 				unsigned int FindBoneId(const std::string& boneName) const noexcept
 				{
-					return m_renderer ? m_renderer->FindBoneId(boneName) : 0;
+					return m_renderer ? m_renderer->FindBoneId(boneName) : UINT_MAX;
 				}
 
 				constexpr inline const nsMath::CMatrix& GetBoneMatixMS(unsigned int boneId) const noexcept
@@ -215,20 +203,15 @@ namespace nsYMEngine
 
 
 			private:
-				void Terminate();
+				void Terminate() noexcept;
 
-				void CreateRenderer(
-					EnModelFormat* pModelFormat, const SModelInitData& modelInitData);
-
-				void RegistToRendererTable(
-					EnModelFormat modelFormat, const SModelInitData& modelInitData);
-
-				EnModelFormat FindMatchExtension(const char* extension);
+				void CreateRenderer(const SModelInitData& modelInitData) noexcept;
 
 				void UpdateWorldMatrix() noexcept;
 
 			private:
-				IModelRendererBase* m_renderer = nullptr;
+				nsAssimp::CAssimpRenderer* m_assimpRenderer = nullptr;
+				nsModels::CBasicModelRenderer* m_renderer = nullptr;
 				CRendererTable::EnRendererType m_rendererType =
 					CRendererTable::EnRendererType::enNumType;
 

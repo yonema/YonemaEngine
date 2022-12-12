@@ -5,11 +5,11 @@ namespace nsAWA
 	namespace nsSamples
 	{
 		const char* CAnimationEventSample::m_kModelFilePath =
-			"Assets/Animations/Rumba_Dancing.fbx";
+			"Assets/Animations/Samples/Rumba_Dancing.fbx";
 		const char* CAnimationEventSample::
 			m_kAnimFilePaths[static_cast<int>(EnAnimType::enNum)] =
 		{
-			"Assets/Animations/animationWithEvent.fbx"
+			"Assets/Animations/Samples/animationWithEvent.fbx"
 		};
 
 		bool CAnimationEventSample::Start()

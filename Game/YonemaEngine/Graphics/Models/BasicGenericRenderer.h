@@ -1,21 +1,25 @@
 #pragma once
+#include "../Renderers/GenericRenderer.h"
+
 namespace nsYMEngine
 {
 	namespace nsGraphics
 	{
-		namespace nsDebugRenderers
+		namespace nsModels
 		{
-			class CPhysicsDebugLineGenericRenderer : public nsRenderers::IGenericRenderer
+			class CBasicGenericRenderer : public nsRenderers::IGenericRenderer
 			{
 			private:
 				enum class EnDescRangeType : unsigned int
 				{
-					enCbvForSceneData,
+					enCbvForModelData,
+					enSrvForMaterialData,
 					enNumDescRangeTypes
 				};
 				enum class EnRootParameterType : unsigned int
 				{
-					enSceneData,
+					enModelData,
+					enMaterialData,
 					enNumRootParamerterTypes
 				};
 
@@ -32,8 +36,9 @@ namespace nsYMEngine
 
 				inline std::wstring CreateRootSignatureName() const noexcept override
 				{
-					return L"PhysicsDebugLineGenericRenderer";
+					return L"BasicGenericRenderer";
 				}
+
 
 				bool CreateShader(
 					nsDx12Wrappers::CBlob* pVsBlob,
@@ -43,25 +48,19 @@ namespace nsYMEngine
 				void CreateInputLayout(
 					std::vector<D3D12_INPUT_ELEMENT_DESC>* pInputLayout) const noexcept override;
 
-				inline D3D12_PRIMITIVE_TOPOLOGY_TYPE SetUpPrimitiveTopologyType() const noexcept override
-				{
-					// ƒ‰ƒCƒ“‚ðˆø‚­
-					return D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
-				}
-
 				inline std::wstring CreatePipelineStateName() const noexcept override
 				{
-					return L"PhysicsDebugLineGenericRenderer";
+					return L"BasicGenericRenderer";
 				}
 
 			public:
-				constexpr CPhysicsDebugLineGenericRenderer() = default;
-				~CPhysicsDebugLineGenericRenderer() = default;
+				constexpr CBasicGenericRenderer() = default;
+				virtual ~CBasicGenericRenderer() = default;
+
 
 			private:
 
 			};
-
 		}
 	}
 }

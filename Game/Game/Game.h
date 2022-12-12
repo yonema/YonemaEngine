@@ -19,8 +19,6 @@ namespace nsAWA
 		~CGame() = default;
 
 	private:
-		int m_debugNum = 0;
-		CModelRenderer* m_unityChanMR = nullptr;
 	};
 
 }
