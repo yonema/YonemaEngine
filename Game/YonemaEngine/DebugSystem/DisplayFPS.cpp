@@ -25,8 +25,9 @@ namespace nsYMEngine
 		void CDisplayFPS::Update(float deltaTime)
 		{
 			constexpr size_t dispTextSize = sizeof(wchar_t) * static_cast<size_t>(m_kLengthDispText);
-			StringCbPrintf(m_dispText, dispTextSize, L"FPS = %3.4f", 1.0f / deltaTime);
-			m_fontRenderer->SetText(m_dispText);
+			wchar_t wText[m_kLengthDispText] = {};
+			StringCbPrintf(wText, dispTextSize, L"FPS = %3.4f", 1.0f / deltaTime);
+			m_fontRenderer->SetText(wText);
 		}
 
 		void CDisplayFPS::OnDestroy()

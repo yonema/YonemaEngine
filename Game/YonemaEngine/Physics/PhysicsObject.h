@@ -23,8 +23,6 @@ namespace nsYMEngine
 				return false;
 			};
 
-			virtual void VirtualActivate() noexcept {};
-
 		public:
 			constexpr IPhysicsObject() = default;
 			virtual ~IPhysicsObject();

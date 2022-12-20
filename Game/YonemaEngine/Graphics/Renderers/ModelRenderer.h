@@ -181,7 +181,14 @@ namespace nsYMEngine
 
 				unsigned int FindBoneId(const std::string& boneName) const noexcept
 				{
-					return m_renderer ? m_renderer->FindBoneId(boneName) : UINT_MAX;
+					return m_renderer ? 
+						m_renderer->FindBoneId(boneName) : 
+						nsAnimations::CSkelton::m_kNotFoundBoneID;
+				}
+
+				constexpr bool IsBoneFound(unsigned int boneId) const noexcept
+				{
+					return boneId != nsAnimations::CSkelton::m_kNotFoundBoneID;
 				}
 
 				constexpr inline const nsMath::CMatrix& GetBoneMatixMS(unsigned int boneId) const noexcept

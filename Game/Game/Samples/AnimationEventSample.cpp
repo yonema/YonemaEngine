@@ -99,13 +99,14 @@ namespace nsAWA
 			constexpr unsigned int eventIdx = 0;
 			m_eventCounter[eventIdx]++;
 			constexpr size_t dispTextSize = sizeof(wchar_t) * static_cast<size_t>(64);
+			wchar_t wText[64] = {};
 			StringCbPrintf(
-				m_eventCounterWChar[eventIdx],
+				wText,
 				dispTextSize, L"イベント%dが呼ばれた回数　%d回",
 				eventIdx + 1,
 				m_eventCounter[eventIdx]
 			);
-			m_eventCounterFR[eventIdx]->SetText(m_eventCounterWChar[eventIdx]);
+			m_eventCounterFR[eventIdx]->SetText(wText);
 
 			return;
 		}
@@ -114,13 +115,14 @@ namespace nsAWA
 			constexpr unsigned int eventIdx = 1;
 			m_eventCounter[eventIdx]++;
 			constexpr size_t dispTextSize = sizeof(wchar_t) * static_cast<size_t>(64);
+			wchar_t wText[64] = {};
 			StringCbPrintf(
-				m_eventCounterWChar[eventIdx],
+				wText,
 				dispTextSize, L"イベント%dが呼ばれた回数　%d回",
 				eventIdx + 1,
 				m_eventCounter[eventIdx]
 			);
-			m_eventCounterFR[eventIdx]->SetText(m_eventCounterWChar[eventIdx]);
+			m_eventCounterFR[eventIdx]->SetText(wText);
 
 			return;
 		}
@@ -129,13 +131,14 @@ namespace nsAWA
 			constexpr unsigned int eventIdx = 2;
 			m_eventCounter[eventIdx]++;
 			constexpr size_t dispTextSize = sizeof(wchar_t) * static_cast<size_t>(64);
+			wchar_t wText[64] = {};
 			StringCbPrintf(
-				m_eventCounterWChar[eventIdx],
+				wText,
 				dispTextSize, L"イベント%dが呼ばれた回数　%d回",
 				eventIdx + 1,
 				m_eventCounter[eventIdx]
 			);
-			m_eventCounterFR[eventIdx]->SetText(m_eventCounterWChar[eventIdx]);
+			m_eventCounterFR[eventIdx]->SetText(wText);
 
 			return;
 		}

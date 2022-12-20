@@ -30,7 +30,6 @@ namespace nsYMEngine
 
 		private:
 			nsGraphics::nsFonts::CFontRenderer* m_fontRenderer = nullptr;
-			wchar_t m_dispText[m_kLengthDispText] = {};
 		};
 
 	}

@@ -43,10 +43,14 @@ namespace nsYMEngine
 				void Terminate();
 
 				void CalcPositionFromAnchar(
-					const CFontRenderer::SFontParameter& fontParam, nsMath::CVector2* pPos) const;
+					const CFontRenderer::SFontParameter& fontParam, nsMath::CVector2* pPos
+				) const noexcept;
 
 				void CalcPivot(
-					const CFontRenderer::SFontParameter& fontParam, nsMath::CVector2* pPivot) const;
+					const wchar_t* const text,
+					const CFontRenderer::SFontParameter& fontParam,
+					nsMath::CVector2* pPivot
+				) const noexcept;
 
 			private:
 				static nsMath::CVector2 m_frameBufferHalfSize;

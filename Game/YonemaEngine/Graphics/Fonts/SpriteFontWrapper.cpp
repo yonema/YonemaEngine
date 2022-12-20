@@ -112,13 +112,14 @@ namespace nsYMEngine
 				nsMath::CVector2 finalPos;
 				CalcPositionFromAnchar(fontParam, &finalPos);
 
-				nsMath::CVector2 finalPivot;
-				CalcPivot(fontParam, &finalPivot);
+				const auto* const text = fontParam.text.c_str();
 
+				nsMath::CVector2 finalPivot;
+				CalcPivot(text, fontParam, &finalPivot);
 
 				m_spriteFont->DrawString(
 					m_spriteBatch,
-					fontParam.text,
+					text,
 					finalPos.m_xmf2Vec,
 					fontParam.color,
 					fontParam.rotation,
@@ -137,7 +138,7 @@ namespace nsYMEngine
 			}
 
 			void CSpriteFontWrapper::CalcPositionFromAnchar(
-				const CFontRenderer::SFontParameter& fontParam, nsMath::CVector2* pPos) const
+				const CFontRenderer::SFontParameter& fontParam, nsMath::CVector2* pPos) const noexcept
 			{
 				// まずはY座標のアンカーに合わせる。
 				switch (fontParam.anchor)
@@ -184,9 +185,12 @@ namespace nsYMEngine
 			}
 
 			void CSpriteFontWrapper::CalcPivot(
-				const CFontRenderer::SFontParameter& fontParam, nsMath::CVector2* pPivot) const
+				const wchar_t* const text,
+				const CFontRenderer::SFontParameter& fontParam,
+				nsMath::CVector2* pPivot
+			) const noexcept
 			{
-				auto stringSizeInFont = m_spriteFont->MeasureString(fontParam.text);
+				auto stringSizeInFont = m_spriteFont->MeasureString(text);
 				pPivot->x = DirectX::XMVectorGetX(stringSizeInFont) * fontParam.pivot.x;
 				pPivot->y = DirectX::XMVectorGetY(stringSizeInFont) * fontParam.pivot.y;
 

@@ -39,15 +39,9 @@ namespace nsYMEngine
 			}
 
 			InitRigidActor(m_rigidTrigger);
-
+			CPhysicsEngine::GetInstance()->AddPhysicsTriggerObject(this);
 
 			return true;
-		}
-
-		void CPhysicsTriggerObject::VirtualActivate() noexcept
-		{
-			CPhysicsEngine::GetInstance()->AddPhysicsTriggerObject(this);
-			return;
 		}
 
 		CPhysicsTriggerObject::~CPhysicsTriggerObject()
@@ -70,6 +64,7 @@ namespace nsYMEngine
 			}
 
 			ReleaseRigidActor();
+			CPhysicsEngine::GetInstance()->RemovePhysicsTriggerObject(this);
 			m_rigidTrigger = nullptr;
 
 			return;

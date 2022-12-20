@@ -13,6 +13,9 @@ namespace nsYMEngine
 		{
 			class CSkelton : nsUtils::SNoncopyable
 			{
+			public:
+				static const unsigned int m_kNotFoundBoneID = UINT_MAX;
+
 			private:
 
 				/**

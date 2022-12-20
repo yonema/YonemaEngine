@@ -151,6 +151,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="YonemaEngine\Physics\CharacterController.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\Models\SkinGenericRenderer.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\Models\AssimpCommon.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\Models\BasicModelRenderer.cpp" />
@@ -235,6 +236,7 @@
     <Image Include="Assets\Images\StarMan.png" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="YonemaEngine\Physics\CharacterController.h" />
     <ClInclude Include="YonemaEngine\Graphics\Models\SkinGenericRenderer.h" />
     <ClInclude Include="YonemaEngine\Graphics\Models\BasicModelRenderer.h" />
     <ClInclude Include="Game\Samples\AnimationEventSample.h" />

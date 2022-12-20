@@ -36,7 +36,6 @@ namespace nsAWA
 			CModelRenderer* m_modelRenderer = nullptr;
 
 			CFontRenderer* m_eventCounterFR[m_kNumAnimEvent] = {};
-			wchar_t m_eventCounterWChar[m_kNumAnimEvent][64] = {};
 			int m_eventCounter[m_kNumAnimEvent] = {};
 		};
 	}

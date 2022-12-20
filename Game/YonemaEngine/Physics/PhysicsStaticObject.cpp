@@ -113,12 +113,12 @@ namespace nsYMEngine
 			meshDesc.points.count =
 				static_cast<physx::PxU32>(meshGeometryBuffer.m_vertices.size());
 			meshDesc.points.stride = sizeof(meshGeometryBuffer.m_vertices[0]);
-			meshDesc.points.data = &meshGeometryBuffer.m_vertices[0];
+			meshDesc.points.data = meshGeometryBuffer.m_vertices.data();
 
 			meshDesc.triangles.count =
-				static_cast<physx::PxU32>(meshGeometryBuffer.m_indices.size());
+				static_cast<physx::PxU32>(meshGeometryBuffer.m_indices.size() / 3);
 			meshDesc.triangles.stride = 3 * sizeof(meshGeometryBuffer.m_indices[0]);
-			meshDesc.triangles.data = &meshGeometryBuffer.m_indices[0];
+			meshDesc.triangles.data = meshGeometryBuffer.m_indices.data();
 
 			meshDesc.flags = physx::PxMeshFlags();
 			meshDesc.flags |= physx::PxMeshFlag::e16_BIT_INDICES;

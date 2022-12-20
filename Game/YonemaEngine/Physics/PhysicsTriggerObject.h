@@ -18,8 +18,6 @@ namespace nsYMEngine
 				const nsMath::CVector3& position
 			) override final;
 
-			void VirtualActivate() noexcept override final;
-
 		public:
 			constexpr CPhysicsTriggerObject() = default;
 			~CPhysicsTriggerObject();

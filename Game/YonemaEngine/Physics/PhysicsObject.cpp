@@ -208,7 +208,6 @@ namespace nsYMEngine
 			}
 
 			CPhysicsEngine::GetInstance()->AddActor(m_rigidActor);
-			VirtualActivate();
 			m_isActive = true;
 
 			return;

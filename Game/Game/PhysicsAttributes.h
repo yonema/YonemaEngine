@@ -9,6 +9,7 @@ namespace nsYMEngine
 		enum class EnPhysicsAttributes
 		{
 			enNone,
+			enCharacterController,
 			enGround,
 			enWall,
 

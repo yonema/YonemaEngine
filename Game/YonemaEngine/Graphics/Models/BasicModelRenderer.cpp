@@ -592,7 +592,7 @@ namespace nsYMEngine
 			{
 				if (IsSkeltalAnimationValid() != true)
 				{
-					return UINT_MAX;
+					return nsAnimations::CSkelton::m_kNotFoundBoneID;
 				}
 
 				// ボーン名からボーンIDを検索
@@ -602,7 +602,7 @@ namespace nsYMEngine
 				if (boneNameToIdx == boneNameToIndexMap.end())
 				{
 					// 指定された名前のボーンが見つからなかった
-					return UINT_MAX;
+					return nsAnimations::CSkelton::m_kNotFoundBoneID;
 				}
 
 				return boneNameToIdx->second;

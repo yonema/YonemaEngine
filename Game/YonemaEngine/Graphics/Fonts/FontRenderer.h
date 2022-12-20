@@ -17,7 +17,7 @@ namespace nsYMEngine
 				struct SFontParameter
 				{
 					constexpr SFontParameter() = default;
-					constexpr SFontParameter(
+					_CONSTEXPR20_CONTAINER SFontParameter(
 						const wchar_t* text,
 						const nsMath::CVector2& position = nsMath::CVector2::Zero(),
 						const nsMath::CVector4& color = nsMath::CVector4::White(),
@@ -32,7 +32,7 @@ namespace nsYMEngine
 
 					~SFontParameter() = default;
 
-					const wchar_t* text = nullptr;
+					std::wstring text = {};
 					nsMath::CVector2 position = nsMath::CVector2::Zero();
 					nsMath::CVector4 color = nsMath::CVector4::White();
 					float rotation = 0.0f;
@@ -70,16 +70,12 @@ namespace nsYMEngine
 					m_fontParameter = fontParam;
 				}
 
-				constexpr const wchar_t* const GetText() const noexcept
+				constexpr const std::wstring& GetText() const noexcept
 				{
 					return m_fontParameter.text;
 				}
-				/**
-				 * @brief テキストには、ローカル変数を渡さないでください。
-				 * メンバ変数やグローバル変数などか、文字列を直接渡してください。
-				 * @param text テキスト(ローカル変数はダメ)
-				*/
-				constexpr void SetText(const wchar_t* text) noexcept
+
+				_CONSTEXPR20_CONTAINER void SetText(const wchar_t* text) noexcept
 				{
 					m_fontParameter.text = text;
 				}

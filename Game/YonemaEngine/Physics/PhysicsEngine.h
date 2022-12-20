@@ -125,11 +125,29 @@ namespace nsYMEngine
 				const nsMath::CVector3& origin,
 				const nsMath::CVector3& normalDir,
 				float distance,
-				physx::PxRaycastBuffer* hitCallback,
+				physx::PxRaycastBuffer* hitCallbackBuffer,
 				const nsMath::CVector4& color = nsMath::CVector4::Red()
 			);
 
 			bool OverlapMultiple(const IPhysicsObject& physicsObject, physx::PxOverlapBuffer* hitCallback);
+
+			bool Sweep(
+				const IPhysicsObject& physicsObject,
+				const nsMath::CVector3& normalDir,
+				float distance,
+				physx::PxSweepCallback* hitCallback,
+				physx::PxQueryFilterCallback* filterCallback = nullptr,
+				float inflation = 0.0f
+				);
+
+			bool SweepMultiple(
+				const IPhysicsObject& physicsObject,
+				const nsMath::CVector3& normalDir,
+				float distance,
+				physx::PxSweepBuffer* hitCallbackBuffer,
+				physx::PxQueryFilterCallback* filterCallback = nullptr,
+				float inflation = 0.0f
+			);
 
 			void AddPhysicsTriggerObject(CPhysicsTriggerObject* object);
 

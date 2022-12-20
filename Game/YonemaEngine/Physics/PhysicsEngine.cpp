@@ -292,24 +292,114 @@ namespace nsYMEngine
 		}
 
 		bool CPhysicsEngine::OverlapMultiple(
-			const IPhysicsObject& physicsObject, physx::PxOverlapBuffer* hitCallback)
+			const IPhysicsObject& physicsObject, physx::PxOverlapBuffer* hitCallbackBuffer)
 		{
 			const auto* actor = physicsObject.GetActor();
-			const auto& shapePose = actor->getGlobalPose();
 
 			physx::PxShape* shapes[1];
 			actor->getShapes(shapes, 1);
-			const auto& overlapShape = shapes[0]->getGeometry().any();
+			const auto& overlapGeometry = shapes[0]->getGeometry().any();
 
-			const physx::PxQueryFilterData filter(
+			const auto& finalPose = physx::PxShapeExt::getGlobalPose(*shapes[0], *actor);
+
+
+			static const physx::PxQueryFilterData filter(
 				physx::PxQueryFlag::eNO_BLOCK |
 				physx::PxQueryFlag::eDYNAMIC |
 				physx::PxQueryFlag::eSTATIC
 			);
 
 			// @attention Ž©•ªŽ©g(ˆø”‚Å“n‚³‚ê‚½physicsObject)‚Æ‚àÕ“Ë‚µ‚Ü‚·B
-			return m_scene->overlap(overlapShape, shapePose, *hitCallback, filter);
+			return m_scene->overlap(overlapGeometry, finalPose, *hitCallbackBuffer, filter);
 
+		}
+
+
+
+		bool CPhysicsEngine::Sweep(
+			const IPhysicsObject& physicsObject,
+			const nsMath::CVector3& normalDir,
+			float distance,
+			physx::PxSweepCallback* hitCallback,
+			physx::PxQueryFilterCallback* filterCallback,
+			float inflation
+		)
+		{
+			const auto* actor = physicsObject.GetActor();
+
+			physx::PxShape* shapes[1];
+			actor->getShapes(shapes, 1);
+			const auto& sweepGeometry = shapes[0]->getGeometry().any();
+			const auto& finalPose = physx::PxShapeExt::getGlobalPose(*shapes[0], *actor);
+
+
+			static const physx::PxHitFlags hitFlags =
+				physx::PxHitFlag::ePOSITION |
+				physx::PxHitFlag::eNORMAL |
+				//physx::PxHitFlag::ePRECISE_SWEEP |
+				physx::PxHitFlag::eMESH_ANY;
+			static const physx::PxQueryFilterData filter(
+				physx::PxQueryFlag::eANY_HIT |
+				physx::PxQueryFlag::eDYNAMIC |
+				physx::PxQueryFlag::eSTATIC |
+				physx::PxQueryFlag::ePREFILTER
+			);
+
+
+			return m_scene->sweep(
+				sweepGeometry,
+				finalPose,
+				{ normalDir.x, normalDir.y, normalDir.z },
+				distance,
+				*hitCallback,
+				hitFlags,
+				filter,
+				filterCallback,
+				nullptr,
+				inflation
+			);
+		}
+
+		bool CPhysicsEngine::SweepMultiple(
+			const IPhysicsObject& physicsObject,
+			const nsMath::CVector3& normalDir,
+			float distance,
+			physx::PxSweepBuffer* hitCallbackBuffer,
+			physx::PxQueryFilterCallback* filterCallback,
+			float inflation
+		)
+		{
+			const auto* actor = physicsObject.GetActor();
+
+			physx::PxShape* shapes[1];
+			actor->getShapes(shapes, 1);
+			const auto& sweepGeometry = shapes[0]->getGeometry().any();
+			const auto& finalPose = physx::PxShapeExt::getGlobalPose(*shapes[0], *actor);
+
+
+			static const physx::PxHitFlags hitFlags =
+				physx::PxHitFlag::ePOSITION |
+				physx::PxHitFlag::eNORMAL/* |
+				physx::PxHitFlag::ePRECISE_SWEEP*/;
+			static const physx::PxQueryFilterData filter(
+				physx::PxQueryFlag::eDYNAMIC |
+				physx::PxQueryFlag::eSTATIC |
+				physx::PxQueryFlag::ePREFILTER
+			);
+
+
+			return m_scene->sweep(
+				sweepGeometry,
+				finalPose,
+				{ normalDir.x, normalDir.y, normalDir.z },
+				distance,
+				*hitCallbackBuffer,
+				hitFlags,
+				filter,
+				filterCallback,
+				nullptr,
+				inflation
+			);
 		}
 
 		void CPhysicsEngine::AddPhysicsTriggerObject(CPhysicsTriggerObject* object)
