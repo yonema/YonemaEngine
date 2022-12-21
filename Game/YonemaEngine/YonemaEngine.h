@@ -19,6 +19,10 @@ namespace nsYMEngine
 	{
 		class CPhysicsEngine;
 	}
+	namespace nsEffect
+	{
+		class CEffectEngine;
+	}
 	namespace nsUtils
 	{
 		class CRandom;
@@ -97,6 +101,7 @@ namespace nsYMEngine
 		nsGameObject::CGameObjectManager* m_gameObjectManager = nullptr;
 		nsInput::CInputManager* m_inputManager = nullptr;
 		nsPhysics::CPhysicsEngine* m_physicsWorld = nullptr;
+		nsEffect::CEffectEngine* m_effectEngine = nullptr;
 		nsTime::CGameTime m_gameTime;
 		nsUtils::CRandom* m_random = nullptr;
 		bool m_isExitGame = false;

@@ -14,6 +14,7 @@
 #include "../YonemaEngine/Physics/ContactEvent.h"
 #include "../YonemaEngine/Physics/ExtendedDataForRigidActor.h"
 #include "../YonemaEngine/Physics/CharacterController.h"
+#include "../YonemaEngine/Effect/EffectPlayer.h"
 #include "../YonemaEngine/Utils/Random.h"
 
 // エイリアス宣言
@@ -51,6 +52,9 @@ using SContactEvent = nsPhysics::SContactEvent;
 using CExtendedDataForRigidActor = nsPhysics::CExtendedDataForRigidActor;
 using EnPhysicsAttributes = nsPhysics::EnPhysicsAttributes;
 using CCharacterController = nsPhysics::CCharacterController;
+
+// エフェクト
+using CEffectPlayer = nsEffect::CEffectPlayer;
 
 // 数学
 using CVector2 = nsMath::CVector2;

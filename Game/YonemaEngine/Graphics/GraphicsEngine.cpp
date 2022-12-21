@@ -4,6 +4,7 @@
 #include "Dx12Wrappers/Texture.h"
 #include "Renderers/Renderer.h"
 #include "Fonts/FontEngine.h"
+#include "../Effect/EffectEngine.h"
 
 
 namespace nsYMEngine
@@ -213,6 +214,8 @@ namespace nsYMEngine
 			DrawWithSimplePostEffect();
 
 			DrawCollision();
+
+			nsEffect::CEffectEngine::GetInstance()->Draw(&m_commandList);
 
 			Draw2D();
 

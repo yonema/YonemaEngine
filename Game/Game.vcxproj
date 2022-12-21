@@ -116,7 +116,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../ExLibrary/DirectXTex-main\DirectXTex;YonemaEngine/PreCompileHeader;..\ExLibrary\DirectXTK12-sept2021\DirectXTK12-sept2021\Inc;..\ExLibrary\PhysX-4.1\PhysX-4.1\physx\include;..\ExLibrary\PhysX-4.1\PhysX-4.1\pxshared\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../ExLibrary/DirectXTex-main\DirectXTex;YonemaEngine/PreCompileHeader;..\ExLibrary\DirectXTK12-sept2021\DirectXTK12-sept2021\Inc;..\ExLibrary\PhysX-4.1\PhysX-4.1\physx\include;..\ExLibrary\PhysX-4.1\PhysX-4.1\pxshared\include;..\ExLibrary\EffekseerForCpp170a\src\Effekseer;..\ExLibrary\EffekseerForCpp170a\src\EffekseerRendererDX12;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>YonemaEnginePreCompile.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>YonemaEnginePreCompile.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
@@ -124,7 +124,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../ExLibrary/DirectXTex-main\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug;../ExLibrary\DirectXTex-main\DirectXTex\Bin\Desktop_2019\x64\Debug;..\ExLibrary\DirectXTK12-sept2021\DirectXTK12-sept2021\Bin\Desktop_2019_Win10\x64\Debug;..\ExLibrary\PhysX-4.1\PhysX-4.1\physx\bin\win.x86_64.vc142.md\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../ExLibrary/DirectXTex-main\DirectXTex\Bin\Desktop_2019_Win10\x64\Debug;../ExLibrary\DirectXTex-main\DirectXTex\Bin\Desktop_2019\x64\Debug;..\ExLibrary\DirectXTK12-sept2021\DirectXTK12-sept2021\Bin\Desktop_2019_Win10\x64\Debug;..\ExLibrary\PhysX-4.1\PhysX-4.1\physx\bin\win.x86_64.vc142.md\debug;..\ExLibrary\EffekseerForCpp170a\src\Effekseer\Debug;..\ExLibrary\EffekseerForCpp170a\src\EffekseerRendererDX12\Debug;..\ExLibrary\EffekseerForCpp170a\src\3rdParty\LLGI\src\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -136,7 +136,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../ExLibrary/DirectXTex-main\DirectXTex;YonemaEngine/PreCompileHeader;..\ExLibrary\DirectXTK12-sept2021\DirectXTK12-sept2021\Inc;..\ExLibrary\PhysX-4.1\PhysX-4.1\physx\include;..\ExLibrary\PhysX-4.1\PhysX-4.1\pxshared\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../ExLibrary/DirectXTex-main\DirectXTex;YonemaEngine/PreCompileHeader;..\ExLibrary\DirectXTK12-sept2021\DirectXTK12-sept2021\Inc;..\ExLibrary\PhysX-4.1\PhysX-4.1\physx\include;..\ExLibrary\PhysX-4.1\PhysX-4.1\pxshared\include;..\ExLibrary\EffekseerForCpp170a\src\Effekseer;..\ExLibrary\EffekseerForCpp170a\src\EffekseerRendererDX12;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>YonemaEnginePreCompile.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>YonemaEnginePreCompile.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
@@ -146,11 +146,14 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../ExLibrary/DirectXTex-main\DirectXTex\Bin\Desktop_2019_Win10\x64\Release;../ExLibrary\DirectXTex-main\DirectXTex\Bin\Desktop_2019\x64\Release;..\ExLibrary\DirectXTK12-sept2021\DirectXTK12-sept2021\Bin\Desktop_2019_Win10\x64\Release;..\ExLibrary\PhysX-4.1\PhysX-4.1\physx\bin\win.x86_64.vc142.md\release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../ExLibrary/DirectXTex-main\DirectXTex\Bin\Desktop_2019_Win10\x64\Release;../ExLibrary\DirectXTex-main\DirectXTex\Bin\Desktop_2019\x64\Release;..\ExLibrary\DirectXTK12-sept2021\DirectXTK12-sept2021\Bin\Desktop_2019_Win10\x64\Release;..\ExLibrary\PhysX-4.1\PhysX-4.1\physx\bin\win.x86_64.vc142.md\release;..\ExLibrary\EffekseerForCpp170a\src\Effekseer\Release;..\ExLibrary\EffekseerForCpp170a\src\EffekseerRendererDX12\Release;..\ExLibrary\EffekseerForCpp170a\src\3rdParty\LLGI\src\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="YonemaEngine\Effect\EffectPlayer.cpp" />
+    <ClCompile Include="Game\Samples\EffectSample.cpp" />
+    <ClCompile Include="YonemaEngine\Effect\EffectEngine.cpp" />
     <ClCompile Include="YonemaEngine\Physics\CharacterController.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\Models\SkinGenericRenderer.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\Models\AssimpCommon.cpp" />
@@ -236,6 +239,9 @@
     <Image Include="Assets\Images\StarMan.png" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="YonemaEngine\Effect\EffectPlayer.h" />
+    <ClInclude Include="Game\Samples\EffectSample.h" />
+    <ClInclude Include="YonemaEngine\Effect\EffectEngine.h" />
     <ClInclude Include="YonemaEngine\Physics\CharacterController.h" />
     <ClInclude Include="YonemaEngine\Graphics\Models\SkinGenericRenderer.h" />
     <ClInclude Include="YonemaEngine\Graphics\Models\BasicModelRenderer.h" />

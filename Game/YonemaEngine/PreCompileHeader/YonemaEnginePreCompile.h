@@ -52,6 +52,12 @@
 #pragma comment (lib, "PhysXPvdSDK_static_64.lib")
 #pragma comment (lib, "SnippetUtils_static_64.lib")
 
+// エフェクト
+#pragma comment (lib, "Effekseer.lib")
+#pragma comment (lib, "EffekseerRendererDX12.lib")
+#pragma comment (lib, "LLGI.lib")
+
+
 #include "../Utils/Noncopyable.h"
 #include "../Math/Math.h"
 #include "../Math/Vector2.h"

@@ -2,6 +2,7 @@
 #include "Graphics/GraphicsEngine.h"
 #include "Input/InputManager.h"
 #include "Physics/PhysicsEngine.h"
+#include "Effect/EffectEngine.h"
 #include "Utils/Random.h"
 #include "DebugSystem/DisplayFPS.h"
 #include "../Game/Game.h"
@@ -28,6 +29,7 @@ namespace nsYMEngine
 		m_gameObjectManager = nsGameObject::CGameObjectManager::CreateInstance();
 		m_inputManager = new nsInput::CInputManager();
 		m_physicsWorld = nsPhysics::CPhysicsEngine::CreateInstance();
+		m_effectEngine = nsEffect::CEffectEngine::CreateInstance();
 
 		//NewGO<nsAWA::CGame>(EnGOPriority::enMid, "AWAGame");
 		NewGO<nsAWA::nsSamples::CSampleMain> ("SampleMain");
@@ -54,13 +56,17 @@ namespace nsYMEngine
 		// GameObjectManagerを先に消して、ゲームオブジェクトを全て破棄しておく。
 		// ゲームオブジェクトのOnDestroyで各種エンジンを使用する処理を書いている場合があるため。
 		nsGameObject::CGameObjectManager::DeleteInstance();
+		m_gameObjectManager = nullptr;
 
+		nsEffect::CEffectEngine::DeleteInstance();
+		m_effectEngine = nullptr;
 		nsPhysics::CPhysicsEngine::DeleteInstance();
+		m_physicsWorld = nullptr;
 		if (m_inputManager)
 		{
 			delete m_inputManager;
+			m_inputManager = nullptr;
 		}
-		m_gameObjectManager = nullptr;
 		nsGraphics::CGraphicsEngine::DeleteInstance();
 		m_graphicsEngine = nullptr;
 
