@@ -8,6 +8,7 @@
 #include "AnimationEventSample.h"
 #include "GetBoneMatrixSample.h"
 #include "EffectSample.h"
+#include "SoundSample.h"
 
 namespace nsAWA
 {
@@ -15,39 +16,42 @@ namespace nsAWA
 	{
 		bool CSampleMain::Start()
 		{
-			constexpr int kSampleIdx = 8;
+			constexpr int kSampleIdx = 9;
 
 			switch (kSampleIdx)
 			{
 			case 0:
-				NewGO<CSkeltalAnimationSample>(EnGOPriority::enMid, "SkeltalAnimationSample");
+				m_sampleGO = NewGO<CSkeltalAnimationSample>(EnGOPriority::enMid, "SkeltalAnimationSample");
 				break;
 			case 1:
-				NewGO<CSpriteSample>(EnGOPriority::enMid, "SpriteSample");
+				m_sampleGO = NewGO<CSpriteSample>(EnGOPriority::enMid, "SpriteSample");
 				break;
 			case 2:
-				NewGO<CFontSample>(EnGOPriority::enMid, "FontSample");
+				m_sampleGO = NewGO<CFontSample>(EnGOPriority::enMid, "FontSample");
 				break;
 			case 3:
-				NewGO<CPhysicsSample>(EnGOPriority::enMid, "PhysicsSample");
+				m_sampleGO = NewGO<CPhysicsSample>(EnGOPriority::enMid, "PhysicsSample");
 				break;
 			case 4:
-				NewGO<CTriggerSample>(EnGOPriority::enMid, "TriggerSample");
+				m_sampleGO = NewGO<CTriggerSample>(EnGOPriority::enMid, "TriggerSample");
 				break;
 			case 5:
-				NewGO<CCharacterControllerSample>(EnGOPriority::enMid, "CharacterControllerSample");
+				m_sampleGO = NewGO<CCharacterControllerSample>(EnGOPriority::enMid, "CharacterControllerSample");
 				break;
 			case 6:
-				NewGO<CAnimationEventSample>(EnGOPriority::enMid, "AnimationEventSample");
+				m_sampleGO = NewGO<CAnimationEventSample>(EnGOPriority::enMid, "AnimationEventSample");
 				break;
 			case 7:
-				NewGO<CGetBoneMatrixSample>(EnGOPriority::enMid, "GetBoneMatrixSample");
+				m_sampleGO = NewGO<CGetBoneMatrixSample>(EnGOPriority::enMid, "GetBoneMatrixSample");
 				break;
 			case 8:
-				NewGO<CEffectSample>(EnGOPriority::enMid, "EffectSample");
+				m_sampleGO = NewGO<CEffectSample>(EnGOPriority::enMid, "EffectSample");
+				break;
+			case 9:
+				m_sampleGO = NewGO<CSoundSample>(EnGOPriority::enMid, "SoundSample");
 				break;
 			default:
-				NewGO<CSkeltalAnimationSample>(EnGOPriority::enMid, "SkeltalAnimationSample");
+				m_sampleGO = NewGO<CSkeltalAnimationSample>(EnGOPriority::enMid, "SkeltalAnimationSample");
 				break;
 			}
 
@@ -56,6 +60,7 @@ namespace nsAWA
 
 		void CSampleMain::OnDestroy()
 		{
+			DeleteGO(m_sampleGO);
 
 			return;
 		}
@@ -64,6 +69,7 @@ namespace nsAWA
 		{
 			if (Keyboard()->IsTrigger(EnKeyButton::enEscape))
 			{
+				DeleteGO(this);
 				ExitGame();
 			}
 			return;

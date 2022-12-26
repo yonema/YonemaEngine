@@ -17,7 +17,7 @@ namespace nsAWA
 			~CSampleMain() = default;
 
 		private:
-
+			IGameObject* m_sampleGO = nullptr;
 		};
 	}
 }

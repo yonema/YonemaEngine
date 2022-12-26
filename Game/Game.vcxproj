@@ -151,6 +151,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Game\Samples\SoundSample.cpp" />
+    <ClCompile Include="YonemaEngine\Memory\ResourceBankTable.cpp" />
+    <ClCompile Include="YonemaEngine\Sound\SoundSource.cpp" />
+    <ClCompile Include="YonemaEngine\Sound\SoundPlayer.cpp" />
+    <ClCompile Include="YonemaEngine\Sound\WaveFile.cpp" />
+    <ClCompile Include="YonemaEngine\Sound\SoundEngine.cpp" />
     <ClCompile Include="YonemaEngine\Effect\EffectPlayer.cpp" />
     <ClCompile Include="Game\Samples\EffectSample.cpp" />
     <ClCompile Include="YonemaEngine\Effect\EffectEngine.cpp" />
@@ -239,6 +245,13 @@
     <Image Include="Assets\Images\StarMan.png" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Game\Samples\SoundSample.h" />
+    <ClInclude Include="Game\SubmixType.h" />
+    <ClInclude Include="YonemaEngine\Memory\ResourceBankTable.h" />
+    <ClInclude Include="YonemaEngine\Sound\SoundSource.h" />
+    <ClInclude Include="YonemaEngine\Sound\SoundPlayer.h" />
+    <ClInclude Include="YonemaEngine\Sound\WaveFile.h" />
+    <ClInclude Include="YonemaEngine\Sound\SoundEngine.h" />
     <ClInclude Include="YonemaEngine\Effect\EffectPlayer.h" />
     <ClInclude Include="Game\Samples\EffectSample.h" />
     <ClInclude Include="YonemaEngine\Effect\EffectEngine.h" />

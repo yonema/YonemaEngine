@@ -15,6 +15,7 @@
 #include "../YonemaEngine/Physics/ExtendedDataForRigidActor.h"
 #include "../YonemaEngine/Physics/CharacterController.h"
 #include "../YonemaEngine/Effect/EffectPlayer.h"
+#include "../YonemaEngine/Sound/SoundPlayer.h"
 #include "../YonemaEngine/Utils/Random.h"
 
 // エイリアス宣言
@@ -55,6 +56,10 @@ using CCharacterController = nsPhysics::CCharacterController;
 
 // エフェクト
 using CEffectPlayer = nsEffect::CEffectPlayer;
+
+// サウンド
+using CSoundPlayer = nsSound::CSoundPlayer;
+using EnSubmixType = nsSound::EnSubmixType;
 
 // 数学
 using CVector2 = nsMath::CVector2;

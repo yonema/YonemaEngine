@@ -3,6 +3,8 @@
 #include "Input/InputManager.h"
 #include "Physics/PhysicsEngine.h"
 #include "Effect/EffectEngine.h"
+#include "Sound/SoundEngine.h"
+#include "Memory/ResourceBankTable.h"
 #include "Utils/Random.h"
 #include "DebugSystem/DisplayFPS.h"
 #include "../Game/Game.h"
@@ -30,6 +32,8 @@ namespace nsYMEngine
 		m_inputManager = new nsInput::CInputManager();
 		m_physicsWorld = nsPhysics::CPhysicsEngine::CreateInstance();
 		m_effectEngine = nsEffect::CEffectEngine::CreateInstance();
+		m_soundEngine = nsSound::CSoundEngine::CreateInstance();
+		m_resourceBankTable = nsMemory::CResourceBankTable::CreateInstance();
 
 		//NewGO<nsAWA::CGame>(EnGOPriority::enMid, "AWAGame");
 		NewGO<nsAWA::nsSamples::CSampleMain> ("SampleMain");
@@ -58,6 +62,11 @@ namespace nsYMEngine
 		nsGameObject::CGameObjectManager::DeleteInstance();
 		m_gameObjectManager = nullptr;
 
+		nsMemory::CResourceBankTable::DeleteInstance();
+		m_resourceBankTable = nullptr;
+
+		nsSound::CSoundEngine::DeleteInstance();
+		m_soundEngine = nullptr;
 		nsEffect::CEffectEngine::DeleteInstance();
 		m_effectEngine = nullptr;
 		nsPhysics::CPhysicsEngine::DeleteInstance();

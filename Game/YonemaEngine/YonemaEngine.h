@@ -23,6 +23,14 @@ namespace nsYMEngine
 	{
 		class CEffectEngine;
 	}
+	namespace nsSound
+	{
+		class CSoundEngine;
+	}
+	namespace nsMemory
+	{
+		class CResourceBankTable;
+	}
 	namespace nsUtils
 	{
 		class CRandom;
@@ -102,6 +110,8 @@ namespace nsYMEngine
 		nsInput::CInputManager* m_inputManager = nullptr;
 		nsPhysics::CPhysicsEngine* m_physicsWorld = nullptr;
 		nsEffect::CEffectEngine* m_effectEngine = nullptr;
+		nsSound::CSoundEngine* m_soundEngine = nullptr;
+		nsMemory::CResourceBankTable* m_resourceBankTable = nullptr;
 		nsTime::CGameTime m_gameTime;
 		nsUtils::CRandom* m_random = nullptr;
 		bool m_isExitGame = false;

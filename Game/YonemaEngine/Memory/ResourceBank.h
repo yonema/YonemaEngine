@@ -10,7 +10,7 @@ namespace nsYMEngine
 		private:
 			using TResourcePtr = std::unique_ptr<TResource>;
 		public:
-			TRsourceBank() = default;
+			constexpr TRsourceBank() = default;
 			~TRsourceBank() = default;
 
 			/**
@@ -18,11 +18,12 @@ namespace nsYMEngine
 			 * @param filePath ファイルパス。これがキーになる。
 			 * @param resource リソース
 			*/
-			void Regist(const char* filePath, TResource* resource)
+			void Register(const char* filePath, TResource* resource)
 			{
 				auto it = m_resourceMap.find(filePath);
 				if (it == m_resourceMap.end())
 				{
+					// 未登録のため、新規登録する。
 					m_resourceMap.emplace(filePath, resource);
 				}
 			}
@@ -37,13 +38,16 @@ namespace nsYMEngine
 				auto it = m_resourceMap.find(filePath);
 				if (it != m_resourceMap.end()) 
 				{
+					// 登録済みのため、バンクからリソースを取ってくる。
 					return it->second.get();
 				}
+
+				// 未登録
 				return nullptr;
 			}
 
 		private:
-			std::unordered_map<const char*, TResourcePtr> m_resourceMap;
+			std::unordered_map<const char*, TResourcePtr> m_resourceMap = {};
 		};
 	}
 }
