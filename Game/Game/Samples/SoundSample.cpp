@@ -9,11 +9,11 @@ namespace nsAWA
 		{
 			// SEタイプのワンショット再生用で初期化
 			m_se = NewGO<CSoundPlayer>();
-			m_se->Init("Assets/Sounds/tokimekiExperience_short.wav", EnSubmixType::enSE, false);
+			m_se->Init("Assets/Sounds/Samples/tokimekiExperience_short.wav", EnSubmixType::enSE, false);
 
 			// BGMタイプのループ生成用で初期化
 			m_bgm = NewGO<CSoundPlayer>();
-			m_bgm->Init("Assets/Sounds/tokimekiExperience_short.wav", EnSubmixType::enBGM, true);
+			m_bgm->Init("Assets/Sounds/Samples/tokimekiExperience_short.wav", EnSubmixType::enBGM, true);
 
 			// BGMタイプ全体の音量設定
 			nsYMEngine::nsSound::CSoundEngine::GetInstance()->SetSubmixVolume(

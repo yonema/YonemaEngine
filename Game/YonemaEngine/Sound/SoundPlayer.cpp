@@ -93,7 +93,14 @@ namespace nsYMEngine
 			m_isLoop = isLoop;
 
 			auto* soundSource = NewGO<CSoundSource>();
-			soundSource->Init(m_filePath, m_submixType);
+			bool res = soundSource->Init(m_filePath, m_submixType);
+
+			if (res != true)
+			{
+				m_filePath = nullptr;
+				DeleteGO(soundSource);
+				return;
+			}
 
 			if (m_isLoop)
 			{

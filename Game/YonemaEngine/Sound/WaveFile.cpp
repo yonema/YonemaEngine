@@ -68,6 +68,7 @@ namespace nsYMEngine
 			if (res != true)
 			{
 				std::wstring str(filePath);
+				str.erase(str.end() - 1);
 				str += L"のwaveファイルのオープンに失敗しました。";
 				nsGameWindow::MessageBoxWarning(str.c_str());
 				return false;

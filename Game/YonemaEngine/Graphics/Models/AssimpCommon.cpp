@@ -34,6 +34,7 @@ namespace nsYMEngine
 				if (pScene == nullptr)
 				{
 					std::wstring wstr = filePathInWStr;
+					wstr.erase(wstr.end() - 1);
 					wstr += L"‚Ìƒ‚ƒfƒ‹‚Ì“Ç‚Ýž‚Ý‚ÉŽ¸”s‚µ‚Ü‚µ‚½B";
 					nsGameWindow::MessageBoxWarning(wstr.c_str());
 					::OutputDebugStringA(pImporter->GetErrorString());

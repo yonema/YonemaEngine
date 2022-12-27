@@ -231,6 +231,7 @@ namespace nsYMEngine
 				if (roaded != true)
 				{
 					std::string msg = filePath;
+					msg.erase(msg.end() - 1);
 					msg += "のテクスチャのロードに失敗しました。拡張子を確認してください。";
 					nsGameWindow::MessageBoxError(nsUtils::GetWideStringFromString(msg).c_str());
 					return false;
@@ -239,6 +240,7 @@ namespace nsYMEngine
 				if (FAILED(result))
 				{
 					std::string msg = filePath;
+					msg.erase(msg.end() - 1);
 					msg += "のテクスチャのロードに失敗しました。ファイルパスを確認してください。";
 					nsGameWindow::MessageBoxError(nsUtils::GetWideStringFromString(msg).c_str());
 					return false;

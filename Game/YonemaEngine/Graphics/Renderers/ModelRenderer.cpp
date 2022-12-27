@@ -66,6 +66,7 @@ namespace nsYMEngine
 				default:
 					msg = modelInitData.modelFilePath;
 					msg += "のモデルのロードに失敗しました。SModelInitDataのrendererTypeが間違っています。";
+					msg.erase(msg.end() - 1);
 					nsGameWindow::MessageBoxError(nsUtils::GetWideStringFromString(msg).c_str());
 					break;
 				}

@@ -62,6 +62,15 @@ namespace nsYMEngine
 				std::wstring wFilePath = nsUtils::GetWideStringFromString(filePath);
 				bool res = m_waveFalie->Init(wFilePath.c_str());
 
+				if (res != true)
+				{
+					std::wstring str = wFilePath;
+					str.erase(str.end() - 1);
+					str += L"のサウンドの読み込みに失敗しました。";
+					nsGameWindow::MessageBoxError(str.c_str());
+					return false;
+				}
+
 				waveFileBank.Register(filePath, m_waveFalie);
 			}
 

@@ -80,6 +80,7 @@ namespace nsYMEngine
 				if (m_scene == nullptr)
 				{
 					std::wstring wstr = filePathInWStr;
+					wstr.erase(wstr.end() - 1);
 					wstr += L"‚Ìƒ‚ƒfƒ‹‚Ì“Ç‚Ýž‚Ý‚ÉŽ¸”s‚µ‚Ü‚µ‚½B";
 					nsGameWindow::MessageBoxWarning(wstr.c_str());
 					::OutputDebugStringA(m_importer->GetErrorString());
