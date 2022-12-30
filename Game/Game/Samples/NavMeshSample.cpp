@@ -21,7 +21,7 @@ namespace nsAWA
 				initData.modelRootPath = "Samples";
 				initData.positionBias = 0.01f;
 				m_level3D.Init(
-					"Assets/Levels3D/Samples/testLevel.fbx",
+					"Assets/Level3D/Samples/testLevel.fbx",
 					initData,
 					[](const SLevelChipData& chipData)->bool
 					{
