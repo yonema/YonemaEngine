@@ -24,9 +24,9 @@ namespace nsYMEngine
 			
 			//////// Constants ////////
 
-			static constexpr unsigned int g_kRemoveComponentFlags = 
-				aiComponent_CAMERAS |
+			static constexpr unsigned int g_kBasicRemoveComponentFlags = 
 				aiComponent_LIGHTS |
+				aiComponent_CAMERAS |
 				aiComponent_ANIMATIONS;
 
 			static constexpr unsigned int g_kBasicPostprocessFlags = 
@@ -44,6 +44,40 @@ namespace nsYMEngine
 				aiProcess_OptimizeMeshes			|	// メッシュを最適化して数を減らす
 				aiProcess_FlipUVs					|	// UV座標のY座標を反転する。DirectXの場合必須。
 				aiProcess_FlipWindingOrder;				// CCWをCWにする。背面を右回りでカリングする。DirectXの場合必須。
+
+			static constexpr unsigned int g_kAnimationRemoveFlags =
+				aiComponent_NORMALS |
+				aiComponent_TANGENTS_AND_BITANGENTS |
+				aiComponent_COLORS |
+				aiComponent_TEXCOORDS |
+				aiComponent_BONEWEIGHTS |
+				aiComponent_TEXTURES |
+				aiComponent_LIGHTS |
+				aiComponent_CAMERAS |
+				aiComponent_MESHES |
+				aiComponent_MATERIALS;
+
+			static constexpr unsigned int g_kAnimationPostprocessFlags =
+				aiProcess_RemoveComponent |
+				aiProcess_MakeLeftHanded;
+
+			static constexpr unsigned int g_kNavMeshRemoveComponentFlags =
+				aiComponent_TANGENTS_AND_BITANGENTS |
+				aiComponent_COLORS |
+				aiComponent_TEXCOORDS |
+				aiComponent_BONEWEIGHTS |
+				aiComponent_ANIMATIONS |
+				aiComponent_TEXTURES |
+				aiComponent_LIGHTS |
+				aiComponent_CAMERAS |
+				aiComponent_MATERIALS;
+
+			static constexpr unsigned int g_kNavMeshPostprocessFlags =
+				aiProcess_JoinIdenticalVertices |
+				aiProcess_MakeLeftHanded |
+				aiProcess_Triangulate |
+				aiProcess_RemoveComponent |
+				aiProcess_GenNormals;
 
 
 			//////// Functions ////////

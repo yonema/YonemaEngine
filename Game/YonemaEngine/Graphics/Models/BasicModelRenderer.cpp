@@ -119,7 +119,7 @@ namespace nsYMEngine
 					modelInitData.modelFilePath,
 					importer,
 					scene,
-					nsAssimpCommon::g_kRemoveComponentFlags,
+					nsAssimpCommon::g_kBasicRemoveComponentFlags,
 					nsAssimpCommon::g_kBasicPostprocessFlags
 				) != true)
 				{

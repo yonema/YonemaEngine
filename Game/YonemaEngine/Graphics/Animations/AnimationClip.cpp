@@ -48,47 +48,14 @@ namespace nsYMEngine
 
 			bool CAnimationClip::ImportScene(const char* animFilePath)
 			{
-				// utf8のファイルパス文字列が必要なため変換。
+				bool res = nsAssimpCommon::ImportScene(
+					animFilePath, m_importer,
+					m_scene,
+					nsAssimpCommon::g_kAnimationRemoveFlags,
+					nsAssimpCommon::g_kAnimationPostprocessFlags
+				);
 
-				auto filePathInChar = animFilePath;
-				auto filePathInWStr = nsUtils::GetWideStringFromString(filePathInChar);
-				auto filePathInUTF8Str = nsUtils::ToUTF8(filePathInWStr);
-
-				m_importer = new Assimp::Importer;
-				unsigned int removeFlags =
-					aiComponent_COLORS |
-					aiComponent_TEXCOORDS |
-					aiComponent_BONEWEIGHTS |
-					aiComponent_TEXTURES |
-					aiComponent_LIGHTS |
-					aiComponent_CAMERAS |
-					aiComponent_MESHES |
-					aiComponent_MATERIALS;
-				m_importer->SetPropertyInteger(AI_CONFIG_PP_RVC_FLAGS, removeFlags);
-
-				m_importer->SetPropertyInteger(
-					AI_CONFIG_PP_SBP_REMOVE, aiPrimitiveType_LINE | aiPrimitiveType_POINT);
-
-				// インポートのポストプロセス設定。
-				static constexpr int kPostprocessFlag =
-					aiProcess_RemoveComponent | 
-					aiProcess_MakeLeftHanded;
-
-
-				m_scene = m_importer->ReadFile(filePathInUTF8Str, kPostprocessFlag);
-
-				if (m_scene == nullptr)
-				{
-					std::wstring wstr = filePathInWStr;
-					wstr.erase(wstr.end() - 1);
-					wstr += L"のモデルの読み込みに失敗しました。";
-					nsGameWindow::MessageBoxWarning(wstr.c_str());
-					::OutputDebugStringA(m_importer->GetErrorString());
-					::OutputDebugStringA("\n");
-					return false;
-				}
-
-				return true;
+				return res;
 			}
 
 

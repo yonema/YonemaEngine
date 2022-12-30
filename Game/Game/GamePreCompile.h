@@ -17,6 +17,10 @@
 #include "../YonemaEngine/Effect/EffectPlayer.h"
 #include "../YonemaEngine/Sound/SoundPlayer.h"
 #include "../YonemaEngine/Utils/Random.h"
+#include "../YonemaEngine/AI/Navigations/NavMesh.h"
+#include "../YonemaEngine/AI/Navigations/Path.h"
+#include "../YonemaEngine/AI/Navigations/PathFinding.h"
+#include "../YonemaEngine/Level3D/Level3D.h"
 
 // エイリアス宣言
 
@@ -60,6 +64,16 @@ using CEffectPlayer = nsEffect::CEffectPlayer;
 // サウンド
 using CSoundPlayer = nsSound::CSoundPlayer;
 using EnSubmixType = nsSound::EnSubmixType;
+
+// ナビゲーション
+using CNavMesh = nsAI::nsNavigations::CNavMesh;
+using CPath = nsAI::nsNavigations::CPath;
+using CPathFinding = nsAI::nsNavigations::CPathFinding;
+
+// レベル3D
+using CLevel3D = nsLevel3D::CLevel3D;
+using SLevelChipData = nsLevel3D::SLevelChipData;
+using SLevel3DInitData = nsLevel3D::SLevel3DinitData;
 
 // 数学
 using CVector2 = nsMath::CVector2;

@@ -161,6 +161,11 @@ namespace nsYMEngine
 				}
 			}
 
+			constexpr const auto* GetScene() noexcept
+			{
+				return m_scene;
+			}
+
 
 			// DebugSystem
 

@@ -9,6 +9,7 @@
 #include "GetBoneMatrixSample.h"
 #include "EffectSample.h"
 #include "SoundSample.h"
+#include "NavMeshSample.h"
 
 namespace nsAWA
 {
@@ -16,7 +17,7 @@ namespace nsAWA
 	{
 		bool CSampleMain::Start()
 		{
-			constexpr int kSampleIdx = 9;
+			constexpr int kSampleIdx = 10;
 
 			switch (kSampleIdx)
 			{
@@ -49,6 +50,9 @@ namespace nsAWA
 				break;
 			case 9:
 				m_sampleGO = NewGO<CSoundSample>(EnGOPriority::enMid, "SoundSample");
+				break;
+			case 10:
+				m_sampleGO = NewGO<CNavMeshSample>(EnGOPriority::enMid, "NavMeshSample");
 				break;
 			default:
 				m_sampleGO = NewGO<CSkeltalAnimationSample>(EnGOPriority::enMid, "SkeltalAnimationSample");
