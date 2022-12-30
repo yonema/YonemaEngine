@@ -20,7 +20,13 @@ namespace nsYMEngine
 
 		void CalcRotationFromMatrix(CQuaternion& rotOut, const CMatrix& srcMat) noexcept
 		{
-			rotOut.SetRotation(srcMat);
+			// ‰ñ“]¬•ªˆÈŠO‚ğœ‹
+			auto tmpMat = srcMat;
+			tmpMat.m_vec4Mat[0].Normalize();
+			tmpMat.m_vec4Mat[1].Normalize();
+			tmpMat.m_vec4Mat[2].Normalize();
+			tmpMat.m_vec4Mat[3] = { 0.0f,0.0f,0.0f,1.0f };
+			rotOut.SetRotation(tmpMat);
 
 			return;
 		}
