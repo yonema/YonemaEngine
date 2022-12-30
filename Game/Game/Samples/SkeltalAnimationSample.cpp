@@ -56,6 +56,8 @@ namespace nsAWA
 				Gamepad()->IsTrigger(EnPadButton::enB) ||
 				Keyboard()->IsTrigger(EnKeyButton::enEnter);
 
+			bool isTrigger3 = Keyboard()->IsTrigger(EnKeyButton::enS);
+
 			static bool isAnimLoop = false;
 			static float animSpeed = 1.0f;
 			static unsigned int animIdx = 0;
@@ -69,6 +71,7 @@ namespace nsAWA
 					animIdx = 0;
 				}
 			}
+
 			// アニメーションスピード変更
 			if (isTriggerUp)
 			{
@@ -92,6 +95,10 @@ namespace nsAWA
 				isAnimLoop = !isAnimLoop;
 			}
 
+			if (isTrigger3)
+			{
+				m_modelRenderer->PlayAnimationFromBeginning(animIdx, animSpeed, isAnimLoop);
+			}
 			m_modelRenderer->PlayAnimation(animIdx, animSpeed, isAnimLoop);
 
 			// モデル回転

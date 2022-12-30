@@ -69,17 +69,24 @@ namespace nsYMEngine
 
 			void CAnimator::PlayAnimation(unsigned int animIdx) noexcept
 			{
-				if (animIdx >= static_cast<unsigned int>(m_animationClips.size()))
-				{
-					// 指定されたアニメーションインデックスが、アニメーション数を超えている。
-					return;
-				}
 				if (m_animationIndex == animIdx/* && m_isPlaying == true*/)
 				{
 					// 現在のアニメーションと指定されたアニメーションが一緒なら変更無し。
 					return;
 				}
 
+				PlayAnimationFromBeginning(animIdx);
+
+				return;
+			}
+
+			void CAnimator::PlayAnimationFromBeginning(unsigned int animIdx) noexcept
+			{
+				if (animIdx >= static_cast<unsigned int>(m_animationClips.size()))
+				{
+					// 指定されたアニメーションインデックスが、アニメーション数を超えている。
+					return;
+				}
 				m_animationClips[m_animationIndex]->ResetAnimationParam();
 				m_animationIndex = animIdx;
 				m_animationTimer = 0.0f;
@@ -87,6 +94,7 @@ namespace nsYMEngine
 
 				return;
 			}
+
 
 			void CAnimator::CalcAndGetAnimatedBoneTransforms(
 				std::vector<nsMath::CMatrix>* pMTransforms) noexcept

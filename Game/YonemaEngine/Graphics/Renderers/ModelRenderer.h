@@ -104,6 +104,16 @@ namespace nsYMEngine
 					}
 				}
 
+				constexpr void PlayAnimationFromBeginning(unsigned int animIdx, float animSpeed = -1, bool isLoop = true) noexcept
+				{
+					if (m_renderer)
+					{
+						SetAnimationSpeed(animSpeed);
+						SetIsAnimationLoop(isLoop);
+						m_renderer->PlayAnimationFromBeginning(animIdx);
+					}
+				}
+
 				/**
 				 * @brief アニメーションを再生する。アニメーションが設定されていなかったら何もしません。
 				 * @param animIdx 再生するアニメーションのインデックス。SAnimationInitDataで設定した順番で登録されています。

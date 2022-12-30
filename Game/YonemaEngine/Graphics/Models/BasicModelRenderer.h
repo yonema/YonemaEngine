@@ -116,6 +116,14 @@ namespace nsYMEngine
 					}
 				}
 
+				inline void PlayAnimationFromBeginning(unsigned int animIdx) noexcept
+				{
+					if (m_animator)
+					{
+						m_animator->PlayAnimationFromBeginning(animIdx);
+					}
+				}
+
 				inline bool IsPlaying() const noexcept
 				{
 					return m_animator ? m_animator->IsPlaying() : false;

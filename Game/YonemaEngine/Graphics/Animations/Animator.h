@@ -45,6 +45,8 @@ namespace nsYMEngine
 
 				void PlayAnimation(unsigned int animIdx) noexcept;
 
+				void PlayAnimationFromBeginning(unsigned int animIdx) noexcept;
+
 				void CalcAndGetAnimatedBoneTransforms(
 					std::vector<nsMath::CMatrix>* pMTransforms) noexcept;
 

@@ -17,7 +17,7 @@ namespace nsAWA
 	{
 		bool CSampleMain::Start()
 		{
-			constexpr int kSampleIdx = 10;
+			constexpr int kSampleIdx = 0;
 
 			switch (kSampleIdx)
 			{
