@@ -18,6 +18,7 @@ namespace nsYMEngine
 
 struct aiScene;
 struct aiMaterial;
+struct aiNode;
 
 
 namespace nsYMEngine
@@ -64,7 +65,7 @@ namespace nsYMEngine
 
 					std::vector<SVertex> vertices = {};
 					std::vector<uint16_t> indices = {};
-					std::string diffuseMapFilePath = {};
+					nsMath::CMatrix mNodeTransformInv = nsMath::CMatrix::Identity();
 				};
 
 				/**
@@ -201,9 +202,18 @@ namespace nsYMEngine
 				) noexcept;
 
 				void LoadMeshes(
+					const nsRenderers::SModelInitData& modelInitData,
 					const aiScene* scene,
 					std::vector<SMesh>* destMeshesOut,
 					const unsigned int numMeshes
+				) noexcept;
+
+				void LoadMeshPerNode(
+					const nsRenderers::SModelInitData& modelInitData,
+					aiNode* node,
+					const aiScene* scene,
+					const nsMath::CMatrix& parentTransform,
+					std::list<SMesh>* dstMeshesListOut
 				) noexcept;
 
 				void LoadMesh(SMesh* dstMesh, const aiMesh& srcMesh, unsigned int meshIdx) noexcept;

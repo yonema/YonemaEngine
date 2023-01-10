@@ -10,11 +10,9 @@ float4 PSMain(SPSInput input) : SV_TARGET
 	float3 baseCol = diffuseTexCol.xyz;
 	float3 col = baseCol;
 	float3 lightDir = normalize(float3(1.0f, -1.0f, 1.0f));
-	float diffuse = dot(-lightDir, input.normal);
+	float diffuse = dot(-lightDir, input.normal.xyz);
 
-	col *= diffuse;
-
-	col += baseCol * 0.3f;
+	col = max(col * diffuse, baseCol * 0.2f);
 
 	return float4(col, 1.0f);
 }

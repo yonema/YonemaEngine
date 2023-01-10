@@ -1,4 +1,5 @@
 #include "GenericRenderer.h"
+#include "GenericRenderer.h"
 namespace nsYMEngine
 {
 	namespace nsGraphics

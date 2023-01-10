@@ -48,7 +48,10 @@ namespace nsYMEngine
 				nsMath::CQuaternion rotation;
 				nsGraphics::nsAssimpCommon::AiMatrixToMyMatrix(
 					levelChip->mTransformation, &mTransformation);
-
+				nsMath::CMatrix mTrans, mRot, mScale;
+				mTrans.MakeTranslation(translation);
+				mRot.MakeRotationFromQuaternion(rotation);
+				mScale.MakeScaling(scaling);
 				mTransformation = initData.mBias * mTransformation;
 
 				nsMath::CalcTRSFromMatrix(translation, rotation, scaling, mTransformation);

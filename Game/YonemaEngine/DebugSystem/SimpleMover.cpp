@@ -104,7 +104,8 @@ namespace nsYMEngine
 			bool isMoveUp = keyboard->IsPress(nsInput::CKeyboard::EnKeyButton::enQ);
 			bool isMoveDown = keyboard->IsPress(nsInput::CKeyboard::EnKeyButton::enE);
 
-			bool isDush = keyboard->IsPress(nsInput::CKeyboard::EnKeyButton::enShift);
+			bool isDush = keyboard->IsPress(nsInput::CKeyboard::EnKeyButton::enLShift);
+			bool isFastDush = keyboard->IsPress(nsInput::CKeyboard::EnKeyButton::enRShift);
 			bool isWalk = keyboard->IsPress(nsInput::CKeyboard::EnKeyButton::enCtrl);
 
 
@@ -114,6 +115,10 @@ namespace nsYMEngine
 			if (isDush)
 			{
 				moveSpeed *= 2.0f;
+			}
+			else if (isFastDush)
+			{
+				moveSpeed *= 10.0f;
 			}
 			if (isWalk)
 			{

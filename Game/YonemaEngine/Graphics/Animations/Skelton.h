@@ -43,9 +43,9 @@ namespace nsYMEngine
 						mFinalTransform(nsMath::CMatrix::Identity())
 					{};
 
-					nsMath::CMatrix mOffset;
-					nsMath::CMatrix mGlobalTransform;
-					nsMath::CMatrix mFinalTransform;
+					nsMath::CMatrix mOffset = nsMath::CMatrix::Identity();
+					nsMath::CMatrix mGlobalTransform = nsMath::CMatrix::Identity();
+					nsMath::CMatrix mFinalTransform = nsMath::CMatrix::Identity();
 				};
 
 				struct SVertexBoneData
@@ -113,10 +113,6 @@ namespace nsYMEngine
 					unsigned int boneIdx, const nsMath::CMatrix& mGlobalTransform) noexcept
 				{
 					m_boneInfoArray[boneIdx].mGlobalTransform = mGlobalTransform;
-					nsMath::CVector3 scale;
-					scale.x = mGlobalTransform.m_vec4Mat[0].Length();
-					scale.y = mGlobalTransform.m_vec4Mat[1].Length();
-					scale.z = mGlobalTransform.m_vec4Mat[2].Length();
 					m_boneInfoArray[boneIdx].mFinalTransform = 
 						m_boneInfoArray[boneIdx].mOffset * 
 						mGlobalTransform * 

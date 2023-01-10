@@ -146,7 +146,7 @@ namespace nsYMEngine
 				}
 
 				std::vector<SMesh> dstMeshes = {};
-				LoadMeshes(scene, &dstMeshes, kNumMeshes);
+				LoadMeshes(modelInitData, scene, &dstMeshes, kNumMeshes);
 				LoadMaterials(modelInitData, scene);
 				CreateVertexAndIndexBuffer(dstMeshes);
 				CopyToPhysicsMeshGeometryBuffer(dstMeshes, modelInitData, numVertices, numIndices);
@@ -224,20 +224,93 @@ namespace nsYMEngine
 			}
 
 			void CBasicModelRenderer::LoadMeshes(
+				const nsRenderers::SModelInitData& modelInitData,
 				const aiScene* scene,
 				std::vector<SMesh>* destMeshesOut,
 				const unsigned int numMeshes
 			) noexcept
 			{
-				destMeshesOut->reserve(numMeshes);
-				for (unsigned int meshIdx = 0; meshIdx < numMeshes; meshIdx++)
+				auto* node = scene->mRootNode;
+				std::list<SMesh> meshesList;
+				LoadMeshPerNode(
+					modelInitData,
+					scene->mRootNode,
+					scene,
+					nsMath::CMatrix::Identity(),
+					&meshesList
+				);
+
+
+				destMeshesOut->reserve(meshesList.size());
+
+				for (const auto& mesh : meshesList)
 				{
 					SMesh dstMesh = {};
-					const auto* srcMesh = scene->mMeshes[meshIdx];
-
-					LoadMesh(&dstMesh, *srcMesh, meshIdx);
+					dstMesh.vertices.reserve(mesh.vertices.size());
+					for (const auto& vertex : mesh.vertices)
+					{
+						dstMesh.vertices.emplace_back(vertex);
+					}
+					for (const auto& index : mesh.indices)
+					{
+						dstMesh.indices.emplace_back(index);
+					}
 
 					destMeshesOut->emplace_back(dstMesh);
+				}
+
+				return;
+			}
+
+			void CBasicModelRenderer::LoadMeshPerNode(
+				const nsRenderers::SModelInitData& modelInitData,
+				aiNode* node,
+				const aiScene* scene,
+				const nsMath::CMatrix& parentTransform,
+				std::list<SMesh>* dstMeshesListOut
+			) noexcept
+			{
+				unsigned int kNumMeshes = node->mNumMeshes;
+				nsMath::CMatrix mNodeTransform;
+				nsAssimpCommon::AiMatrixToMyMatrix(node->mTransformation, &mNodeTransform);
+				nsMath::CMatrix mGlobalTransform = mNodeTransform * parentTransform;
+				nsMath::CMatrix mGlobalRotate = mGlobalTransform;
+				mGlobalRotate.m_vec4Mat[0].Normalize();
+				mGlobalRotate.m_vec4Mat[1].Normalize();
+				mGlobalRotate.m_vec4Mat[2].Normalize();
+				mGlobalRotate.m_vec4Mat[3] = { 0.0f,0.0f,0.0f,1.0f };
+
+				for (unsigned int meshIdx = 0; meshIdx < kNumMeshes; meshIdx++)
+				{
+					SMesh dstMesh = {};
+					const auto* srcMesh = scene->mMeshes[node->mMeshes[meshIdx]];
+
+					LoadMesh(&dstMesh, *srcMesh, node->mMeshes[meshIdx]);
+
+					if (IsSkeltalAnimationValid() != true)
+					{
+						for (auto& vertex : dstMesh.vertices)
+						{
+							mGlobalTransform.Apply(vertex.position);
+							mGlobalRotate.Apply(vertex.normal);
+							vertex.normal.Normalize();
+							dstMesh.mNodeTransformInv = mGlobalTransform;
+							dstMesh.mNodeTransformInv.Inverse();
+						}
+					}
+
+					dstMeshesListOut->emplace_back(dstMesh);
+				}
+
+				for (unsigned int childIdx = 0; childIdx < node->mNumChildren; childIdx++)
+				{
+					LoadMeshPerNode(
+						modelInitData,
+						node->mChildren[childIdx],
+						scene,
+						mGlobalTransform,
+						dstMeshesListOut
+					);
 				}
 
 				return;
@@ -310,7 +383,6 @@ namespace nsYMEngine
 					dstIndeices[faceIdx * 3 + 2] = face.mIndices[2];
 
 				}
-
 
 				return;
 			}

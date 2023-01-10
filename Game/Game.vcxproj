@@ -151,6 +151,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Game\Samples\ModelRendererSample.cpp" />
     <ClCompile Include="YonemaEngine\Level3D\LevelChip.cpp" />
     <ClCompile Include="YonemaEngine\Level3D\Level3D.cpp" />
     <ClCompile Include="YonemaEngine\AI\Navigations\PathFinding.cpp" />
@@ -253,6 +254,7 @@
     <Image Include="Assets\Images\StarMan.png" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Game\Samples\ModelRendererSample.h" />
     <ClInclude Include="YonemaEngine\Level3D\LevelChip.h" />
     <ClInclude Include="YonemaEngine\Level3D\Level3D.h" />
     <ClInclude Include="YonemaEngine\AI\Navigations\PathFinding.h" />

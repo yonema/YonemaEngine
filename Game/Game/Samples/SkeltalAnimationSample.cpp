@@ -32,6 +32,9 @@ namespace nsAWA
 			m_modelRenderer->Init(modelInitData);
 			m_modelRenderer->SetIsAnimationLoop(false);
 
+			MainCamera()->SetFarClip(10000.0f);
+
+
 			return true;
 		}
 
