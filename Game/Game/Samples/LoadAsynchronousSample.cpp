@@ -10,7 +10,7 @@ namespace nsAWA
 		const char* CLoadAsynchronousSample::
 			m_kAnimFilePaths[static_cast<int>(EnAnimType::enNum)] =
 		{
-			"Assets/Animations/Sword_Idle.fbx",
+			"Assets/Animations/Player/Sword_Idle.fbx",
 			"Assets/Animations/Samples/Rumba_Dancing.fbx",
 			"Assets/Animations/Samples/Hip_Hop_Dancing.fbx",
 			"Assets/Animations/Samples/Robot_Hip_Hop_Dance.fbx",

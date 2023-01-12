@@ -11,7 +11,7 @@ namespace nsAWA
 		const char* CGetBoneMatrixSample::
 			m_kHumanAnimFilePaths[static_cast<int>(EnHumanAnimType::enNum)] = 
 		{
-			"Assets/Animations/Sword_Idle.fbx"
+			"Assets/Animations/Player/Sword_Idle.fbx",
 		};
 		const char* const CGetBoneMatrixSample::m_kHumanRightHandBoneName = "J_Bip_R_Hand";
 

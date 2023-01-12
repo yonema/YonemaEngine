@@ -216,6 +216,11 @@ namespace nsYMEngine
 					return m_renderer ? m_renderer->GetWorldMatrix() : nsMath::CMatrix::Identity();
 				}
 
+				constexpr bool IsLoadingAsynchronous() const noexcept
+				{
+					return m_enableLoadingAsynchronous;
+				}
+
 
 			private:
 				void Terminate() noexcept;
