@@ -29,6 +29,11 @@ namespace nsYMEngine
 					const char* animationFilePaths[]
 				);
 
+				void Init(
+					unsigned int numAnims,
+					const char* animFilePaths[]
+				);
+
 				unsigned int numAnimations = 0;
 				std::vector<const char*> animationFilePathArray = {};
 			};
@@ -39,7 +44,11 @@ namespace nsYMEngine
 				constexpr CAnimator() = default;
 				~CAnimator();
 
-				bool Init(const SAnimationInitData& animInitData, CSkelton* pSkelton);
+				bool Init(
+					const SAnimationInitData& animInitData,
+					CSkelton* pSkelton,
+					bool loadingSynchronous
+				);
 
 				void Release();
 
@@ -93,11 +102,33 @@ namespace nsYMEngine
 					m_animationClips[animIdx]->AddAnimationEventFunc(animationEventFunc);
 				}
 
+				inline bool IsLoaded() const noexcept
+				{
+					if (m_animationClips.empty())
+					{
+						return true;
+					}
+
+					for (const auto* animClip : m_animationClips)
+					{
+						if (animClip->IsLoaded() != true)
+						{
+							return false;
+						}
+					}
+
+					return true;
+				}
+
 			private:
 
 				void Terminate();
 
-				bool InitAnimationClips(const SAnimationInitData& animInitData, CSkelton* pSkelton);
+				bool InitAnimationClips(
+					const SAnimationInitData& animInitData,
+					CSkelton* pSkelton,
+					bool loadingSynchronous
+				);
 
 
 			private:
@@ -107,6 +138,7 @@ namespace nsYMEngine
 				bool m_isPlaying = true;	// çÏê¨ÇµÇΩèuä‘Ç©ÇÁçƒê∂äJén
 				float m_animationSpeed = 1.0f;
 				bool m_isLoop = true;
+				CSkelton* m_pSkelton = nullptr;
 			};
 
 		}

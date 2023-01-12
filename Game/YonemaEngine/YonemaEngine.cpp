@@ -6,6 +6,7 @@
 #include "Sound/SoundEngine.h"
 #include "Memory/ResourceBankTable.h"
 #include "Utils/Random.h"
+#include "Thread/LoadModelThread.h"
 #include "DebugSystem/DisplayFPS.h"
 #include "../Game/Game.h"
 #include "../Game/Samples/SampleMain.h"
@@ -34,6 +35,7 @@ namespace nsYMEngine
 		m_effectEngine = nsEffect::CEffectEngine::CreateInstance();
 		m_soundEngine = nsSound::CSoundEngine::CreateInstance();
 		m_resourceBankTable = nsMemory::CResourceBankTable::CreateInstance();
+		m_loadModelThread = nsThread::CLoadModelThread::CreateInstance();
 
 		//NewGO<nsAWA::CGame>(EnGOPriority::enMid, "AWAGame");
 		NewGO<nsAWA::nsSamples::CSampleMain> ("SampleMain");
@@ -56,6 +58,10 @@ namespace nsYMEngine
 
 		delete m_random;
 		m_random = nullptr;
+
+		// オブジェクトの破棄より先にスレッドの破棄
+		nsThread::CLoadModelThread::DeleteInstance();
+		m_loadModelThread = nullptr;
 
 		// GameObjectManagerを先に消して、ゲームオブジェクトを全て破棄しておく。
 		// ゲームオブジェクトのOnDestroyで各種エンジンを使用する処理を書いている場合があるため。

@@ -17,7 +17,7 @@ namespace nsAWA
 			// CreateModelRenderer
 			SModelInitData modelInitData;
 			modelInitData.modelFilePath = m_kModelFilePath;
-			//modelInitData.vertexBias.SetRotationXDeg(90.0f);
+			modelInitData.enableNodeTransform = true;
 			m_modelRenderer = NewGO<CModelRenderer>();
 			m_modelRenderer->Init(modelInitData);
 

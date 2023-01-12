@@ -57,5 +57,13 @@ namespace nsYMEngine
 	};
 
 
+	enum class EnLoadingState
+	{
+		enBeforeLoading,
+		enNowLoading,
+		enAfterLoading
+	};
+
+
 
 }

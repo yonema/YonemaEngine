@@ -6,10 +6,6 @@ namespace nsYMEngine
 {
 	namespace nsGraphics
 	{
-		namespace nsAssimp
-		{
-			class CAssimpRenderer;
-		}
 		namespace nsAnimations
 		{
 			struct SAnimationInitData;
@@ -29,7 +25,7 @@ namespace nsYMEngine
 	{
 		namespace nsRenderers
 		{
-			struct SModelInitData : private nsUtils::SNoncopyable
+			struct SModelInitData
 			{
 				const char* modelFilePath = nullptr;
 				CRendererTable::EnRendererType rendererType = 
@@ -38,6 +34,8 @@ namespace nsYMEngine
 				const nsAnimations::SAnimationInitData* animInitData = nullptr;
 				nsPhysics::SMeshGeometryBuffer* physicsMeshGeomBuffer = nullptr;
 				const char* textureRootPath = nullptr;
+				bool enableNodeTransform = false;
+				bool enableLoadingSynchronous = false;
 			};
 
 			class CModelRenderer : public nsGameObject::IGameObject
@@ -227,7 +225,6 @@ namespace nsYMEngine
 				void UpdateWorldMatrix() noexcept;
 
 			private:
-				nsAssimp::CAssimpRenderer* m_assimpRenderer = nullptr;
 				nsModels::CBasicModelRenderer* m_renderer = nullptr;
 				CRendererTable::EnRendererType m_rendererType =
 					CRendererTable::EnRendererType::enNumType;
@@ -235,6 +232,9 @@ namespace nsYMEngine
 				nsMath::CVector3 m_position = nsMath::CVector3::Zero();
 				nsMath::CQuaternion m_rotation = nsMath::CQuaternion::Identity();
 				nsMath::CVector3 m_scale = nsMath::CVector3::One();
+
+				bool m_enableLoadingSynchronous = false;
+				SModelInitData m_modelInitData = {};
 			};
 
 		}

@@ -149,5 +149,19 @@ namespace nsYMEngine
 
 			return;
 		}
+
+
+
+		void CSimpleMover::MoveCameraBySimpleMover() noexcept
+		{
+			// MoveCameraBySimpleMover
+			MainCamera()->SetPosition(GetPosition());
+			nsMath::CVector3 toTarget = GetForward();
+			toTarget.Scale(5.0f);
+			MainCamera()->SetTargetPosition(GetPosition() + toTarget);
+
+			return;
+		}
+
 	}
 }

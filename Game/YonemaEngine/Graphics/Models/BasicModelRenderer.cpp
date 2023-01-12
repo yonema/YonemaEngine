@@ -1,6 +1,7 @@
 #include "BasicModelRenderer.h"
 #include "../GraphicsEngine.h"
 #include "AssimpCommon.h"
+#include "../../Thread/LoadModelThread.h"
 #include "../../Utils/StringManipulation.h"
 #include "../../Utils/AlignSize.h"
 
@@ -12,6 +13,12 @@ namespace nsYMEngine
 		{
 			void CBasicModelRenderer::Draw(nsDx12Wrappers::CCommandList* commandList)
 			{
+				if (m_loadingState != EnLoadingState::enAfterLoading)
+				{
+					int a = 1;
+					return;
+				}
+
 				// モデルごとの定数バッファのセット
 				ID3D12DescriptorHeap* modelDescHeaps[] = { m_modelDH.Get() };
 				commandList->SetDescriptorHeaps(1, modelDescHeaps);
@@ -69,6 +76,9 @@ namespace nsYMEngine
 
 			void CBasicModelRenderer::Release()
 			{
+				m_isLoadedModel = false;
+				m_loadingState = EnLoadingState::enBeforeLoading;
+
 				for (auto& materialDH : m_materialDHs)
 				{
 					if (materialDH)
@@ -112,6 +122,24 @@ namespace nsYMEngine
 
 			bool CBasicModelRenderer::Init(const nsRenderers::SModelInitData& modelInitData) noexcept
 			{
+				m_isLoadedModel = false;
+
+				if (modelInitData.enableLoadingSynchronous)
+				{
+					m_loadingState = EnLoadingState::enNowLoading;
+					m_modelInitDataRef = &modelInitData;
+					nsThread::CLoadModelThread::GetInstance()->PushLoadModelAndAnimRef(
+						this, &modelInitData, nullptr, nullptr, nullptr
+					);
+
+					return true;
+				}
+				else
+				{
+					m_loadingState = EnLoadingState::enAfterLoading;
+					m_isLoadedModel = true;
+				}
+
 				Assimp::Importer* importer = nullptr;
 				const aiScene* scene = nullptr;
 
@@ -128,6 +156,47 @@ namespace nsYMEngine
 
 				InitSkeltalAnimation(modelInitData, scene);
 
+				InitAfterLoadModel(modelInitData, scene);
+
+				
+				
+				return true;
+			}
+
+			bool CBasicModelRenderer::InitSynchronous() noexcept
+			{
+				if (nsAssimpCommon::ImportScene(
+					m_modelInitDataRef->modelFilePath,
+					m_importerForLoadSynchronous,
+					m_sceneForLoadSynchronous,
+					nsAssimpCommon::g_kBasicRemoveComponentFlags,
+					nsAssimpCommon::g_kBasicPostprocessFlags
+				) != true)
+				{
+					return false;
+				}
+
+				InitSkeltalAnimation(*m_modelInitDataRef, m_sceneForLoadSynchronous);
+
+				m_isLoadedModel = true;
+
+				return true;
+			}
+
+			void CBasicModelRenderer::InitAfterLoadModel(
+				const nsRenderers::SModelInitData& modelInitData,
+				const aiScene* scene
+			)
+			{
+				if (scene == nullptr)
+				{
+					if (m_sceneForLoadSynchronous == nullptr) 
+					{
+						return;
+					}
+
+					scene = m_sceneForLoadSynchronous;
+				}
 				const auto kNumMeshes = scene->mNumMeshes;
 				unsigned int numVertices = 0;
 				unsigned int numIndices = 0;
@@ -154,7 +223,7 @@ namespace nsYMEngine
 				CreateMaterialSRV();
 				m_bias.MakeRotationFromQuaternion(modelInitData.vertexBias);
 
-				if (IsSkeltalAnimationValid() && 
+				if (IsSkeltalAnimationValid() &&
 					modelInitData.rendererType == nsRenderers::CRendererTable::EnRendererType::enBasicModel)
 				{
 					SetRenderType(nsRenderers::CRendererTable::EnRendererType::enSkinModel);
@@ -164,8 +233,17 @@ namespace nsYMEngine
 					SetRenderType(modelInitData.rendererType);
 				}
 				EnableDrawing();
-				
-				return true;
+
+				if (m_importerForLoadSynchronous)
+				{
+					m_importerForLoadSynchronous->FreeScene();
+					m_sceneForLoadSynchronous = nullptr;
+
+					delete m_importerForLoadSynchronous;
+					m_importerForLoadSynchronous = nullptr;
+				}
+
+				return;
 			}
 
 			bool CBasicModelRenderer::InitSkeltalAnimation(
@@ -179,7 +257,11 @@ namespace nsYMEngine
 					m_skelton->Init(*scene->mRootNode);
 					m_animator = new nsAnimations::CAnimator();
 					isSkeltalAnimation = 
-						m_animator->Init(*modelInitData.animInitData, m_skelton);
+						m_animator->Init(
+							*modelInitData.animInitData,
+							m_skelton, 
+							modelInitData.enableLoadingSynchronous
+						);
 				}
 
 				return isSkeltalAnimation;
@@ -287,7 +369,8 @@ namespace nsYMEngine
 
 					LoadMesh(&dstMesh, *srcMesh, node->mMeshes[meshIdx]);
 
-					if (IsSkeltalAnimationValid() != true)
+					if (modelInitData.enableNodeTransform == true && 
+						IsSkeltalAnimationValid() != true)
 					{
 						for (auto& vertex : dstMesh.vertices)
 						{
@@ -679,6 +762,32 @@ namespace nsYMEngine
 
 				return boneNameToIdx->second;
 			}
+
+			void CBasicModelRenderer::CheckLoaded() noexcept
+			{
+				if (m_loadingState != EnLoadingState::enNowLoading)
+				{
+					return;
+				}
+
+				if (m_isLoadedModel != true)
+				{
+					return;
+				}
+
+				if (m_animator)
+				{
+					if (m_animator->IsLoaded() != true)
+					{
+						return;
+					}
+				}
+
+				m_loadingState = EnLoadingState::enAfterLoading;
+
+				return;
+			}
+
 
 
 		}

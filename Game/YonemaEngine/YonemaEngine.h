@@ -35,6 +35,10 @@ namespace nsYMEngine
 	{
 		class CRandom;
 	}
+	namespace nsThread
+	{
+		class CLoadModelThread;
+	}
 }
 
 namespace nsYMEngine
@@ -114,6 +118,7 @@ namespace nsYMEngine
 		nsMemory::CResourceBankTable* m_resourceBankTable = nullptr;
 		nsTime::CGameTime m_gameTime;
 		nsUtils::CRandom* m_random = nullptr;
+		nsThread::CLoadModelThread* m_loadModelThread = nullptr;
 		bool m_isExitGame = false;
 
 		nsDebugSystem::CDisplayFPS* m_displayFPS = nullptr;

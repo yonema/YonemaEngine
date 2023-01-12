@@ -1,5 +1,6 @@
 #include "Animator.h"
 #include "../Models/AssimpCommon.h"
+#include "../Thread/LoadModelThread.h"
 
 namespace nsYMEngine
 {
@@ -18,6 +19,23 @@ namespace nsYMEngine
 				{
 					animationFilePathArray.emplace_back(animationFilePaths[animIdx]);
 				}
+				return;
+			}
+
+			void SAnimationInitData::Init(
+				unsigned int numAnims,
+				const char* animFilePaths[]
+			)
+			{
+				numAnimations = numAnims;
+
+				animationFilePathArray.clear();
+				animationFilePathArray.reserve(numAnimations);
+				for (unsigned int animIdx = 0; animIdx < numAnimations; animIdx++)
+				{
+					animationFilePathArray.emplace_back(animFilePaths[animIdx]);
+				}
+
 				return;
 			}
 
@@ -40,21 +58,41 @@ namespace nsYMEngine
 				return;
 			}
 
-			bool CAnimator::Init(const SAnimationInitData& animInitData, CSkelton* pSkelton)
+			bool CAnimator::Init(
+				const SAnimationInitData& animInitData, 
+				CSkelton* pSkelton, 
+				bool loadingSynchronous
+			)
 			{
-				bool res = InitAnimationClips(animInitData, pSkelton);
+				m_pSkelton = pSkelton;
+				bool res = InitAnimationClips(animInitData, pSkelton, loadingSynchronous);
 
 				return res;
 			}
 
-			bool CAnimator::InitAnimationClips(const SAnimationInitData& animInitData, CSkelton* pSkelton)
+			bool CAnimator::InitAnimationClips(
+				const SAnimationInitData& animInitData,
+				CSkelton* pSkelton,
+				bool loadingSynchronous
+			)
 			{
 				bool res = false;
 				m_animationClips.reserve(animInitData.numAnimations);
 
 				for (unsigned int animIdx = 0; animIdx < animInitData.numAnimations; animIdx++)
 				{
-					m_animationClips.emplace_back(new CAnimationClip());
+					auto* animClip = new CAnimationClip();
+					m_animationClips.emplace_back(animClip);
+					const auto* animFilePath = animInitData.animationFilePathArray[animIdx];
+
+					if (loadingSynchronous)
+					{
+						nsThread::CLoadModelThread::GetInstance()->PushLoadModelAndAnimRef(
+							nullptr, nullptr, animClip, animFilePath, pSkelton
+						);
+						continue;
+					}
+
 					res = m_animationClips[animIdx]->Init(
 						animInitData.animationFilePathArray[animIdx], pSkelton);
 

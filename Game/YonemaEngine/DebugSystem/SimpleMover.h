@@ -61,6 +61,9 @@ namespace nsYMEngine
 				return m_right;
 			}
 
+			void MoveCameraBySimpleMover() noexcept;
+
+
 		private:
 			void CalcForward() noexcept;
 

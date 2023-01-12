@@ -82,6 +82,11 @@ namespace nsYMEngine
 					m_animationEventFuncArray.emplace_back(animationEventFunc);
 				}
 
+				constexpr bool IsLoaded() const noexcept
+				{
+					return m_isLoaded;
+				}
+
 			private:
 
 				void Terminate();
@@ -137,6 +142,7 @@ namespace nsYMEngine
 				unsigned int m_prevAnimEventIdx = 0;
 				int m_animLoopCounter = 0;
 				std::vector<std::function<void(void)>> m_animationEventFuncArray = {};
+				bool m_isLoaded = false;
 			};
 
 		}

@@ -38,10 +38,10 @@ namespace nsYMEngine
 				aiProcess_GenSmoothNormals			|	// 全ての頂点になめらかな法線を生成
 				aiProcess_LimitBoneWeights			|	// 1つの頂点に影響を与えるボーンの最大数を制限
 				aiProcess_ImproveCacheLocality		|	// 頂点キャッシュの局所性を高めるために三角形の順序を変更
-				aiProcess_RemoveRedundantMaterials	|	// 冗長なマテリアルの消去
-				aiProcess_FindInvalidData			|	// 無効なデータを探し、消去・修正
-				aiProcess_GenUVCoords				|	// UV以外のマッピングをUVへ変換
-				aiProcess_OptimizeMeshes			|	// メッシュを最適化して数を減らす
+				//aiProcess_RemoveRedundantMaterials	|	// 冗長なマテリアルの消去
+				//aiProcess_FindInvalidData			|	// 無効なデータを探し、消去・修正
+				//aiProcess_GenUVCoords				|	// UV以外のマッピングをUVへ変換
+				//aiProcess_OptimizeMeshes			|	// メッシュを最適化して数を減らす
 				aiProcess_FlipUVs					|	// UV座標のY座標を反転する。DirectXの場合必須。
 				aiProcess_FlipWindingOrder;				// CCWをCWにする。背面を右回りでカリングする。DirectXの場合必須。
 

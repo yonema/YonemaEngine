@@ -27,6 +27,7 @@ namespace nsYMEngine
 
 			void CAnimationClip::Release()
 			{
+				m_isLoaded = false;
 				if (m_importer)
 				{
 					m_importer->FreeScene();
@@ -39,7 +40,11 @@ namespace nsYMEngine
 
 			bool CAnimationClip::Init(const char* animFilePath, CSkelton* pSkelton)
 			{
+				m_isLoaded = false;
+
 				ImportScene(animFilePath);
+
+				m_isLoaded = true;
 
 				m_skeltonRef = pSkelton;
 
@@ -49,7 +54,8 @@ namespace nsYMEngine
 			bool CAnimationClip::ImportScene(const char* animFilePath)
 			{
 				bool res = nsAssimpCommon::ImportScene(
-					animFilePath, m_importer,
+					animFilePath,
+					m_importer,
 					m_scene,
 					nsAssimpCommon::g_kAnimationRemoveFlags,
 					nsAssimpCommon::g_kAnimationPostprocessFlags
