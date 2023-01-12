@@ -303,7 +303,7 @@
     <ClCompile Include="YonemaEngine\Thread\LoadtModelThread.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Game\Samples\LoadSynchronousSample.cpp">
+    <ClCompile Include="Game\Samples\LoadAsynchronousSample.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -652,7 +652,7 @@
     <ClInclude Include="YonemaEngine\Thread\LoadModelThread.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Game\Samples\LoadSynchronousSample.h">
+    <ClInclude Include="Game\Samples\LoadAsynchronousSample.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

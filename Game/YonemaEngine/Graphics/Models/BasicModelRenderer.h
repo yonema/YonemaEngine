@@ -102,10 +102,12 @@ namespace nsYMEngine
 				CBasicModelRenderer(const nsRenderers::SModelInitData& modelInitData);
 				~CBasicModelRenderer();
 
-				void InitAfterLoadModel(
+				void InitAfterImportScene(
 					const nsRenderers::SModelInitData& modelInitData,
-					const aiScene* scene = nullptr
+					const aiScene* scene
 				);
+
+				void InitAfterImportScene();
 
 				void Release();
 
@@ -200,7 +202,7 @@ namespace nsYMEngine
 
 				void CheckLoaded() noexcept;
 
-				bool InitSynchronous() noexcept;
+				bool InitAsynchronous() noexcept;
 
 			private:
 				bool Init(const nsRenderers::SModelInitData& modelInitData) noexcept;
@@ -286,9 +288,9 @@ namespace nsYMEngine
 				nsAnimations::CAnimator* m_animator = nullptr;
 
 				EnLoadingState m_loadingState = EnLoadingState::enBeforeLoading;
-				bool m_isLoadedModel = false;
-				Assimp::Importer* m_importerForLoadSynchronous = nullptr;
-				const aiScene* m_sceneForLoadSynchronous = nullptr;
+				bool m_isImportedModelScene = false;
+				Assimp::Importer* m_importerForLoadAsynchronous = nullptr;
+				const aiScene* m_sceneForLoadAsynchronous = nullptr;
 
 				const nsRenderers::SModelInitData* m_modelInitDataRef = nullptr;
 			};

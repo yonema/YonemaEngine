@@ -152,7 +152,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Game\Samples\ModelRendererSample.cpp" />
-    <ClCompile Include="Game\Samples\LoadSynchronousSample.cpp" />
+    <ClCompile Include="Game\Samples\LoadAsynchronousSample.cpp" />
     <ClCompile Include="YonemaEngine\Thread\LoadtModelThread.cpp" />
     <ClCompile Include="YonemaEngine\Level3D\LevelChip.cpp" />
     <ClCompile Include="YonemaEngine\Level3D\Level3D.cpp" />
@@ -257,7 +257,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\Samples\ModelRendererSample.h" />
-    <ClInclude Include="Game\Samples\LoadSynchronousSample.h" />
+    <ClInclude Include="Game\Samples\LoadAsynchronousSample.h" />
     <ClInclude Include="YonemaEngine\Thread\LoadModelThread.h" />
     <ClInclude Include="YonemaEngine\Level3D\LevelChip.h" />
     <ClInclude Include="YonemaEngine\Level3D\Level3D.h" />

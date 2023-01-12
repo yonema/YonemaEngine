@@ -25,30 +25,36 @@ namespace nsYMEngine
 	{
 		class CLoadModelThread : private nsUtils::SNoncopyable
 		{
+		public:
+			enum class EnLoadProcessType
+			{
+				enLoadModel,
+				enLoadAnim
+			};
 		private:
 			static const unsigned int m_kNumThread = 3;
 
-			struct SModelAndAnimRef
+			struct SLoadModelProcess
 			{
-				constexpr SModelAndAnimRef() = default;
-				constexpr SModelAndAnimRef(
+				constexpr SLoadModelProcess() = default;
+				constexpr SLoadModelProcess(
+					EnLoadProcessType loadProcessType,
 					nsGraphics::nsModels::CBasicModelRenderer* modelRef,
-					const nsGraphics::nsRenderers::SModelInitData* modelInitDataRef,
 					nsGraphics::nsAnimations::CAnimationClip* animClipRef,
 					const char* animFilePath,
 					nsGraphics::nsAnimations::CSkelton* skeltonRef
 				)
-					:modelRef(modelRef),
-					modelInitData(modelInitData),
+					:loadProcessType(loadProcessType),
+					modelRef(modelRef),
 					animClipRef(animClipRef),
 					animFilePath(animFilePath),
 					skeltonRef(skeltonRef)
 				{};
 
-				~SModelAndAnimRef() = default;
+				~SLoadModelProcess() = default;
 
+				EnLoadProcessType loadProcessType = EnLoadProcessType::enLoadModel;
 				nsGraphics::nsModels::CBasicModelRenderer* modelRef = nullptr;
-				const nsGraphics::nsRenderers::SModelInitData* modelInitData = nullptr;
 				nsGraphics::nsAnimations::CAnimationClip* animClipRef = nullptr;
 				const char* animFilePath = nullptr;
 				nsGraphics::nsAnimations::CSkelton* skeltonRef = nullptr;
@@ -97,15 +103,16 @@ namespace nsYMEngine
 
 
 
-			inline void PushLoadModelAndAnimRef(
+			inline void PushLoadModelProcess(
+				EnLoadProcessType loadProcessType,
 				nsGraphics::nsModels::CBasicModelRenderer* modelRef,
-				const nsGraphics::nsRenderers::SModelInitData* modelInitDataRef,
-				nsGraphics::nsAnimations::CAnimationClip* animClipRef,
-				const char* animFilePath,
-				nsGraphics::nsAnimations::CSkelton* skeltonRef
+				nsGraphics::nsAnimations::CAnimationClip* animClipRef = nullptr,
+				const char* animFilePath = nullptr,
+				nsGraphics::nsAnimations::CSkelton* skeltonRef = nullptr
 			) noexcept
 			{
-				m_modelAndAnimRef[m_threadIdx].emplace_back(modelRef, modelInitDataRef, animClipRef, animFilePath, skeltonRef);
+				m_loadModelProcess[m_threadIdx].emplace_back(
+					loadProcessType, modelRef, animClipRef, animFilePath, skeltonRef);
 				m_threadIdx++;
 				if (m_threadIdx >= m_kNumThread)
 				{
@@ -125,8 +132,8 @@ namespace nsYMEngine
 			static CLoadModelThread* m_instance;
 			static bool m_isProcessingThread;
 			std::array<std::thread*, m_kNumThread> m_thread = {};
-			std::array <std::list<SModelAndAnimRef>, m_kNumThread>
-				m_modelAndAnimRef = {};
+			std::array <std::list<SLoadModelProcess>, m_kNumThread>
+				m_loadModelProcess = {};
 			unsigned int m_threadIdx = 0;
 		};
 

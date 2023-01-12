@@ -47,7 +47,7 @@ namespace nsYMEngine
 				bool Init(
 					const SAnimationInitData& animInitData,
 					CSkelton* pSkelton,
-					bool loadingSynchronous
+					bool loadingAsynchronous
 				);
 
 				void Release();
@@ -127,7 +127,7 @@ namespace nsYMEngine
 				bool InitAnimationClips(
 					const SAnimationInitData& animInitData,
 					CSkelton* pSkelton,
-					bool loadingSynchronous
+					bool loadingAsynchronous
 				);
 
 

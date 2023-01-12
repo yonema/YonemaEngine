@@ -76,7 +76,7 @@ namespace nsYMEngine
 
 			void CBasicModelRenderer::Release()
 			{
-				m_isLoadedModel = false;
+				m_isImportedModelScene = false;
 				m_loadingState = EnLoadingState::enBeforeLoading;
 
 				for (auto& materialDH : m_materialDHs)
@@ -122,14 +122,15 @@ namespace nsYMEngine
 
 			bool CBasicModelRenderer::Init(const nsRenderers::SModelInitData& modelInitData) noexcept
 			{
-				m_isLoadedModel = false;
+				m_isImportedModelScene = false;
 
-				if (modelInitData.enableLoadingSynchronous)
+				if (modelInitData.enableLoadingAsynchronous)
 				{
 					m_loadingState = EnLoadingState::enNowLoading;
 					m_modelInitDataRef = &modelInitData;
-					nsThread::CLoadModelThread::GetInstance()->PushLoadModelAndAnimRef(
-						this, &modelInitData, nullptr, nullptr, nullptr
+					nsThread::CLoadModelThread::GetInstance()->PushLoadModelProcess(
+						nsThread::CLoadModelThread::EnLoadProcessType::enLoadModel,
+						this
 					);
 
 					return true;
@@ -137,7 +138,7 @@ namespace nsYMEngine
 				else
 				{
 					m_loadingState = EnLoadingState::enAfterLoading;
-					m_isLoadedModel = true;
+					m_isImportedModelScene = true;
 				}
 
 				Assimp::Importer* importer = nullptr;
@@ -156,19 +157,19 @@ namespace nsYMEngine
 
 				InitSkeltalAnimation(modelInitData, scene);
 
-				InitAfterLoadModel(modelInitData, scene);
+				InitAfterImportScene(modelInitData, scene);
 
 				
 				
 				return true;
 			}
 
-			bool CBasicModelRenderer::InitSynchronous() noexcept
+			bool CBasicModelRenderer::InitAsynchronous() noexcept
 			{
 				if (nsAssimpCommon::ImportScene(
 					m_modelInitDataRef->modelFilePath,
-					m_importerForLoadSynchronous,
-					m_sceneForLoadSynchronous,
+					m_importerForLoadAsynchronous,
+					m_sceneForLoadAsynchronous,
 					nsAssimpCommon::g_kBasicRemoveComponentFlags,
 					nsAssimpCommon::g_kBasicPostprocessFlags
 				) != true)
@@ -176,27 +177,30 @@ namespace nsYMEngine
 					return false;
 				}
 
-				InitSkeltalAnimation(*m_modelInitDataRef, m_sceneForLoadSynchronous);
+				InitSkeltalAnimation(*m_modelInitDataRef, m_sceneForLoadAsynchronous);
 
-				m_isLoadedModel = true;
+				m_isImportedModelScene = true;
 
 				return true;
 			}
 
-			void CBasicModelRenderer::InitAfterLoadModel(
+			void CBasicModelRenderer::InitAfterImportScene()
+			{
+				InitAfterImportScene(*m_modelInitDataRef, m_sceneForLoadAsynchronous);
+
+				return;
+			}
+
+			void CBasicModelRenderer::InitAfterImportScene(
 				const nsRenderers::SModelInitData& modelInitData,
 				const aiScene* scene
 			)
 			{
 				if (scene == nullptr)
 				{
-					if (m_sceneForLoadSynchronous == nullptr) 
-					{
-						return;
-					}
-
-					scene = m_sceneForLoadSynchronous;
+					return;
 				}
+
 				const auto kNumMeshes = scene->mNumMeshes;
 				unsigned int numVertices = 0;
 				unsigned int numIndices = 0;
@@ -234,14 +238,16 @@ namespace nsYMEngine
 				}
 				EnableDrawing();
 
-				if (m_importerForLoadSynchronous)
+				if (m_importerForLoadAsynchronous)
 				{
-					m_importerForLoadSynchronous->FreeScene();
-					m_sceneForLoadSynchronous = nullptr;
+					m_importerForLoadAsynchronous->FreeScene();
+					m_sceneForLoadAsynchronous = nullptr;
 
-					delete m_importerForLoadSynchronous;
-					m_importerForLoadSynchronous = nullptr;
+					delete m_importerForLoadAsynchronous;
+					m_importerForLoadAsynchronous = nullptr;
 				}
+
+
 
 				return;
 			}
@@ -260,7 +266,7 @@ namespace nsYMEngine
 						m_animator->Init(
 							*modelInitData.animInitData,
 							m_skelton, 
-							modelInitData.enableLoadingSynchronous
+							modelInitData.enableLoadingAsynchronous
 						);
 				}
 
@@ -770,7 +776,7 @@ namespace nsYMEngine
 					return;
 				}
 
-				if (m_isLoadedModel != true)
+				if (m_isImportedModelScene != true)
 				{
 					return;
 				}
@@ -784,6 +790,7 @@ namespace nsYMEngine
 				}
 
 				m_loadingState = EnLoadingState::enAfterLoading;
+
 
 				return;
 			}

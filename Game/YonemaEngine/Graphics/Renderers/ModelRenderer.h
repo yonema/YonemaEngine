@@ -35,7 +35,7 @@ namespace nsYMEngine
 				nsPhysics::SMeshGeometryBuffer* physicsMeshGeomBuffer = nullptr;
 				const char* textureRootPath = nullptr;
 				bool enableNodeTransform = false;
-				bool enableLoadingSynchronous = false;
+				bool enableLoadingAsynchronous = false;
 			};
 
 			class CModelRenderer : public nsGameObject::IGameObject
@@ -233,7 +233,7 @@ namespace nsYMEngine
 				nsMath::CQuaternion m_rotation = nsMath::CQuaternion::Identity();
 				nsMath::CVector3 m_scale = nsMath::CVector3::One();
 
-				bool m_enableLoadingSynchronous = false;
+				bool m_enableLoadingAsynchronous = false;
 				SModelInitData m_modelInitData = {};
 			};
 

@@ -61,11 +61,11 @@ namespace nsYMEngine
 			bool CAnimator::Init(
 				const SAnimationInitData& animInitData, 
 				CSkelton* pSkelton, 
-				bool loadingSynchronous
+				bool loadingAsynchronous
 			)
 			{
 				m_pSkelton = pSkelton;
-				bool res = InitAnimationClips(animInitData, pSkelton, loadingSynchronous);
+				bool res = InitAnimationClips(animInitData, pSkelton, loadingAsynchronous);
 
 				return res;
 			}
@@ -73,7 +73,7 @@ namespace nsYMEngine
 			bool CAnimator::InitAnimationClips(
 				const SAnimationInitData& animInitData,
 				CSkelton* pSkelton,
-				bool loadingSynchronous
+				bool loadingAsynchronous
 			)
 			{
 				bool res = false;
@@ -85,10 +85,14 @@ namespace nsYMEngine
 					m_animationClips.emplace_back(animClip);
 					const auto* animFilePath = animInitData.animationFilePathArray[animIdx];
 
-					if (loadingSynchronous)
+					if (loadingAsynchronous)
 					{
-						nsThread::CLoadModelThread::GetInstance()->PushLoadModelAndAnimRef(
-							nullptr, nullptr, animClip, animFilePath, pSkelton
+						nsThread::CLoadModelThread::GetInstance()->PushLoadModelProcess(
+							nsThread::CLoadModelThread::EnLoadProcessType::enLoadAnim,
+							nullptr, 
+							animClip,
+							animFilePath,
+							pSkelton
 						);
 						continue;
 					}

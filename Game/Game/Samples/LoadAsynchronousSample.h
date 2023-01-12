@@ -11,7 +11,7 @@ namespace nsAWA
 {
 	namespace nsSamples
 	{
-		class CLoadSynchronousSample : public IGameObject
+		class CLoadAsynchronousSample : public IGameObject
 		{
 		private:
 			enum class EnAnimType
@@ -32,8 +32,8 @@ namespace nsAWA
 
 			void Update(float deltaTime) override final;
 		public:
-			constexpr CLoadSynchronousSample() = default;
-			~CLoadSynchronousSample() = default;
+			constexpr CLoadAsynchronousSample() = default;
+			~CLoadAsynchronousSample() = default;
 
 		private:
 			CModelRenderer* m_modelRenderer = nullptr;

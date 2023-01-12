@@ -3,7 +3,7 @@
 #include "SkeltalAnimationSample.h"
 #include "AnimationEventSample.h"
 #include "GetBoneMatrixSample.h"
-#include "LoadSynchronousSample.h"
+#include "LoadAsynchronousSample.h"
 #include "SpriteSample.h"
 #include "FontSample.h"
 #include "EffectSample.h"
@@ -25,7 +25,7 @@ namespace nsAWA
 				enSkeltalAnimation,
 				enAnimationEvent,
 				enGetBoneMatrix,
-				enLoadSynchronous,
+				enLoadAsynchronous,
 				enSprite,
 				enFont,
 				enEffect,
@@ -36,7 +36,7 @@ namespace nsAWA
 				enCharacterController,
 			};
 
-			constexpr EnSampleIdx g_kSampleIdx = EnSampleIdx::enLoadSynchronous;
+			constexpr EnSampleIdx g_kSampleIdx = EnSampleIdx::enLoadAsynchronous;
 		}
 
 		bool CSampleMain::Start()
@@ -55,8 +55,8 @@ namespace nsAWA
 			case EnSampleIdx::enGetBoneMatrix:
 				m_sampleGO = NewGO<CGetBoneMatrixSample>("GetBoneMatrixSample");
 				break;
-			case EnSampleIdx::enLoadSynchronous:
-				m_sampleGO = NewGO<CLoadSynchronousSample>("LoadSynchronousSample");
+			case EnSampleIdx::enLoadAsynchronous:
+				m_sampleGO = NewGO<CLoadAsynchronousSample>("LoadAsynchronousSample");
 				break;
 			case EnSampleIdx::enSprite:
 				m_sampleGO = NewGO<CSpriteSample>("SpriteSample");

@@ -23,7 +23,7 @@ namespace nsYMEngine
 
 			void CModelRenderer::Update(float deltaTime)
 			{
-				if (m_enableLoadingSynchronous)
+				if (m_enableLoadingAsynchronous)
 				{
 					m_renderer->CheckLoaded();
 
@@ -31,9 +31,9 @@ namespace nsYMEngine
 					{
 						return;
 					}
-					m_renderer->InitAfterLoadModel(m_modelInitData);
+					m_renderer->InitAfterImportScene();
 					m_renderer->PlayAnimation(0);
-					m_enableLoadingSynchronous = false;
+					m_enableLoadingAsynchronous = false;
 				}
 				UpdateWorldMatrix();
 
@@ -53,11 +53,11 @@ namespace nsYMEngine
 			void CModelRenderer::Init(const SModelInitData& modelInitData) noexcept
 			{
 				m_modelInitData = modelInitData;
-				m_enableLoadingSynchronous = modelInitData.enableLoadingSynchronous;
+				m_enableLoadingAsynchronous = modelInitData.enableLoadingAsynchronous;
 
 				CreateRenderer(m_modelInitData);
 
-				if (m_enableLoadingSynchronous != true)
+				if (m_enableLoadingAsynchronous != true)
 				{
 					UpdateWorldMatrix();
 				}

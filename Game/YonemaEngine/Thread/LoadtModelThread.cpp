@@ -57,25 +57,35 @@ namespace nsYMEngine
 
 		void CLoadModelThread::Update(unsigned int threadID) noexcept
 		{
-			if (m_modelAndAnimRef[threadID].empty())
+			if (m_loadModelProcess[threadID].empty())
 			{
 				return;
 			}
 
-			auto itr = m_modelAndAnimRef[threadID].begin();
-			if (itr == m_modelAndAnimRef[threadID].end())
+			auto itr = m_loadModelProcess[threadID].begin();
+			if (itr == m_loadModelProcess[threadID].end())
 			{
 				return;
 			}
-			if (itr->modelRef)
+
+			switch (itr->loadProcessType)
 			{
-				itr->modelRef->InitSynchronous();
+			case EnLoadProcessType::enLoadModel:
+				if (itr->modelRef)
+				{
+					itr->modelRef->InitAsynchronous();
+				}
+				break;
+			case EnLoadProcessType::enLoadAnim:
+				if (itr->animClipRef)
+				{
+					itr->animClipRef->Init(itr->animFilePath, itr->skeltonRef);
+				}
+				break;
 			}
-			if (itr->animClipRef)
-			{
-				itr->animClipRef->Init(itr->animFilePath, itr->skeltonRef);
-			}
-			m_modelAndAnimRef[threadID].erase(itr);
+
+
+			m_loadModelProcess[threadID].erase(itr);
 
 			return;
 		}
