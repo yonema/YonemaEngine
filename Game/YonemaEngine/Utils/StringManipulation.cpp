@@ -80,7 +80,7 @@ namespace nsYMEngine
 
 		std::pair<std::string, std::string> SplitFilename(
 			const std::string& fileName,
-			const char spliter = '*'
+			const char spliter
 		) noexcept
 		{
 			int idx = static_cast<int>(fileName.find(spliter));
@@ -96,7 +96,7 @@ namespace nsYMEngine
 
 		std::pair<std::string, std::string> SplitFilename(
 			const char* fileName,
-			const char spliter = '*'
+			const char spliter
 		) noexcept
 		{
 			std::string str = fileName;
