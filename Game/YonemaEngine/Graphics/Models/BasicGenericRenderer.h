@@ -12,14 +12,18 @@ namespace nsYMEngine
 			private:
 				enum class EnDescRangeType : unsigned int
 				{
-					enCbvForModelData,
-					enSrvForMaterialData,
+					enCbvForModel,
+					enSrvForBoneMatrixArray,
+					enSrvForWorldMatrixArray,
+					enSrvForMaterial,
 					enNumDescRangeTypes
 				};
 				enum class EnRootParameterType : unsigned int
 				{
-					enModelData,
-					enMaterialData,
+					enModel,
+					enBoneMatrixArray,
+					enWorldMatrixArray,
+					enMaterial,
 					enNumRootParamerterTypes
 				};
 

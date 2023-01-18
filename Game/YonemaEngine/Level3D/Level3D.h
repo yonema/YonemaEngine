@@ -21,6 +21,7 @@ namespace nsYMEngine
 			nsMath::CVector3 scale;			//拡大率。
 			const char* name = nullptr;	//名前。
 			int number = 0;
+			bool isCreateStaticPhysicsObject = true;
 
 			/// <summary>
 			/// 引数で渡したオブジェクト名のオブジェクトか調べる。
@@ -57,6 +58,7 @@ namespace nsYMEngine
 			float positionBias = 1.0f;
 			const char* modelRootPath = nullptr;
 			nsMath::CQuaternion levelChipBias = nsMath::CQuaternion::Identity();
+			bool isCreateStaticPhysicsObjectForAll = true;
 		};
 
 		class CLevel3D : private nsUtils::SNoncopyable

@@ -16,7 +16,11 @@ namespace nsYMEngine
 			initData.vertexBias = levelInitData.levelChipBias;
 
 			nsPhysics::SMeshGeometryBuffer physicsMeshBuffer = {};
-			initData.physicsMeshGeomBuffer = &physicsMeshBuffer;
+			if (chipData.isCreateStaticPhysicsObject && 
+				levelInitData.isCreateStaticPhysicsObjectForAll)
+			{
+				initData.physicsMeshGeomBuffer = &physicsMeshBuffer;
+			}
 
 			//モデルを読み込む。
 			m_modelRenderer = NewGO<nsGraphics::nsRenderers::CModelRenderer>(chipData.name);
@@ -25,15 +29,25 @@ namespace nsYMEngine
 			m_modelRenderer->SetScale(chipData.scale);
 			m_modelRenderer->Init(initData);
 
-			for (auto& vertex : physicsMeshBuffer.m_vertices)
+			if (chipData.isCreateStaticPhysicsObject && 
+				levelInitData.isCreateStaticPhysicsObjectForAll)
 			{
-				vertex.x *= chipData.scale.x;
-				vertex.y *= chipData.scale.y;
-				vertex.z *= chipData.scale.z;
+				for (auto& vertex : physicsMeshBuffer.m_vertices)
+				{
+					vertex.x *= chipData.scale.x;
+					vertex.y *= chipData.scale.y;
+					vertex.z *= chipData.scale.z;
+				}
 			}
-			//静的物理オブジェクトを作成。
-			m_physicsStaticObject.InitAsMesh(physicsMeshBuffer, chipData.position);
-			m_physicsStaticObject.SetRotation(chipData.rotation);
+
+			if (chipData.isCreateStaticPhysicsObject &&
+				levelInitData.isCreateStaticPhysicsObjectForAll)
+			{
+				//静的物理オブジェクトを作成。
+				m_physicsStaticObject.InitAsMesh(physicsMeshBuffer, chipData.position);
+				m_physicsStaticObject.SetRotation(chipData.rotation);
+			}
+
 			
 			return;
 		}

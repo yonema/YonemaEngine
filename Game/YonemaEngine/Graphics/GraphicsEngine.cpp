@@ -285,6 +285,20 @@ namespace nsYMEngine
 				renderer->DrawWrapper(&m_commandList);
 			}
 
+			// Instancingƒ‚ƒfƒ‹‚Ì•`‰æİ’è
+			m_commandList.SetGraphicsRootSignatureAndPipelineState(
+				m_rendererTable.GetRootSignature(
+					RendererType::enInstancingModel),
+				m_rendererTable.GetPipelineState(
+					RendererType::enInstancingModel)
+			);
+
+			// Instancingƒ‚ƒfƒ‹•`‰æ
+			for (auto renderer : m_rendererTable.GetRendererList(RendererType::enInstancingModel))
+			{
+				renderer->DrawWrapper(&m_commandList);
+			}
+
 
 			// •`‰æI—¹
 			m_commandList.TransitionFromRenderTargetToShaderResource(m_mainRenderTarget);

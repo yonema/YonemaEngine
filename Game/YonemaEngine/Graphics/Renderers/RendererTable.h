@@ -26,6 +26,7 @@ namespace nsYMEngine
 					enNone = -1,
 					enBasicModel,
 					enSkinModel,
+					enInstancingModel,
 					enSkyCube,
 					enCollisionRenderer,
 					enSimplePostEffect,

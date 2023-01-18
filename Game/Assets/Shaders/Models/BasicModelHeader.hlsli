@@ -1,9 +1,9 @@
+//// 各種宣言 ////
 
 struct SVSInput
 {
 	float4 pos : POSITION;
 	float3 normal : NORMAL;
-	float4 color : COLOR;
 	float2 uv : TEXCOORD;
 	min16uint4 boneNo : BONE_NO;
 	min16uint4 weight : WEIGHT;
@@ -14,37 +14,63 @@ struct SPSInput
 {
 	float4 svpos : SV_POSITION;	// システム用頂点座標
 	float3 normal : NORMAL;	// 法線ベクトル
-	float4 color : COLOR;
 	float2 uv : TEXCOORD;		// uv
 };
 
-//struct SBasicModelCB
-//{
-//	float4x4 g_mWorld;
-//	float4x4 g_mWorldViewProj;
-//};
 
-SamplerState g_sampler : register(s0);	// 0番スロットに設定されたサンプラ
-Texture2D<float4> g_diffuseTexture : register(t0);
+//// 各種レジスタ ////
 
+SamplerState g_sampler : register(s0);
 
-SPSInput VSCore(in SVSInput input, in float4x4 mWorld, in float4x4 mWorldViewProj)
+// スキニング用のボーン行列
+StructuredBuffer<float4x4> g_mBones : register(t0);
+// インスタンシング用のワールド行列の配列
+StructuredBuffer<float4x4> g_worldMatrixArray : register(t1);
+// テクスチャ
+Texture2D<float4> g_diffuseTexture : register(t2);
+
+cbuffer ModelCB : register(b0)
 {
-	SPSInput output =
-	{
-		{100.0f,0.0f,0.0f,0.0f},
-		{0.0f,0.0f,0.0f},
-		{0.0f,0.0f,0.0f,1.0f},
-		{0.0f,0.0f}
+	float4x4 g_mWorld;
+	float4x4 g_mViewProj;
+}
+
+
+//// 関数 ////
+
+/**
+ * @brief スキン行列を計算する
+*/
+float4x4 CalcSkinMatrix(SVSInput input)
+{
+	int totalWeight = 0;
+	float4x4 mBone = {
+		0.0f,0.0f,0.0f,0.0f,
+		0.0f,0.0f,0.0f,0.0f,
+		0.0f,0.0f,0.0f,0.0f,
+		0.0f,0.0f,0.0f,0.0f
 	};
 
-	output.svpos = mul(mWorldViewProj, input.pos);
+	// ボーンウェイトを考慮して、ボーン行列を計算
+	[unroll]
+	for (int i = 0; i < 4; i++)
+	{
+		float weight = input.weight[i];
+		totalWeight += input.weight[i];
+		weight /= 10000.0f;
+		mBone += g_mBones[input.boneNo[i]] * weight;
+	}
 
-	output.normal = normalize(mul(mWorld, float4(input.normal, 0.0f)).xyz);
+	// ボーンウェイトが全て0だったときは、単位行列を入れる
+	if (totalWeight == 0)
+	{
+		mBone = float4x4(
+			1.0f, 0.0f, 0.0f, 0.0f,
+			0.0f, 1.0f, 0.0f, 0.0f,
+			0.0f, 0.0f, 1.0f, 0.0f,
+			0.0f, 0.0f, 0.0f, 1.0f);
+	}
 
-	output.color = input.color;
 
-	output.uv = input.uv;
-
-	return output;
+	return mBone;
 }

@@ -46,6 +46,11 @@ namespace nsYMEngine
 					return m_descriptorHeap;
 				}
 
+				constexpr bool IsValid() const noexcept
+				{
+					return m_descriptorHeap ? true : false;
+				}
+
 				void SetName(const wchar_t* objectName);
 				
 

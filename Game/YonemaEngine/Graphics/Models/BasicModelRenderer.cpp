@@ -20,11 +20,30 @@ namespace nsYMEngine
 				}
 
 				// モデルごとの定数バッファのセット
-				ID3D12DescriptorHeap* modelDescHeaps[] = { m_modelDH.Get() };
-				commandList->SetDescriptorHeaps(1, modelDescHeaps);
+				{
+					ID3D12DescriptorHeap* descHeaps[] = { m_modelDH.Get() };
+					commandList->SetDescriptorHeaps(1, descHeaps);
+				}
 				auto descriptorHeapH = m_modelDH.GetGPUHandle();
 				commandList->SetGraphicsRootDescriptorTable(0, descriptorHeapH);
 
+				// スケルたタルアニメーションが有効なら、ボーン行列の配列をセット
+				if (IsSkeltalAnimationValid())
+				{
+					ID3D12DescriptorHeap* descHeaps[] = { m_boneMatrixArrayDH.Get() };
+					commandList->SetDescriptorHeaps(1, descHeaps);
+					descriptorHeapH = m_boneMatrixArrayDH.GetGPUHandle();
+					commandList->SetGraphicsRootDescriptorTable(1, descriptorHeapH);
+				}
+
+				// インスタンシングが有効なら、ワールド行列の配列をセット
+				if (m_worldMatrixArrayDH.IsValid())
+				{
+					ID3D12DescriptorHeap* descHeaps[] = { m_worldMatrixArrayDH.Get() };
+					commandList->SetDescriptorHeaps(1, descHeaps);
+					descriptorHeapH = m_worldMatrixArrayDH.GetGPUHandle();
+					commandList->SetGraphicsRootDescriptorTable(2, descriptorHeapH);
+				}
 
 				// マテリアルごとに描画
 				// 最初にマテリアルごとにメッシュ分解しているため、メッシュごとに描画と同意。
@@ -40,14 +59,14 @@ namespace nsYMEngine
 					ID3D12DescriptorHeap* materialDescHeaps[] = { materialDH->Get() };
 					commandList->SetDescriptorHeaps(1, materialDescHeaps);
 					descriptorHeapH = materialDH->GetGPUHandle();
-					commandList->SetGraphicsRootDescriptorTable(1, descriptorHeapH);
+					commandList->SetGraphicsRootDescriptorTable(3, descriptorHeapH);
 
 					// 頂点バッファとインデックスバッファをセット
 					commandList->SetIndexBuffer(*indexBuffer);
 					commandList->SetVertexBuffer(*vertexBuffer);
 
 					// 描画
-					commandList->DrawInstanced(meshInfo.numIndices);
+					commandList->DrawInstanced(meshInfo.numIndices, m_numInstances);
 
 				}
 				return;
@@ -79,6 +98,10 @@ namespace nsYMEngine
 				m_isImportedModelScene = false;
 				m_loadingState = EnLoadingState::enBeforeLoading;
 
+				m_boneMatrixArrayDH.Release();
+				m_boneMatrixArraySB.Release();
+				m_worldMatrixArrayDH.Release();
+				m_worldMatrixArraySB.Release();
 				for (auto& materialDH : m_materialDHs)
 				{
 					if (materialDH)
@@ -225,17 +248,33 @@ namespace nsYMEngine
 				CopyToPhysicsMeshGeometryBuffer(dstMeshes, modelInitData, numVertices, numIndices);
 				CreateModelCBV();
 				CreateMaterialSRV();
+				CreateBoneMatrisArraySB();
+				CreateWorldMatrixArraySB(modelInitData);
+
 				m_bias.MakeRotationFromQuaternion(modelInitData.vertexBias);
 
-				if (IsSkeltalAnimationValid() &&
-					modelInitData.rendererType == nsRenderers::CRendererTable::EnRendererType::enBasicModel)
+				if (modelInitData.rendererType != 
+					nsRenderers::CRendererTable::EnRendererType::enBasicModel)
 				{
+					// 初期化データにレンダラータイプが設定されていたら、それを優先する。
+					SetRenderType(modelInitData.rendererType);
+				}
+				else if (modelInitData.maxInstance > 2)
+				{
+					// インスタンシングが有効なら、インスタンシングタイプ
+					SetRenderType(nsRenderers::CRendererTable::EnRendererType::enInstancingModel);
+				}
+				else if (IsSkeltalAnimationValid())
+				{
+					// スキンアニメーションが有効ならスキンタイプ
 					SetRenderType(nsRenderers::CRendererTable::EnRendererType::enSkinModel);
 				}
 				else
 				{
-					SetRenderType(modelInitData.rendererType);
+					// その他は基本モデルタイプ
+					SetRenderType(nsRenderers::CRendererTable::EnRendererType::enBasicModel);
 				}
+
 				EnableDrawing();
 
 				if (m_importerForLoadAsynchronous)
@@ -439,7 +478,6 @@ namespace nsYMEngine
 					// @todo タンジェントはそのうち実装
 					//dstVertex.tangent = { tangent.x, tangent.y, tangent.z };
 					dstVertex.uv = { uv.x, uv.y };
-					dstVertex.color = { color.r, color.g, color.b, color.a };
 
 					if (IsSkeltalAnimationValid() != true)
 					{
@@ -644,11 +682,6 @@ namespace nsYMEngine
 
 				// ワールド行列 + ワールドビュープロジェクション行列 = 2
 				auto cbSize = sizeof(nsMath::CMatrix) * 2;
-				if (IsSkeltalAnimationValid())
-				{
-					m_boneMatrices.resize(m_kMaxNumBones);
-					cbSize += sizeof(m_boneMatrices.at(0)) * m_boneMatrices.size();
-				}
 
 				m_modelCB.Init(static_cast<unsigned int>(cbSize), L"ModelCB");
 
@@ -657,12 +690,7 @@ namespace nsYMEngine
 				auto* mappedCB =
 					static_cast<nsMath::CMatrix*>(m_modelCB.GetMappedConstantBuffer());
 				mappedCB[0] = mWorld;
-				mappedCB[1] = mWorld * mViewProj;
-
-				if (IsSkeltalAnimationValid())
-				{
-					copy(m_boneMatrices.begin(), m_boneMatrices.end(), mappedCB + 2);
-				}
+				mappedCB[1] = mViewProj;
 
 				// ディスクリプタヒープ作成
 				constexpr unsigned int kNumDescHeaps = 1;
@@ -706,6 +734,58 @@ namespace nsYMEngine
 				return true;
 			}
 
+			bool CBasicModelRenderer::CreateBoneMatrisArraySB()
+			{
+				if (IsSkeltalAnimationValid() != true)
+				{
+					return true;
+				}
+
+				m_boneMatrices.resize(m_kMaxNumBones);
+
+
+				m_boneMatrixArrayDH.InitAsCbvSrvUav(1, L"BoneMatrixArrayDH");
+
+				bool res =
+					m_boneMatrixArraySB.Init(sizeof(nsMath::CMatrix), m_kMaxNumBones);
+
+				if (FAILED(res))
+				{
+					nsGameWindow::MessageBoxError(L"m_boneMatrixArraySBの生成に失敗しました。");
+					return false;
+				}
+
+				m_boneMatrixArraySB.RegistShaderResourceView(m_boneMatrixArrayDH.GetCPUHandle());
+
+				return true;
+			}
+
+
+			bool CBasicModelRenderer::CreateWorldMatrixArraySB(
+				const nsRenderers::SModelInitData& modelInitData)
+			{
+				if (modelInitData.maxInstance <= 1)
+				{
+					return true;
+				}
+
+
+				m_worldMatrixArrayDH.InitAsCbvSrvUav(1, L"WorldMatrixArrayDH");
+
+				bool res = 
+					m_worldMatrixArraySB.Init(sizeof(nsMath::CMatrix), modelInitData.maxInstance);
+
+				if (FAILED(res))
+				{
+					nsGameWindow::MessageBoxError(L"m_worldMatrixArraySBの生成に失敗しました。");
+					return false;
+				}
+
+				m_worldMatrixArraySB.RegistShaderResourceView(m_worldMatrixArrayDH.GetCPUHandle());
+
+				return true;
+			}
+
 
 			void CBasicModelRenderer::UpdateWorldMatrix(
 				const nsMath::CVector3& position,
@@ -725,7 +805,7 @@ namespace nsYMEngine
 					static_cast<nsMath::CMatrix*>(m_modelCB.GetMappedConstantBuffer());
 				mappedCB[0] = m_worldMatrix;
 				auto mViewProj = CGraphicsEngine::GetInstance()->GetMatrixViewProj();
-				mappedCB[1] = m_worldMatrix * mViewProj;
+				mappedCB[1] = mViewProj;
 
 				return;
 			}
@@ -741,10 +821,7 @@ namespace nsYMEngine
 
 				m_animator->CalcAndGetAnimatedBoneTransforms(&m_boneMatrices);
 
-				auto mappedCB =
-					static_cast<nsMath::CMatrix*>(m_modelCB.GetMappedConstantBuffer());
-
-				copy(m_boneMatrices.begin(), m_boneMatrices.end(), mappedCB + 2);
+				m_boneMatrixArraySB.CopyToMappedStructuredBuffer(m_boneMatrices.data());
 
 				return;
 			}
@@ -795,6 +872,18 @@ namespace nsYMEngine
 				return;
 			}
 
+			void CBasicModelRenderer::UpdateWorldMatrixArray(
+				const std::vector<nsMath::CMatrix>& worldMatrixArray)
+			{
+				if (m_worldMatrixArrayDH.IsValid() != true)
+				{
+					return;
+				}
+
+				m_worldMatrixArraySB.CopyToMappedStructuredBuffer(worldMatrixArray.data());
+
+				return;
+			}
 
 
 		}

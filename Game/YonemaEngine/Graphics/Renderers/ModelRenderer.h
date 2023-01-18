@@ -33,6 +33,7 @@ namespace nsYMEngine
 				nsMath::CQuaternion vertexBias = nsMath::CQuaternion::Identity();
 				const nsAnimations::SAnimationInitData* animInitData = nullptr;
 				nsPhysics::SMeshGeometryBuffer* physicsMeshGeomBuffer = nullptr;
+				unsigned int maxInstance = 1;
 				const char* textureRootPath = nullptr;
 				bool enableNodeTransform = false;
 				bool enableLoadingAsynchronous = false;
@@ -85,6 +86,13 @@ namespace nsYMEngine
 				{
 					return m_scale;
 				}
+
+				constexpr std::vector<nsMath::CMatrix>* GetWorldMatrixArrayRef() noexcept
+				{
+					return &m_worldMatrixArray;
+				}
+
+				void UpdateWorldMatrixArray() noexcept;
 
 				/**
 				 * @brief アニメーションを再生する。アニメーションが設定されていなかったら何もしません。
@@ -237,8 +245,10 @@ namespace nsYMEngine
 				nsMath::CVector3 m_position = nsMath::CVector3::Zero();
 				nsMath::CQuaternion m_rotation = nsMath::CQuaternion::Identity();
 				nsMath::CVector3 m_scale = nsMath::CVector3::One();
+				std::vector<nsMath::CMatrix> m_worldMatrixArray = {};
 
 				bool m_enableLoadingAsynchronous = false;
+
 				SModelInitData m_modelInitData = {};
 			};
 

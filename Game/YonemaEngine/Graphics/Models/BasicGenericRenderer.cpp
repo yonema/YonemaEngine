@@ -8,7 +8,7 @@ namespace nsYMEngine
 		namespace nsModels
 		{
 			const wchar_t* const CBasicGenericRenderer::m_kVsFilePath =
-				L"Assets/Shaders/Models/NonSkinModelVertexShader.hlsl";
+				L"Assets/Shaders/Models/BasicModelVertexShader.hlsl";
 			const char* const CBasicGenericRenderer::m_kVsEntryFuncName = "VSMain";
 			const wchar_t* const CBasicGenericRenderer::m_kPsFilePath =
 				L"Assets/Shaders/Models/BasicModelPixelShader.hlsl";
@@ -26,35 +26,57 @@ namespace nsYMEngine
 
 				constexpr unsigned int kNumDescTblRanges =
 					static_cast<unsigned int>(EnDescRangeType::enNumDescRangeTypes);
-				constexpr unsigned int kDescRangeNoForModelCB =
-					static_cast<unsigned int>(EnDescRangeType::enCbvForModelData);
-				constexpr unsigned int kDescRangeNoForMaterialSR =
-					static_cast<unsigned int>(EnDescRangeType::enSrvForMaterialData);
+				constexpr unsigned int kRangeNoForModelCB =
+					static_cast<unsigned int>(EnDescRangeType::enCbvForModel);
+				constexpr unsigned int kRangeNoForBoneMatrixArraySRV =
+					static_cast<unsigned int>(EnDescRangeType::enSrvForBoneMatrixArray);
+				constexpr unsigned int kRangeNoForWorldMatrixArraySRV =
+					static_cast<unsigned int>(EnDescRangeType::enSrvForWorldMatrixArray);
+				constexpr unsigned int kRangeNoForMaterialSRV =
+					static_cast<unsigned int>(EnDescRangeType::enSrvForMaterial);
 
 				pDescTblRanges->resize(kNumDescTblRanges);
-				pDescTblRanges->at(kDescRangeNoForModelCB).Init(
+				pDescTblRanges->at(kRangeNoForModelCB).Init(
 					D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, numCBVs++);
-				pDescTblRanges->at(kDescRangeNoForMaterialSR).Init(
+				pDescTblRanges->at(kRangeNoForBoneMatrixArraySRV).Init(
+					D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, numSRVs++);
+				pDescTblRanges->at(kRangeNoForWorldMatrixArraySRV).Init(
+					D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, numSRVs++);
+				pDescTblRanges->at(kRangeNoForMaterialSRV).Init(
 					D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, numSRVs++);
 
 
 				constexpr unsigned int kNumRootParameters =
 					static_cast<unsigned int>(EnRootParameterType::enNumRootParamerterTypes);
-				constexpr unsigned int kRootParamNoForModelData =
-					static_cast<unsigned int>(EnRootParameterType::enModelData);
-				constexpr unsigned int kRootParamNoForMaterialData =
-					static_cast<unsigned int>(EnRootParameterType::enMaterialData);
+				constexpr unsigned int kParamNoForModel =
+					static_cast<unsigned int>(EnRootParameterType::enModel);
+				constexpr unsigned int kParamNoForBoneMatrixArray =
+					static_cast<unsigned int>(EnRootParameterType::enBoneMatrixArray);
+				constexpr unsigned int kParamNoForWorldMatrixArray =
+					static_cast<unsigned int>(EnRootParameterType::enWorldMatrixArray);
+				constexpr unsigned int kParamNoForMaterial =
+					static_cast<unsigned int>(EnRootParameterType::enMaterial);
 
 				pRootParameters->resize(kNumRootParameters);
 
-				pRootParameters->at(kRootParamNoForModelData).InitAsDescriptorTable(
+				pRootParameters->at(kParamNoForModel).InitAsDescriptorTable(
 					1,
-					&pDescTblRanges->at(kDescRangeNoForModelCB),
+					&pDescTblRanges->at(kRangeNoForModelCB),
 					D3D12_SHADER_VISIBILITY_VERTEX
 				);
-				pRootParameters->at(kRootParamNoForMaterialData).InitAsDescriptorTable(
+				pRootParameters->at(kParamNoForBoneMatrixArray).InitAsDescriptorTable(
 					1,
-					&pDescTblRanges->at(kDescRangeNoForMaterialSR),
+					&pDescTblRanges->at(kRangeNoForBoneMatrixArraySRV),
+					D3D12_SHADER_VISIBILITY_VERTEX
+				);
+				pRootParameters->at(kParamNoForWorldMatrixArray).InitAsDescriptorTable(
+					1,
+					&pDescTblRanges->at(kRangeNoForWorldMatrixArraySRV),
+					D3D12_SHADER_VISIBILITY_VERTEX
+				);
+				pRootParameters->at(kParamNoForMaterial).InitAsDescriptorTable(
+					1,
+					&pDescTblRanges->at(kRangeNoForMaterialSRV),
 					D3D12_SHADER_VISIBILITY_PIXEL
 				);
 
@@ -94,15 +116,6 @@ namespace nsYMEngine
 						"NORMAL",
 						0,
 						DXGI_FORMAT_R32G32B32_FLOAT,
-						0,
-						D3D12_APPEND_ALIGNED_ELEMENT,
-						D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
-						0
-					},
-					{
-						"COLOR",
-						0,
-						DXGI_FORMAT_R32G32B32A32_FLOAT,
 						0,
 						D3D12_APPEND_ALIGNED_ELEMENT,
 						D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,

@@ -83,6 +83,7 @@ namespace nsYMEngine
 		void CPhysicsEngine::Terminate()
 		{
 			// ”jŠü‚·‚é‘O‚É“¯Šú‚·‚éB
+			m_scene->simulate(0.001f);
 			m_scene->fetchResults(true);
 
 			CExtendedDataForRigidActor::DeleteAllExtendedData();
@@ -236,7 +237,7 @@ namespace nsYMEngine
 
 		void CPhysicsEngine::Update(float deltaTime)
 		{
-			m_scene->simulate(deltaTime);
+			m_scene->simulate(std::max(0.0001f, deltaTime));
 			m_scene->fetchResults(true);
 
 			for (auto& physicsTriggerObject : m_physicsTriggerObjectList)

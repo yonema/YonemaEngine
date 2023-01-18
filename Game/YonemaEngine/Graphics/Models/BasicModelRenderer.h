@@ -52,7 +52,6 @@ namespace nsYMEngine
 
 					nsMath::CVector3 position;
 					nsMath::CVector3 normal;
-					nsMath::CVector4 color;
 					nsMath::CVector2 uv;
 					unsigned short boneNo[4] = {};
 					unsigned short weights[4] = {};
@@ -99,7 +98,8 @@ namespace nsYMEngine
 
 
 			public:
-				CBasicModelRenderer(const nsRenderers::SModelInitData& modelInitData);
+				CBasicModelRenderer(
+					const nsRenderers::SModelInitData& modelInitData);
 				~CBasicModelRenderer();
 
 				void InitAfterImportScene(
@@ -204,6 +204,18 @@ namespace nsYMEngine
 
 				bool InitAsynchronous() noexcept;
 
+				constexpr void SetNumInstances(unsigned int numInstances) noexcept
+				{
+					m_numInstances = numInstances;
+				}
+
+				constexpr unsigned int GetNumInstances() const noexcept
+				{
+					return m_numInstances;
+				}
+
+				void UpdateWorldMatrixArray(const std::vector<nsMath::CMatrix>& worldMatrixArray);
+
 			private:
 				bool Init(const nsRenderers::SModelInitData& modelInitData) noexcept;
 
@@ -269,21 +281,29 @@ namespace nsYMEngine
 
 				bool CreateMaterialSRV();
 
+				bool CreateBoneMatrisArraySB();
+
+				bool CreateWorldMatrixArraySB(const nsRenderers::SModelInitData& modelInitData);
+
 			private:
-				std::vector<nsDx12Wrappers::CVertexBuffer*> m_vertexBuffers;
-				std::vector<nsDx12Wrappers::CIndexBuffer*> m_indexBuffers;
+				std::vector<nsDx12Wrappers::CVertexBuffer*> m_vertexBuffers = {};
+				std::vector<nsDx12Wrappers::CIndexBuffer*> m_indexBuffers = {};
 
-				nsDx12Wrappers::CConstantBuffer m_modelCB;
-				nsDx12Wrappers::CDescriptorHeap m_modelDH;
+				nsDx12Wrappers::CConstantBuffer m_modelCB = {};
+				nsDx12Wrappers::CDescriptorHeap m_modelDH = {};
+				nsDx12Wrappers::CStructuredBuffer m_boneMatrixArraySB = {};
+				nsDx12Wrappers::CDescriptorHeap m_boneMatrixArrayDH = {};
+				nsDx12Wrappers::CStructuredBuffer m_worldMatrixArraySB = {};
+				nsDx12Wrappers::CDescriptorHeap m_worldMatrixArrayDH = {};
 
-				std::vector<nsDx12Wrappers::CTexture*> m_diffuseTextures;
-				std::vector<nsDx12Wrappers::CDescriptorHeap*> m_materialDHs;
+				std::vector<nsDx12Wrappers::CTexture*> m_diffuseTextures = {};
+				std::vector<nsDx12Wrappers::CDescriptorHeap*> m_materialDHs = {};
 
 				nsMath::CMatrix m_bias = nsMath::CMatrix::Identity();
 				nsMath::CMatrix m_worldMatrix = nsMath::CMatrix::Identity();
 
-				std::vector<SBasicMeshInfo> m_meshInfoArray;
-				std::vector<nsMath::CMatrix> m_boneMatrices;
+				std::vector<SBasicMeshInfo> m_meshInfoArray = {};
+				std::vector<nsMath::CMatrix> m_boneMatrices = {};
 				nsAnimations::CSkelton* m_skelton = nullptr;
 				nsAnimations::CAnimator* m_animator = nullptr;
 
@@ -293,6 +313,7 @@ namespace nsYMEngine
 				const aiScene* m_sceneForLoadAsynchronous = nullptr;
 
 				const nsRenderers::SModelInitData* m_modelInitDataRef = nullptr;
+				unsigned int m_numInstances = 1;
 			};
 
 		}

@@ -55,11 +55,28 @@ namespace nsYMEngine
 				m_modelInitData = modelInitData;
 				m_enableLoadingAsynchronous = modelInitData.enableLoadingAsynchronous;
 
+				if (m_modelInitData.maxInstance > 1)
+				{
+					if (m_worldMatrixArray.empty() != true)
+					{
+						m_worldMatrixArray.clear();
+					}
+					m_worldMatrixArray.resize(m_modelInitData.maxInstance);
+					for (auto& worldMatrix : m_worldMatrixArray)
+					{
+						worldMatrix = nsMath::CMatrix::Identity();
+					}
+				}
+
 				CreateRenderer(m_modelInitData);
 
 				if (m_enableLoadingAsynchronous != true)
 				{
 					UpdateWorldMatrix();
+				}
+				if (m_renderer && m_modelInitData.maxInstance > 1)
+				{
+					m_renderer->SetNumInstances(m_modelInitData.maxInstance);
 				}
 
 				return;
@@ -107,6 +124,24 @@ namespace nsYMEngine
 
 				return;
 			}
+
+			void CModelRenderer::UpdateWorldMatrixArray() noexcept
+			{
+				if (m_renderer == nullptr)
+				{
+					return;
+				}
+
+				if (m_worldMatrixArray.empty())
+				{
+					return;
+				}
+
+				m_renderer->UpdateWorldMatrixArray(m_worldMatrixArray);
+
+				return;
+			}
+
 		}
 	}
 }

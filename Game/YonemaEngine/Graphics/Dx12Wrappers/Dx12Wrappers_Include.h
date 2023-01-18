@@ -4,6 +4,7 @@
 #include "RootSignature.h"
 #include "PipelineState.h"
 #include "ConstantBuffer.h"
+#include "StructuredBuffer.h"
 #include "IndexBuffer.h"
 #include "VertexBuffer.h"
 #include "DescriptorHeap.h"
