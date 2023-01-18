@@ -17,7 +17,7 @@ namespace nsAWA
 
 		// MonsterData
 		const char* CGetBoneMatrixSample::m_kMonsterModelFilePath = 
-			"Assets/Models/Giyara.fbx";
+			"Assets/Models/Monsters/Giyara.fbx";
 		const char* CGetBoneMatrixSample::
 			m_kMonsterAnimFilePaths[static_cast<int>(EnMonsterAnimType::enNum)] =
 		{

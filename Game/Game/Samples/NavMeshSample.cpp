@@ -39,7 +39,7 @@ namespace nsAWA
 			{
 				m_aiMoveMR = NewGO<CModelRenderer>();
 				SModelInitData modelInitData;
-				modelInitData.modelFilePath = "Assets/Models/Giyara.fbx";
+				modelInitData.modelFilePath = "Assets/Models/Monsters/Giyara.fbx";
 				modelInitData.textureRootPath = "monster";
 				modelInitData.vertexBias.SetRotationXDeg(90.0f);
 				m_aiMoveMR->SetPosition({ 10.0f,10.0f,0.0f });
