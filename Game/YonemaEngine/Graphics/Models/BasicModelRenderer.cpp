@@ -741,13 +741,15 @@ namespace nsYMEngine
 					return true;
 				}
 
-				m_boneMatrices.resize(m_kMaxNumBones);
+				const auto& boneInfoArray = m_skelton->GetBoneInfoArray();
+				unsigned int numBoneInfoArray = static_cast<unsigned int>(boneInfoArray.size());
+				m_boneMatrices.resize(numBoneInfoArray);
 
 
 				m_boneMatrixArrayDH.InitAsCbvSrvUav(1, L"BoneMatrixArrayDH");
 
 				bool res =
-					m_boneMatrixArraySB.Init(sizeof(nsMath::CMatrix), m_kMaxNumBones);
+					m_boneMatrixArraySB.Init(sizeof(nsMath::CMatrix), numBoneInfoArray);
 
 				if (FAILED(res))
 				{
