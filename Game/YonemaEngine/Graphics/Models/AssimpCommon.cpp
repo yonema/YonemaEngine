@@ -12,7 +12,8 @@ namespace nsYMEngine
 				Assimp::Importer*& pImporter,
 				const aiScene*& pScene,
 				unsigned int removeFlags,
-				unsigned int postprocessFlag
+				unsigned int postprocessFlag,
+				bool removeLineAndPoint
 			)
 			{
 				// utf8のファイルパス文字列が必要なため変換。
@@ -25,8 +26,11 @@ namespace nsYMEngine
 
 				pImporter->SetPropertyInteger(AI_CONFIG_PP_RVC_FLAGS, removeFlags);
 
-				pImporter->SetPropertyInteger(
-					AI_CONFIG_PP_SBP_REMOVE, aiPrimitiveType_LINE | aiPrimitiveType_POINT);
+				if (removeLineAndPoint)
+				{
+					pImporter->SetPropertyInteger(
+						AI_CONFIG_PP_SBP_REMOVE, aiPrimitiveType_LINE | aiPrimitiveType_POINT);
+				}
 
 
 				pScene = pImporter->ReadFile(filePathInUTF8Str, postprocessFlag);

@@ -11,7 +11,7 @@ namespace nsYMEngine
 {
 	namespace nsLevel3D
 	{
-		struct SLevelChipData : private nsUtils::SNoncopyable 
+		struct SLevelChipData
 		{
 			constexpr SLevelChipData() = default;
 			~SLevelChipData() = default;
@@ -49,7 +49,7 @@ namespace nsYMEngine
 			}
 		};
 
-		struct SLevel3DinitData : private nsUtils::SNoncopyable
+		struct SLevel3DinitData
 		{
 			constexpr SLevel3DinitData() = default;
 			~SLevel3DinitData() = default;
@@ -89,7 +89,7 @@ namespace nsYMEngine
 			) noexcept;
 
 		private:
-			std::list<LevelChipPtr> m_levelChipList = {};
+			std::unordered_map<std::string, LevelChipPtr> m_levelChipMap = {};
 		};
 
 	}

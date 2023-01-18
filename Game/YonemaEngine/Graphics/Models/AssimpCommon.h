@@ -79,6 +79,25 @@ namespace nsYMEngine
 				aiProcess_RemoveComponent |
 				aiProcess_GenNormals;
 
+			static constexpr unsigned int g_kLevel3DRemoveComponentFlags = 
+				aiComponent_NORMALS |
+				aiComponent_TANGENTS_AND_BITANGENTS |
+				aiComponent_COLORS |
+				aiComponent_TEXCOORDS |
+				aiComponent_BONEWEIGHTS |
+				aiComponent_ANIMATIONS |
+				aiComponent_TEXTURES |
+				aiComponent_LIGHTS |
+				aiComponent_CAMERAS |
+				aiComponent_MESHES |
+				aiComponent_MATERIALS;
+
+			static constexpr unsigned int g_kLevel3DPostprocessFlags =
+				aiProcess_JoinIdenticalVertices |
+				aiProcess_MakeLeftHanded |
+				aiProcess_Triangulate |
+				aiProcess_RemoveComponent;
+
 
 			//////// Functions ////////
 
@@ -87,7 +106,8 @@ namespace nsYMEngine
 				Assimp::Importer*& pImporter,
 				const aiScene*& pScene,
 				unsigned int removeFlags = 0,
-				unsigned int postprocessFlag = 0
+				unsigned int postprocessFlag = 0,
+				bool removeLineAndPoint = true
 			);
 
 			static inline void AiMatrixToMyMatrix(

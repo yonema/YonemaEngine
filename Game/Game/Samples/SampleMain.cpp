@@ -40,7 +40,7 @@ namespace nsAWA
 				enDrawWorld,
 			};
 
-			constexpr EnSampleIdx g_kSampleIdx = EnSampleIdx::enGetBoneMatrix;
+			constexpr EnSampleIdx g_kSampleIdx = EnSampleIdx::enDrawWorld;
 		}
 
 		bool CSampleMain::Start()
