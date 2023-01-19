@@ -21,6 +21,7 @@
 #include "../YonemaEngine/AI/Navigations/Path.h"
 #include "../YonemaEngine/AI/Navigations/PathFinding.h"
 #include "../YonemaEngine/Level3D/Level3D.h"
+#include "../YonemaEngine/Level2D/Level2D.h"
 
 // エイリアス宣言
 

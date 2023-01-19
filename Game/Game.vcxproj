@@ -159,6 +159,7 @@
     <ClCompile Include="Game\Samples\LoadAsynchronousSample.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\Models\InstancingGenericRenderer.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\Dx12Wrappers\StructuredBuffer.cpp" />
+    <ClCompile Include="YonemaEngine\Level2D\Level2D.cpp" />
     <ClCompile Include="YonemaEngine\Thread\LoadtModelThread.cpp" />
     <ClCompile Include="YonemaEngine\Level3D\LevelChip.cpp" />
     <ClCompile Include="YonemaEngine\Level3D\Level3D.cpp" />
@@ -270,6 +271,8 @@
     <ClInclude Include="Game\Samples\LoadAsynchronousSample.h" />
     <ClInclude Include="YonemaEngine\Graphics\Models\InstancingGenericRenderer.h" />
     <ClInclude Include="YonemaEngine\Graphics\Dx12Wrappers\StructuredBuffer.h" />
+    <ClInclude Include="YonemaEngine\Level2D\Level2D.h" />
+    <ClInclude Include="YonemaEngine\Level2D\Level2DSpriteData.h" />
     <ClInclude Include="YonemaEngine\Thread\LoadModelThread.h" />
     <ClInclude Include="YonemaEngine\Level3D\LevelChip.h" />
     <ClInclude Include="YonemaEngine\Level3D\Level3D.h" />
