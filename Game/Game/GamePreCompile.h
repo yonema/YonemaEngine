@@ -43,6 +43,7 @@ using SAnimationInitData = nsGraphics::nsAnimations::SAnimationInitData;
 // スプライト
 using CSpriteRenderer = nsGraphics::nsRenderers::CSpriteRenderer;
 using SSpriteInitData = nsGraphics::nsSprites::SSpriteInitData;
+using EnAlphaBlendMode = nsGraphics::nsSprites::EnAlphaBlendMode;
 
 // フォント
 using CFontRenderer = nsGraphics::nsFonts::CFontRenderer;

@@ -62,6 +62,11 @@ namespace nsYMEngine
 					m_constantBufferCPU.mulColor = mulColor;
 				}
 
+				constexpr const nsMath::CVector4& GetMulColor() const noexcept
+				{
+					return m_constantBufferCPU.mulColor;
+				}
+
 			private:
 				void Terminate();
 

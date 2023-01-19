@@ -10,6 +10,7 @@ namespace nsAWA
 			SSpriteInitData spriteInitData;
 			spriteInitData.filePath = m_kSpriteFilePath;
 			spriteInitData.spriteSize = { 300.0f,300.0f };
+			spriteInitData.alphaBlendMode = EnAlphaBlendMode::enTrans;
 			m_spriteRenderer = NewGO<CSpriteRenderer>();
 			m_spriteRenderer->Init(spriteInitData);
 			m_spriteRenderer->SetPosition({ 0.0f,0.0f });
@@ -31,6 +32,30 @@ namespace nsAWA
 			auto rotTmp = m_spriteRenderer->GetRotation();
 			rotTmp.AddRotationZDeg(50.0f * deltaTime);
 			m_spriteRenderer->SetRotation(rotTmp);
+
+			// æŽZƒJƒ‰[
+			static bool hoge = true;
+			auto mulCol = m_spriteRenderer->GetMulColor();
+			if (hoge)
+			{
+				mulCol.a -= 0.5f * deltaTime;
+				if (mulCol.a <= 0.0f)
+				{
+					mulCol.a = 0.0f;
+					hoge = false;
+				}
+			}
+			else
+			{
+				mulCol.a += 0.5f * deltaTime;
+				if (mulCol.a >= 1.0f)
+				{
+					mulCol.a = 1.0f;
+					hoge = true;
+				}
+			}
+			m_spriteRenderer->SetMulColor(mulCol);
+
 
 			return;
 		}

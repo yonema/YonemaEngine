@@ -81,6 +81,19 @@ namespace nsYMEngine
 				{
 					return m_anchor;
 				}
+				
+				inline void SetMulColor(const nsMath::CVector4& mulColor) noexcept
+				{
+					if (m_sprite)
+					{
+						m_sprite->SetMulColor(mulColor);
+					}
+				}
+
+				constexpr const nsMath::CVector4& GetMulColor() const noexcept
+				{
+					return m_sprite ? m_sprite->GetMulColor() : nsMath::CVector4::White();
+				}
 
 			private:
 				void Terminate();
