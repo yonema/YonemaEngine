@@ -2,6 +2,8 @@
 #include "../Renderers/Renderer.h"
 #include "../Animations/Animator.h"
 #include "../Animations/Skelton.h"
+#include "../Geometries/GeometryData.h"
+
 
 namespace nsYMEngine
 {
@@ -11,6 +13,10 @@ namespace nsYMEngine
 		{
 			struct SModelInitData;
 		}
+	}
+	namespace nsGeometries
+	{
+		class CGeometryData;
 	}
 }
 
@@ -30,6 +36,33 @@ namespace nsYMEngine
 	{
 		namespace nsModels
 		{
+			/**
+			 * @attention この構造体はコピーを許可する。
+			*/
+			struct SVertex
+			{
+				constexpr SVertex() = default;
+				~SVertex() = default;
+
+				nsMath::CVector3 position;
+				nsMath::CVector3 normal;
+				nsMath::CVector2 uv;
+				unsigned short boneNo[4] = {};
+				unsigned short weights[4] = {};
+			};
+
+			/**
+			 * @attention この構造体はコピーを許可する。
+			*/
+			struct SMesh
+			{
+				constexpr SMesh() = default;
+				~SMesh() = default;
+
+				std::vector<SVertex> vertices = {};
+				std::vector<uint16_t> indices = {};
+				nsMath::CMatrix mNodeTransformInv = nsMath::CMatrix::Identity();
+			};
 
 			class CBasicModelRenderer : public nsRenderers::IRenderer
 			{
@@ -41,34 +74,6 @@ namespace nsYMEngine
 				static const unsigned int m_kMaxNumBoneWeights = 4;
 				static const unsigned int m_kAligSizeVertexStride = 4;
 				static const unsigned int m_kMaxNumBones = 256;
-
-				/**
-				 * @attention この構造体はコピーを許可する。
-				*/
-				struct SVertex
-				{
-					constexpr SVertex() = default;
-					~SVertex() = default;
-
-					nsMath::CVector3 position;
-					nsMath::CVector3 normal;
-					nsMath::CVector2 uv;
-					unsigned short boneNo[4] = {};
-					unsigned short weights[4] = {};
-				};
-
-				/**
-				 * @attention この構造体はコピーを許可する。
-				*/
-				struct SMesh
-				{
-					constexpr SMesh() = default;
-					~SMesh() = default;
-
-					std::vector<SVertex> vertices = {};
-					std::vector<uint16_t> indices = {};
-					nsMath::CMatrix mNodeTransformInv = nsMath::CMatrix::Identity();
-				};
 
 				/**
 				 * @attention この構造体はコピーを許可する。
@@ -94,8 +99,6 @@ namespace nsYMEngine
 					unsigned int baseIndexNo = 0;
 					unsigned int materialIndex = 0;
 				};
-
-
 
 			public:
 				CBasicModelRenderer(
@@ -314,6 +317,9 @@ namespace nsYMEngine
 
 				const nsRenderers::SModelInitData* m_modelInitDataRef = nullptr;
 				unsigned int m_numInstances = 1;
+
+				std::vector<nsGeometries::CGeometryData*> m_geometryDataArray = {};
+				unsigned int m_fixNumInstanceOnFrame = 0;
 			};
 
 		}

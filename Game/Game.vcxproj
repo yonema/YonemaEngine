@@ -151,6 +151,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="YonemaEngine\Geometries\GeometryData.cpp" />
+    <ClCompile Include="YonemaEngine\Geometries\AABB.cpp" />
     <ClCompile Include="Game\Samples\DrawInstancingSample.cpp" />
     <ClCompile Include="Game\Samples\DrawWorldSample.cpp" />
     <ClCompile Include="Game\Samples\ModelRendererSample.cpp" />
@@ -260,6 +262,8 @@
     <Image Include="Assets\Images\StarMan.png" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="YonemaEngine\Geometries\GeometryData.h" />
+    <ClInclude Include="YonemaEngine\Geometries\AABB.h" />
     <ClInclude Include="Game\Samples\DrawInstancingSample.h" />
     <ClInclude Include="Game\Samples\DrawWorldSample.h" />
     <ClInclude Include="Game\Samples\ModelRendererSample.h" />

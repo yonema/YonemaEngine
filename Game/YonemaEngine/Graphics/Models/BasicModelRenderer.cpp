@@ -66,7 +66,7 @@ namespace nsYMEngine
 					commandList->SetVertexBuffer(*vertexBuffer);
 
 					// 描画
-					commandList->DrawInstanced(meshInfo.numIndices, m_numInstances);
+					commandList->DrawInstanced(meshInfo.numIndices, m_fixNumInstanceOnFrame);
 
 				}
 				return;
@@ -97,6 +97,16 @@ namespace nsYMEngine
 			{
 				m_isImportedModelScene = false;
 				m_loadingState = EnLoadingState::enBeforeLoading;
+
+				for (auto& geomData : m_geometryDataArray)
+				{
+					if (geomData)
+					{
+						delete geomData;
+						geomData = nullptr;
+					}
+				}
+				m_geometryDataArray.clear();
 
 				m_boneMatrixArrayDH.Release();
 				m_boneMatrixArraySB.Release();
@@ -250,6 +260,15 @@ namespace nsYMEngine
 				CreateMaterialSRV();
 				CreateBoneMatrisArraySB();
 				CreateWorldMatrixArraySB(modelInitData);
+
+				m_geometryDataArray.reserve(modelInitData.maxInstance);
+				m_geometryDataArray.emplace_back(new nsGeometries::CGeometryData());
+				m_geometryDataArray[0]->Init(dstMeshes);
+				for (unsigned int instanceIdx = 1; instanceIdx < modelInitData.maxInstance; instanceIdx++)
+				{
+					m_geometryDataArray.emplace_back(new nsGeometries::CGeometryData());
+					m_geometryDataArray[instanceIdx]->Init(m_geometryDataArray[0]->GetAABB());
+				}
 
 				m_bias.MakeRotationFromQuaternion(modelInitData.vertexBias);
 
@@ -809,6 +828,16 @@ namespace nsYMEngine
 				auto mViewProj = CGraphicsEngine::GetInstance()->GetMatrixViewProj();
 				mappedCB[1] = mViewProj;
 
+
+				m_fixNumInstanceOnFrame = 0;
+
+				// ジオメトリデータを更新
+				m_geometryDataArray[0]->Update(m_worldMatrix);
+				if (m_geometryDataArray[0]->IsInViewFrustum())
+				{
+					m_fixNumInstanceOnFrame++;
+				}
+
 				return;
 			}
 
@@ -882,7 +911,26 @@ namespace nsYMEngine
 					return;
 				}
 
-				m_worldMatrixArraySB.CopyToMappedStructuredBuffer(worldMatrixArray.data());
+				m_fixNumInstanceOnFrame = 0;
+
+				std::vector<nsMath::CMatrix> fixWorldMatrixArray = {};
+				fixWorldMatrixArray.reserve(worldMatrixArray.size());
+
+				auto geomData = m_geometryDataArray.begin();
+				for (const auto& mWorld : worldMatrixArray)
+				{
+					(*geomData)->Update(mWorld);
+					if ((*geomData)->IsInViewFrustum())
+					{
+						fixWorldMatrixArray.emplace_back(mWorld);
+						m_fixNumInstanceOnFrame++;
+					}
+					geomData++;
+				}
+
+				m_worldMatrixArraySB.CopyToMappedStructuredBuffer(
+					fixWorldMatrixArray.data(), 
+					sizeof(nsMath::CMatrix) * m_fixNumInstanceOnFrame);
 
 				return;
 			}

@@ -27,6 +27,8 @@ namespace nsYMEngine
 
 				void CopyToMappedStructuredBuffer(const void* data);
 
+				void CopyToMappedStructuredBuffer(const void* data, size_t size);
+
 				constexpr auto* GetMappedStructuredBuffer() noexcept
 				{
 					return m_mappedStructuredBuffer;

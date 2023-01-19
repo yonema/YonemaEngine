@@ -35,7 +35,12 @@ namespace nsYMEngine
 					m_renderer->PlayAnimation(0);
 					m_enableLoadingAsynchronous = false;
 				}
+
 				UpdateWorldMatrix();
+				if (m_modelInitData.maxInstance > 1)
+				{
+					UpdateWorldMatrixArray();
+				}
 
 				m_renderer->UpdateAnimation(deltaTime);
 

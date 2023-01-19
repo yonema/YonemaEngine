@@ -140,6 +140,13 @@ namespace nsYMEngine
 				return;
 			}
 
+			void CStructuredBuffer::CopyToMappedStructuredBuffer(const void* data, size_t size)
+			{
+				memcpy(m_mappedStructuredBuffer, data, size);
+
+				return;
+			}
+
 
 			void CStructuredBuffer::SetName(const wchar_t* objectName)
 			{
