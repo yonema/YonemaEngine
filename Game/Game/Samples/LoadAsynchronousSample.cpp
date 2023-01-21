@@ -19,16 +19,14 @@ namespace nsAWA
 
 		bool CLoadAsynchronousSample::Start()
 		{
-			m_animationInitData.Init(
-				static_cast<unsigned int>(EnAnimType::enNum), m_kAnimFilePaths);
-
 			{
 				SModelInitData modelInitData;
 				modelInitData.modelFilePath = m_kModelFilePath;
 				modelInitData.vertexBias.SetRotationX(nsMath::YM_PIDIV2);
-				modelInitData.animInitData = &m_animationInitData;
+				modelInitData.animInitData.Init(
+					static_cast<unsigned int>(EnAnimType::enNum), m_kAnimFilePaths);
 				modelInitData.textureRootPath = "Player";
-				modelInitData.enableLoadingAsynchronous = true;
+				modelInitData.SetFlags(EnModelInitDataFlags::enLoadingAsynchronous);
 
 				m_modelRenderer = NewGO<CModelRenderer>();
 				m_modelRenderer->SetPosition({ 0.0f, 4.0f, 0.0f });

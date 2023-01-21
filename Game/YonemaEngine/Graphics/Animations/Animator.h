@@ -20,7 +20,7 @@ namespace nsYMEngine
 	{
 		namespace nsAnimations
 		{
-			struct SAnimationInitData : private nsUtils::SNoncopyable
+			struct SAnimationInitData
 			{
 				constexpr SAnimationInitData() = default;
 
@@ -28,6 +28,8 @@ namespace nsYMEngine
 					unsigned int numAnimations,
 					const char* animationFilePaths[]
 				);
+
+				~SAnimationInitData() = default;
 
 				void Init(
 					unsigned int numAnims,
@@ -47,7 +49,8 @@ namespace nsYMEngine
 				bool Init(
 					const SAnimationInitData& animInitData,
 					CSkelton* pSkelton,
-					bool loadingAsynchronous
+					bool loadingAsynchronous,
+					bool regiseterAnimBank
 				);
 
 				void Release();
@@ -127,7 +130,8 @@ namespace nsYMEngine
 				bool InitAnimationClips(
 					const SAnimationInitData& animInitData,
 					CSkelton* pSkelton,
-					bool loadingAsynchronous
+					bool loadingAsynchronous,
+					bool regiseterAnimBank
 				);
 
 

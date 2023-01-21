@@ -5,6 +5,7 @@
 #include "Renderers/Renderer.h"
 #include "Fonts/FontEngine.h"
 #include "../Effect/EffectEngine.h"
+#include "../Memory/ResourceBankTable.h"
 
 
 namespace nsYMEngine
@@ -28,6 +29,11 @@ namespace nsYMEngine
 			D3D_FEATURE_LEVEL_11_1,
 			D3D_FEATURE_LEVEL_11_0
 		};
+
+		const char* const CGraphicsEngine::m_kWhiteTextureFilePath = 
+			"Assets/Images/Presets/white.jpg";
+		const char* const CGraphicsEngine::m_kBlackTextureFilePath =
+			"Assets/Images/Presets/black.jpg";
 
 		using RendererType = nsRenderers::CRendererTable::EnRendererType;
 
@@ -131,8 +137,14 @@ namespace nsYMEngine
 
 			m_whiteTexture = new nsDx12Wrappers::CTexture();
 			m_blackTexture = new nsDx12Wrappers::CTexture();
-			m_whiteTexture->Init("Assets/Images/Presets/white.jpg");
-			m_blackTexture->Init("Assets/Images/Presets/black.jpg");
+			m_whiteTexture->Init(m_kWhiteTextureFilePath);
+			m_blackTexture->Init(m_kBlackTextureFilePath);
+
+			auto& textureBank = nsMemory::CResourceBankTable::GetInstance()->GetTextureBank();
+			m_whiteTexture->SetShared(true);
+			textureBank.Register(m_kWhiteTextureFilePath, m_whiteTexture);
+			m_blackTexture->SetShared(true);
+			textureBank.Register(m_kBlackTextureFilePath, m_blackTexture);
 
 			m_mainCamera.SetPosition({ 0.0f,10.0f,-25.0f });
 			m_mainCamera.SetTargetPosition({ 0.0f,10.0f,0.0f });
@@ -156,11 +168,19 @@ namespace nsYMEngine
 			}
 			if (m_whiteTexture)
 			{
-				delete m_whiteTexture;
+				if (m_whiteTexture->IsShared() != true)
+				{
+					delete m_whiteTexture;
+				}
+				m_whiteTexture = nullptr;
 			}
 			if (m_blackTexture)
 			{
-				delete m_blackTexture;
+				if (m_blackTexture->IsShared() != true)
+				{
+					delete m_blackTexture;
+				}
+				m_blackTexture = nullptr;
 			}
 			nsFonts::CFontEngine::DeleteInstance();
 			m_sceneDataDH.Release();
@@ -172,11 +192,13 @@ namespace nsYMEngine
 			if (m_fence)
 			{
 				m_fence->Release();
+				m_fence = nullptr;
 			}
 			m_frameBuffer.Release();
 			if (m_commandQueue)
 			{
 				m_commandQueue->Release();
+				m_commandQueue = nullptr;
 			}
 			m_commandList.Release();
 			if (m_commandAllocator)
@@ -186,6 +208,7 @@ namespace nsYMEngine
 			if (m_device)
 			{
 				m_device->Release();
+				m_device = nullptr;
 			}
 
 			return;

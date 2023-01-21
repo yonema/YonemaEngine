@@ -38,7 +38,6 @@ namespace nsAWA
 		private:
 			CModelRenderer* m_modelRenderer = nullptr;
 			CModelRenderer* m_boxMR = nullptr;
-			SAnimationInitData m_animationInitData = {};
 			nsYMEngine::nsDebugSystem::CSimpleMover* m_simpleMover = nullptr;
 		};
 

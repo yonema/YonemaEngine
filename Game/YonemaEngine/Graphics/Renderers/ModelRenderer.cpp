@@ -8,6 +8,11 @@ namespace nsYMEngine
 	{
 		namespace nsRenderers
 		{
+			const std::bitset<static_cast<int>(EnModelInitDataFlags::enNum)> 
+				SModelInitData::kDefaultFlags(std::string("0000"));
+
+
+
 			bool CModelRenderer::Start()
 			{
 				if (m_renderer->GetLoadingState() != EnLoadingState::enAfterLoading)
@@ -58,7 +63,8 @@ namespace nsYMEngine
 			void CModelRenderer::Init(const SModelInitData& modelInitData) noexcept
 			{
 				m_modelInitData = modelInitData;
-				m_enableLoadingAsynchronous = modelInitData.enableLoadingAsynchronous;
+				m_enableLoadingAsynchronous = 
+					modelInitData.GetFlags(EnModelInitDataFlags::enLoadingAsynchronous);
 
 				if (m_modelInitData.maxInstance > 1)
 				{

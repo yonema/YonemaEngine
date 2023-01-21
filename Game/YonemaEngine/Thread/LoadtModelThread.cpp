@@ -79,7 +79,7 @@ namespace nsYMEngine
 			case EnLoadProcessType::enLoadAnim:
 				if (itr->animClipRef)
 				{
-					itr->animClipRef->Init(itr->animFilePath, itr->skeltonRef);
+					itr->animClipRef->Init(itr->animFilePath, itr->skeltonRef, itr->registerAnimBank);
 				}
 				break;
 			}

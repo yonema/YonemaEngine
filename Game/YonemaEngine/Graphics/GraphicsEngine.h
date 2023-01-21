@@ -36,6 +36,8 @@ namespace nsYMEngine
 			static const wchar_t* m_kGPUAdapterNames[EnGPUAdapterType::NumGPUAdapterType];
 			static const unsigned int m_kNumFeatureLevel = 4;
 			static const D3D_FEATURE_LEVEL m_kFeatureLevels[m_kNumFeatureLevel];
+			static const char* const m_kWhiteTextureFilePath;
+			static const char* const m_kBlackTextureFilePath;
 
 			struct SSceneDataMatrix
 			{
@@ -160,6 +162,16 @@ namespace nsYMEngine
 			}
 
 			void WaitForCommandExecutionToComplete();
+
+			constexpr const char* const GetWhiteTextureFilePath() const noexcept
+			{
+				return m_kWhiteTextureFilePath;
+			}
+
+			constexpr const char* const GetBlackTextureFilePath() const noexcept
+			{
+				return m_kBlackTextureFilePath;
+			}
 
 		private:
 

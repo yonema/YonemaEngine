@@ -1,16 +1,10 @@
 #pragma once
 #include "RendererTable.h"
 #include "../Models/BasicModelRenderer.h"
+#include "../Animations/Animator.h"
 
 namespace nsYMEngine
 {
-	namespace nsGraphics
-	{
-		namespace nsAnimations
-		{
-			struct SAnimationInitData;
-		}
-	}
 	namespace nsPhysics
 	{
 		class IPhysicsObject;
@@ -25,18 +19,46 @@ namespace nsYMEngine
 	{
 		namespace nsRenderers
 		{
+			enum class EnModelInitDataFlags
+			{
+				enNodeTransform,
+				enLoadingAsynchronous,
+				enRegisterAnimationBank,
+				enRegisterTextureBank,
+				enNum
+			};
+
 			struct SModelInitData
 			{
+			private:
+				static const 
+					std::bitset<static_cast<int>(EnModelInitDataFlags::enNum)> kDefaultFlags;
+
+			public:
+				constexpr SModelInitData() = default;
+				~SModelInitData() = default;
+
+				inline void SetFlags(EnModelInitDataFlags enFlags, bool value= true) noexcept
+				{
+					flags.set(static_cast<int>(enFlags), value);
+				}
+
+				inline bool GetFlags(EnModelInitDataFlags enFlags) const noexcept
+				{
+					return flags.test(static_cast<int>(enFlags));
+				}
+
 				const char* modelFilePath = nullptr;
 				CRendererTable::EnRendererType rendererType = 
 					CRendererTable::EnRendererType::enBasicModel;
 				nsMath::CQuaternion vertexBias = nsMath::CQuaternion::Identity();
-				const nsAnimations::SAnimationInitData* animInitData = nullptr;
+				nsAnimations::SAnimationInitData animInitData = {};
 				nsPhysics::SMeshGeometryBuffer* physicsMeshGeomBuffer = nullptr;
 				unsigned int maxInstance = 1;
 				const char* textureRootPath = nullptr;
-				bool enableNodeTransform = false;
-				bool enableLoadingAsynchronous = false;
+
+			private:
+				std::bitset<static_cast<int>(EnModelInitDataFlags::enNum)> flags = kDefaultFlags;
 			};
 
 			class CModelRenderer : public nsGameObject::IGameObject

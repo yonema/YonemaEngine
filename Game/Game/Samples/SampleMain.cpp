@@ -14,6 +14,7 @@
 #include "TriggerSample.h"
 #include "CharacterControllerSample.h"
 #include "DrawWorldSample.h"
+#include "ShareAnimationSample.h"
 
 namespace nsAWA
 {
@@ -29,6 +30,7 @@ namespace nsAWA
 				enGetBoneMatrix,
 				enLoadAsynchronous,
 				enDrawInstancing,
+				enShareAnimation,
 				enSprite,
 				enFont,
 				enEffect,
@@ -40,7 +42,7 @@ namespace nsAWA
 				enDrawWorld,
 			};
 
-			constexpr EnSampleIdx g_kSampleIdx = EnSampleIdx::enDrawWorld;
+			constexpr EnSampleIdx g_kSampleIdx = EnSampleIdx::enShareAnimation;
 		}
 
 		bool CSampleMain::Start()
@@ -64,6 +66,9 @@ namespace nsAWA
 				break;
 			case EnSampleIdx::enDrawInstancing:
 				m_sampleGO = NewGO<CDrawInstancingSample>("DrawInstancingSample");
+				break;
+			case EnSampleIdx::enShareAnimation:
+				m_sampleGO = NewGO<CShareAnimationSample>("ShareAnimationSample");
 				break;
 			case EnSampleIdx::enSprite:
 				m_sampleGO = NewGO<CSpriteSample>("SpriteSample");

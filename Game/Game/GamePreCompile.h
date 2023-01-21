@@ -39,7 +39,7 @@ using EnAxisMapping = nsInput::EnAxisMapping;
 // モデル
 using CModelRenderer = nsGraphics::nsRenderers::CModelRenderer;
 using SModelInitData = nsGraphics::nsRenderers::SModelInitData;
-using SAnimationInitData = nsGraphics::nsAnimations::SAnimationInitData;
+using EnModelInitDataFlags = nsGraphics::nsRenderers::EnModelInitDataFlags;
 
 // スプライト
 using CSpriteRenderer = nsGraphics::nsRenderers::CSpriteRenderer;

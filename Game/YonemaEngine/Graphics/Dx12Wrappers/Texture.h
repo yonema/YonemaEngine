@@ -77,6 +77,16 @@ namespace nsYMEngine
 #endif
 				}
 
+				constexpr bool IsShared() const noexcept
+				{
+					return m_isShared;
+				}
+
+				constexpr void SetShared(bool isShared) noexcept
+				{
+					m_isShared = isShared;
+				}
+
 			private:
 
 				void Terminate();
@@ -128,6 +138,7 @@ namespace nsYMEngine
 				UINT16 m_mipLevels = 0;
 				DXGI_FORMAT m_format = DXGI_FORMAT_UNKNOWN;
 				nsMath::CVector2 m_textureSize = nsMath::CVector2::Zero();
+				bool m_isShared = false;
 			};
 		}
 	}

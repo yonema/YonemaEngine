@@ -42,13 +42,15 @@ namespace nsYMEngine
 					nsGraphics::nsModels::CBasicModelRenderer* modelRef,
 					nsGraphics::nsAnimations::CAnimationClip* animClipRef,
 					const char* animFilePath,
-					nsGraphics::nsAnimations::CSkelton* skeltonRef
+					nsGraphics::nsAnimations::CSkelton* skeltonRef,
+					bool registerAnimBank
 				)
 					:loadProcessType(loadProcessType),
 					modelRef(modelRef),
 					animClipRef(animClipRef),
 					animFilePath(animFilePath),
-					skeltonRef(skeltonRef)
+					skeltonRef(skeltonRef),
+					registerAnimBank(registerAnimBank)
 				{};
 
 				~SLoadModelProcess() = default;
@@ -58,6 +60,7 @@ namespace nsYMEngine
 				nsGraphics::nsAnimations::CAnimationClip* animClipRef = nullptr;
 				const char* animFilePath = nullptr;
 				nsGraphics::nsAnimations::CSkelton* skeltonRef = nullptr;
+				bool registerAnimBank = false;
 			};
 
 		private:
@@ -108,11 +111,12 @@ namespace nsYMEngine
 				nsGraphics::nsModels::CBasicModelRenderer* modelRef,
 				nsGraphics::nsAnimations::CAnimationClip* animClipRef = nullptr,
 				const char* animFilePath = nullptr,
-				nsGraphics::nsAnimations::CSkelton* skeltonRef = nullptr
+				nsGraphics::nsAnimations::CSkelton* skeltonRef = nullptr,
+				bool registerAnimBank = false
 			) noexcept
 			{
 				m_loadModelProcess[m_threadIdx].emplace_back(
-					loadProcessType, modelRef, animClipRef, animFilePath, skeltonRef);
+					loadProcessType, modelRef, animClipRef, animFilePath, skeltonRef, registerAnimBank);
 				m_threadIdx++;
 				if (m_threadIdx >= m_kNumThread)
 				{

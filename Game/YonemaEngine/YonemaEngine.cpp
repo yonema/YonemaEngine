@@ -24,6 +24,9 @@ namespace nsYMEngine
 
 	bool CYonemaEngine::Init()
 	{
+		// リソースバンクは、グラフィックスエンジンより先に生成する。
+		m_resourceBankTable = nsMemory::CResourceBankTable::CreateInstance();
+
 		m_graphicsEngine = nsGraphics::CGraphicsEngine::CreateInstance();
 		if (m_graphicsEngine->Init() != true)
 		{
@@ -34,7 +37,6 @@ namespace nsYMEngine
 		m_physicsWorld = nsPhysics::CPhysicsEngine::CreateInstance();
 		m_effectEngine = nsEffect::CEffectEngine::CreateInstance();
 		m_soundEngine = nsSound::CSoundEngine::CreateInstance();
-		m_resourceBankTable = nsMemory::CResourceBankTable::CreateInstance();
 		m_loadModelThread = nsThread::CLoadModelThread::CreateInstance();
 
 		//NewGO<nsAWA::CGame>(EnGOPriority::enMid, "AWAGame");
@@ -68,8 +70,6 @@ namespace nsYMEngine
 		nsGameObject::CGameObjectManager::DeleteInstance();
 		m_gameObjectManager = nullptr;
 
-		nsMemory::CResourceBankTable::DeleteInstance();
-		m_resourceBankTable = nullptr;
 
 		nsSound::CSoundEngine::DeleteInstance();
 		m_soundEngine = nullptr;
@@ -82,8 +82,13 @@ namespace nsYMEngine
 			delete m_inputManager;
 			m_inputManager = nullptr;
 		}
+
 		nsGraphics::CGraphicsEngine::DeleteInstance();
 		m_graphicsEngine = nullptr;
+
+		// リソースバンクはグラフィックスエンジンより後に破棄する。
+		nsMemory::CResourceBankTable::DeleteInstance();
+		m_resourceBankTable = nullptr;
 
 		return;
 	}

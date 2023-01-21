@@ -3,6 +3,7 @@
 #include "Skelton.h"
 #include "../../Utils/StringManipulation.h"
 #include "../../Utils/AlignSize.h"
+#include "../../Memory/ResourceBankTable.h"
 
 namespace nsYMEngine
 {
@@ -38,7 +39,7 @@ namespace nsYMEngine
 			}
 
 
-			bool CAnimationClip::Init(const char* animFilePath, CSkelton* pSkelton)
+			bool CAnimationClip::Init(const char* animFilePath, CSkelton* pSkelton, bool registerAnimBank)
 			{
 				m_isLoaded = false;
 
@@ -47,6 +48,20 @@ namespace nsYMEngine
 				m_isLoaded = true;
 
 				m_skeltonRef = pSkelton;
+
+				if (registerAnimBank)
+				{
+					auto& animClipBank =
+						nsMemory::CResourceBankTable::GetInstance()->GetAnimationClipBank();
+					auto* animClip = animClipBank.Get(animFilePath);
+					if (animClip == nullptr)
+					{
+						SetIsShared(true);
+						// AnimBank‚É–¢“o˜^‚Ì‚½‚ßAV‹K‚É“o˜^‚·‚éB
+						animClipBank.Register(animFilePath, this);
+					}
+				}
+
 
 				return true;
 			}

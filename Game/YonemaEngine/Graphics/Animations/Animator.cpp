@@ -1,6 +1,7 @@
 #include "Animator.h"
 #include "../Models/AssimpCommon.h"
-#include "../Thread/LoadModelThread.h"
+#include "../../Thread/LoadModelThread.h"
+#include "../../Memory/ResourceBankTable.h"
 
 namespace nsYMEngine
 {
@@ -54,6 +55,24 @@ namespace nsYMEngine
 
 			void CAnimator::Release()
 			{
+				for (auto& animClip : m_animationClips)
+				{
+					if (animClip == nullptr)
+					{
+						continue;
+					}
+
+					if (animClip->IsShared())
+					{
+						animClip = nullptr;
+						continue;
+					}
+
+					delete animClip;
+					animClip = nullptr;
+				}
+
+				m_animationClips.clear();
 
 				return;
 			}
@@ -61,11 +80,13 @@ namespace nsYMEngine
 			bool CAnimator::Init(
 				const SAnimationInitData& animInitData, 
 				CSkelton* pSkelton, 
-				bool loadingAsynchronous
+				bool loadingAsynchronous,
+				bool regiseterAnimBank
 			)
 			{
 				m_pSkelton = pSkelton;
-				bool res = InitAnimationClips(animInitData, pSkelton, loadingAsynchronous);
+				bool res = InitAnimationClips(
+					animInitData, pSkelton, loadingAsynchronous, regiseterAnimBank);
 
 				return res;
 			}
@@ -73,7 +94,8 @@ namespace nsYMEngine
 			bool CAnimator::InitAnimationClips(
 				const SAnimationInitData& animInitData,
 				CSkelton* pSkelton,
-				bool loadingAsynchronous
+				bool loadingAsynchronous,
+				bool regiseterAnimBank
 			)
 			{
 				bool res = false;
@@ -81,27 +103,54 @@ namespace nsYMEngine
 
 				for (unsigned int animIdx = 0; animIdx < animInitData.numAnimations; animIdx++)
 				{
-					auto* animClip = new CAnimationClip();
-					m_animationClips.emplace_back(animClip);
 					const auto* animFilePath = animInitData.animationFilePathArray[animIdx];
 
-					if (loadingAsynchronous)
+					auto& animClipBank = 
+						nsMemory::CResourceBankTable::GetInstance()->GetAnimationClipBank();
+					auto* animClip = animClipBank.Get(animFilePath);
+
+					if (animClip == nullptr)
 					{
-						nsThread::CLoadModelThread::GetInstance()->PushLoadModelProcess(
-							nsThread::CLoadModelThread::EnLoadProcessType::enLoadAnim,
-							nullptr, 
-							animClip,
-							animFilePath,
-							pSkelton
-						);
-						continue;
+						// AnimBankに未登録のため、新規作成する。
+
+						animClip = new CAnimationClip();
+
+						// AnimationClipBankのRegisterはCAnimationClipの中で行う
+
+						if (loadingAsynchronous)
+						{
+							nsThread::CLoadModelThread::GetInstance()->PushLoadModelProcess(
+								nsThread::CLoadModelThread::EnLoadProcessType::enLoadAnim,
+								nullptr,
+								animClip,
+								animFilePath,
+								pSkelton,
+								regiseterAnimBank
+							);
+							res = true;
+						}
+						else
+						{
+							res = animClip->Init(
+								animInitData.animationFilePathArray[animIdx], pSkelton, regiseterAnimBank);
+						}
+
+					}
+					else
+					{
+						res = true;
 					}
 
-					res = m_animationClips[animIdx]->Init(
-						animInitData.animationFilePathArray[animIdx], pSkelton);
+					m_animationClips.emplace_back(animClip);
+
+
 
 					if (res != true)
 					{
+						std::wstring wstr = nsUtils::GetWideStringFromString(animFilePath);
+						wstr.erase(wstr.end() - 1);
+						wstr += L"のアニメーションのロードに失敗しました。";
+						nsGameWindow::MessageBoxError(wstr.c_str());
 						return false;
 					}
 				}

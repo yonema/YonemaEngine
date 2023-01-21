@@ -48,7 +48,7 @@ namespace nsYMEngine
 				constexpr CAnimationClip() = default;
 				~CAnimationClip();
 
-				bool Init(const char* animFilePath, CSkelton* pSkelton);
+				bool Init(const char* animFilePath, CSkelton* pSkelton, bool registerAnimBank);
 
 				void Release();
 
@@ -85,6 +85,16 @@ namespace nsYMEngine
 				constexpr bool IsLoaded() const noexcept
 				{
 					return m_isLoaded;
+				}
+
+				constexpr bool IsShared() const noexcept
+				{
+					return m_isShared;
+				}
+
+				constexpr void SetIsShared(bool isShared) noexcept
+				{
+					m_isShared = isShared;
 				}
 
 			private:
@@ -143,6 +153,7 @@ namespace nsYMEngine
 				int m_animLoopCounter = 0;
 				std::vector<std::function<void(void)>> m_animationEventFuncArray = {};
 				bool m_isLoaded = false;
+				bool m_isShared = false;
 			};
 
 		}

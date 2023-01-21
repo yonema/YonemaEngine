@@ -47,7 +47,7 @@ namespace nsYMEngine
 			}
 
 		private:
-			std::unordered_map<const char*, TResourcePtr> m_resourceMap = {};
+			std::unordered_map<std::string, TResourcePtr> m_resourceMap = {};
 		};
 	}
 }

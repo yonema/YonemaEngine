@@ -32,12 +32,10 @@ namespace nsAWA
 
 			// InitHumanModel
 			{
-				SAnimationInitData animInitData(
-					static_cast<unsigned int>(EnHumanAnimType::enNum), m_kHumanAnimFilePaths);
-
 				SModelInitData modelInitData;
 				modelInitData.modelFilePath = m_kHumanModelFilePath;
-				modelInitData.animInitData = &animInitData;
+				modelInitData.animInitData.Init(
+					static_cast<unsigned int>(EnHumanAnimType::enNum), m_kHumanAnimFilePaths);
 				modelInitData.textureRootPath = "player";
 				modelInitData.vertexBias.SetRotationXDeg(90.0f);
 
@@ -53,12 +51,10 @@ namespace nsAWA
 
 			// InitMonsterModel
 			{
-				SAnimationInitData animInitData(
-					static_cast<unsigned int>(EnMonsterAnimType::enNum), m_kMonsterAnimFilePaths);
-
 				SModelInitData modelInitData;
 				modelInitData.modelFilePath = m_kMonsterModelFilePath;
-				modelInitData.animInitData = &animInitData;
+				modelInitData.animInitData.Init(
+					static_cast<unsigned int>(EnMonsterAnimType::enNum), m_kMonsterAnimFilePaths);
 				modelInitData.textureRootPath = "monster";
 				modelInitData.vertexBias.SetRotationXDeg(90.0f);
 

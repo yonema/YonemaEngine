@@ -4,6 +4,7 @@
 #include "../../Thread/LoadModelThread.h"
 #include "../../Utils/StringManipulation.h"
 #include "../../Utils/AlignSize.h"
+#include "../../Memory/ResourceBankTable.h"
 
 namespace nsYMEngine
 {
@@ -119,13 +120,25 @@ namespace nsYMEngine
 						materialDH->Release();
 					}
 				}
+				
 				for (auto& diffuseTexture : m_diffuseTextures)
 				{
-					if (diffuseTexture)
+					if (diffuseTexture == nullptr)
 					{
-						diffuseTexture->Release();
+						continue;
 					}
+
+					if (diffuseTexture->IsShared())
+					{
+						diffuseTexture = nullptr;
+						continue;
+					}
+
+					diffuseTexture->Release();
+					delete diffuseTexture;
+					diffuseTexture = nullptr;
 				}
+				m_diffuseTextures.clear();
 				m_modelDH.Release();
 				m_modelCB.Release();
 				for (auto* indexBuffer : m_indexBuffers)
@@ -156,11 +169,11 @@ namespace nsYMEngine
 			bool CBasicModelRenderer::Init(const nsRenderers::SModelInitData& modelInitData) noexcept
 			{
 				m_isImportedModelScene = false;
+				m_modelInitDataRef = &modelInitData;
 
-				if (modelInitData.enableLoadingAsynchronous)
+				if (modelInitData.GetFlags(EnModelInitDataFlags::enLoadingAsynchronous))
 				{
 					m_loadingState = EnLoadingState::enNowLoading;
-					m_modelInitDataRef = &modelInitData;
 					nsThread::CLoadModelThread::GetInstance()->PushLoadModelProcess(
 						nsThread::CLoadModelThread::EnLoadProcessType::enLoadModel,
 						this
@@ -315,16 +328,17 @@ namespace nsYMEngine
 			{
 				bool isSkeltalAnimation = false;
 
-				if (modelInitData.animInitData)
+				if (modelInitData.animInitData.numAnimations > 0)
 				{
 					m_skelton = new nsAnimations::CSkelton();
 					m_skelton->Init(*scene->mRootNode);
 					m_animator = new nsAnimations::CAnimator();
 					isSkeltalAnimation = 
 						m_animator->Init(
-							*modelInitData.animInitData,
+							modelInitData.animInitData,
 							m_skelton, 
-							modelInitData.enableLoadingAsynchronous
+							modelInitData.GetFlags(EnModelInitDataFlags::enLoadingAsynchronous),
+							modelInitData.GetFlags(EnModelInitDataFlags::enRegisterAnimationBank)
 						);
 				}
 
@@ -433,8 +447,11 @@ namespace nsYMEngine
 
 					LoadMesh(&dstMesh, *srcMesh, node->mMeshes[meshIdx]);
 
-					if (modelInitData.enableNodeTransform == true && 
-						IsSkeltalAnimationValid() != true)
+					if (
+						modelInitData.GetFlags(EnModelInitDataFlags::enNodeTransform)
+							== true &&
+						IsSkeltalAnimationValid() != true
+						)
 					{
 						for (auto& vertex : dstMesh.vertices)
 						{
@@ -545,8 +562,7 @@ namespace nsYMEngine
 						modelInitData,
 						*srcMaterial,
 						AI_MATKEY_TEXTURE_DIFFUSE(0),
-						&m_diffuseTextures,
-						matIdx
+						&m_diffuseTextures
 						);
 				}
 
@@ -559,21 +575,23 @@ namespace nsYMEngine
 				const char* aiMaterialKey,
 				unsigned int aiMaterialType,
 				unsigned int aiMaterialIndex,
-				std::vector<nsDx12Wrappers::CTexture*>* texturesOut,
-				unsigned int matIdx
+				std::vector<nsDx12Wrappers::CTexture*>* texturesOut
 			) noexcept
 			{
-				texturesOut->emplace_back(new nsDx12Wrappers::CTexture());
-				auto* texture = texturesOut->at(matIdx);
-
 				aiString relativeTexFilePath;
+				auto& textureBank = nsMemory::CResourceBankTable::GetInstance()->GetTextureBank();
+
 				if (srcMaterial.Get(
 					aiMaterialKey, aiMaterialType, aiMaterialIndex, relativeTexFilePath
 				) != AI_SUCCESS)
 				{
 					// テクスチャが設定されていない
-					texture->InitFromTexture(
-						CGraphicsEngine::GetInstance()->GetWhiteTexture());
+
+					const auto* const filePath =
+						CGraphicsEngine::GetInstance()->GetWhiteTextureFilePath();
+					
+					auto* texture = textureBank.Get(filePath);
+					texturesOut->emplace_back(texture);
 
 					return;
 				}
@@ -584,16 +602,36 @@ namespace nsYMEngine
 				if (texFileName == "")
 				{
 					// テクスチャは設定されているが、名前が設定されていない。
-					texture->InitFromTexture(
-						CGraphicsEngine::GetInstance()->GetWhiteTexture());
+					const auto* const filePath =
+						CGraphicsEngine::GetInstance()->GetWhiteTextureFilePath();
+
+					auto* texture = textureBank.Get(filePath);
+					texturesOut->emplace_back(texture);
+
 					return;
 				}
 
 				auto texFilePath = BuildTextureFilePath(modelInitData, texFileName);
 
+				auto* texture = textureBank.Get(texFilePath.c_str());
 
-				// テクスチャの初期化
-				texture->Init(texFilePath.c_str());
+				if (texture == nullptr)
+				{
+					// textureBankに未登録のため、新規作成。
+
+					texture = new nsDx12Wrappers::CTexture();
+					texture->Init(texFilePath.c_str());
+
+					if (modelInitData.GetFlags(
+						nsRenderers::EnModelInitDataFlags::enRegisterTextureBank))
+					{
+						texture->SetShared(true);
+						textureBank.Register(texFilePath.c_str(), texture);
+					}
+				}
+
+				texturesOut->emplace_back(texture);
+
 
 				return;
 			}

@@ -1,6 +1,8 @@
 #pragma once
 #include "ResourceBank.h"
 #include "../Sound/WaveFile.h"
+#include "../Graphics/Animations/AnimationClip.h"
+#include "../Graphics/Dx12Wrappers/Texture.h"
 
 namespace nsYMEngine
 {
@@ -42,10 +44,22 @@ namespace nsYMEngine
 				return m_waveFileBank;
 			}
 
+			constexpr auto& GetAnimationClipBank() noexcept
+			{
+				return m_animationClipBank;
+			}
+
+			constexpr auto& GetTextureBank() noexcept
+			{
+				return m_textureBank;
+			}
+
 
 		private:
 			static CResourceBankTable* m_instance;
 			TRsourceBank<nsSound::CWaveFile> m_waveFileBank = {};
+			TRsourceBank<nsGraphics::nsAnimations::CAnimationClip> m_animationClipBank = {};
+			TRsourceBank<nsGraphics::nsDx12Wrappers::CTexture> m_textureBank = {};
 		};
 
 	}

@@ -262,8 +262,7 @@ namespace nsYMEngine
 					const char* aiMaterialKey,
 					unsigned int aiMaterialType,
 					unsigned int aiMaterialIndex,
-					std::vector<nsDx12Wrappers::CTexture*>* texturesOut,
-					unsigned int matIdx
+					std::vector<nsDx12Wrappers::CTexture*>* texturesOut
 				) noexcept;
 
 				std::string BuildTextureFilePath(

@@ -16,12 +16,10 @@ namespace nsAWA
 		{
 			// InitModel
 			{
-				SAnimationInitData animInitData(
-					static_cast<unsigned int>(EnAnimType::enNum), m_kAnimFilePaths);
-
 				SModelInitData modelInitData;
 				modelInitData.modelFilePath = m_kModelFilePath;
-				modelInitData.animInitData = &animInitData;
+				modelInitData.animInitData.Init(
+					static_cast<unsigned int>(EnAnimType::enNum), m_kAnimFilePaths);
 
 				m_modelRenderer = NewGO<CModelRenderer>("SkeltalAnimationSampleModel");
 				m_modelRenderer->Init(modelInitData);

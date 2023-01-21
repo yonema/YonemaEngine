@@ -17,7 +17,7 @@ namespace nsAWA
 			// CreateModelRenderer
 			SModelInitData modelInitData;
 			modelInitData.modelFilePath = m_kModelFilePath;
-			modelInitData.enableNodeTransform = true;
+			modelInitData.SetFlags(EnModelInitDataFlags::enNodeTransform);
 			m_modelRenderer = NewGO<CModelRenderer>();
 			m_modelRenderer->Init(modelInitData);
 
