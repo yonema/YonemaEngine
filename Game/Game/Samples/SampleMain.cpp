@@ -42,7 +42,7 @@ namespace nsAWA
 				enDrawWorld,
 			};
 
-			constexpr EnSampleIdx g_kSampleIdx = EnSampleIdx::enShareAnimation;
+			constexpr EnSampleIdx g_kSampleIdx = EnSampleIdx::enAnimationEvent;
 		}
 
 		bool CSampleMain::Start()

@@ -259,6 +259,14 @@ namespace nsYMEngine
 				std::string nodeName(node.mName.data);
 
 				auto itr = m_boneNameToIndexMap.find(nodeName);
+
+				if (itr != m_boneNameToIndexMap.end())
+				{
+					unsigned int boneIdx = itr->second;
+					/*m_boneInfo[BoneIndex].FinalTransformation =
+						m_globalInverseTransform * GlobalTransformation * m_boneInfo[BoneIndex].OffsetMatrix;*/
+					//pSkelton->SetBoneFinalTransformMatrix(boneIdx, mGlobalTransform);
+				}
 			}
 
 

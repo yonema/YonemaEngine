@@ -19,7 +19,7 @@ namespace nsYMEngine
 			nsMath::CVector3 vertexPos[CAABB::m_kNumVertesPos];
 			m_aabb.CalcVertexPositions(vertexPos, mWorld);
 
-			DrawDebugLine(vertexPos);
+			//DrawDebugLine(vertexPos);
 
 			const auto& mViewProj = nsGraphics::CGraphicsEngine::GetInstance()->GetMatrixViewProj();
 			

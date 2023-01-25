@@ -142,6 +142,7 @@ namespace nsYMEngine
 				unsigned int FindPosition(float animTimeTicks, const aiNodeAnim& nodeAnim) const noexcept;
 
 
+				bool FindAnimKeyEventNode(const aiNode& node);
 
 				void ReadAnimKeyEventNode(
 					float animTimeTicks,
@@ -161,6 +162,7 @@ namespace nsYMEngine
 				bool m_isShared = false;
 				std::vector<std::unordered_map<std::string, const aiNodeAnim*>>
 					m_nodeAnimMapArray = {};
+				const aiNode* m_animEventNode = nullptr;
 			};
 
 		}

@@ -75,6 +75,8 @@ namespace nsYMEngine
 					}
 				}
 
+				FindAnimKeyEventNode(*m_scene->mRootNode);
+
 				return true;
 			}
 
@@ -128,6 +130,13 @@ namespace nsYMEngine
 					pSkelton,
 					animIdx
 				);
+
+				if (m_animEventNode)
+				{
+					ReadAnimKeyEventNode(
+						animTimeTicks, *m_animEventNode, animation, animIdx);
+				}
+
 
 				const auto& boneInfoArray = pSkelton->GetBoneInfoArray();
 				unsigned int numBoneInfoArray = static_cast<unsigned int>(boneInfoArray.size());
@@ -260,13 +269,13 @@ namespace nsYMEngine
 
 					if (it == requiredNodeMap.end())
 					{
-						if (childName == m_kAnimEventKeyNodeName)
-						{
-							ReadAnimKeyEventNode(
-								animTimeTicks, *node.mChildren[childIdx], animation, animIdx);
+						//if (childName == m_kAnimEventKeyNodeName)
+						//{
+						//	ReadAnimKeyEventNode(
+						//		animTimeTicks, *node.mChildren[childIdx], animation, animIdx);
 
-							continue;
-						}
+						//	continue;
+						//}
 #ifdef _DEBUG
 						char buffer[256];
 						sprintf_s(buffer, "Child %s cannot be found in the required node map\n", childName.c_str());
@@ -498,6 +507,26 @@ namespace nsYMEngine
 
 
 
+			bool CAnimationClip::FindAnimKeyEventNode(const aiNode& node)
+			{
+				static const aiString kAnimEventKeyNodeName(m_kAnimEventKeyNodeName.c_str());
+
+				if (node.mName == kAnimEventKeyNodeName)
+				{
+					m_animEventNode = &node;
+					return true;
+				}
+
+				for (unsigned int childIdx = 0; childIdx < node.mNumChildren; childIdx++)
+				{
+					if (FindAnimKeyEventNode(*node.mChildren[childIdx]))
+					{
+						return true;
+					}
+				}
+
+				return false;
+			}
 
 
 			void CAnimationClip::ReadAnimKeyEventNode(
