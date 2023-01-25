@@ -142,6 +142,14 @@ namespace nsYMEngine
 					}
 				}
 
+				inline void PlayAnimationFromMiddle(unsigned int animIdx, float timer) noexcept
+				{
+					if (m_renderer)
+					{
+						m_renderer->PlayAnimationFromMiddle(animIdx, timer);
+					}
+				}
+
 				/**
 				 * @brief アニメーションを再生する。アニメーションが設定されていなかったら何もしません。
 				 * @param animIdx 再生するアニメーションのインデックス。SAnimationInitDataで設定した順番で登録されています。
@@ -179,6 +187,11 @@ namespace nsYMEngine
 					{
 						m_renderer->SetAnimationSpeed(animSpeed);
 					}
+				}
+
+				constexpr float GetAnimationSpeed() const noexcept
+				{
+					return m_renderer ? m_renderer->GetAnimationSpeed() : 1.0f;
 				}
 
 				/**

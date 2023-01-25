@@ -270,7 +270,8 @@ namespace nsYMEngine
 		)
 		{
 			nsMath::CVector3 toPos = origin + (normalDir * distance);
-			m_myDebugLineArray.emplace_back(
+
+			PushDebugLine(
 				SMyDebugLine(
 					origin,
 					{ color.r, color.g, color.b },
@@ -278,11 +279,6 @@ namespace nsYMEngine
 					{ color.r, color.g, color.b }
 				)
 			);
-			if (m_myDebugLineArray.size() > m_kMaxMyDebugLine)
-			{
-				nsGameWindow::MessageBoxError(L"ƒŒƒC‚Ì”‚ª‘½‚·‚¬‚Ü‚·B");
-				std::abort();
-			}
 
 			return m_scene->raycast(
 				physx::PxVec3(origin.x, origin.y, origin.z),

@@ -132,12 +132,13 @@ namespace nsYMEngine
 						else
 						{
 							res = animClip->Init(
-								animInitData.animationFilePathArray[animIdx], pSkelton, regiseterAnimBank);
+								animInitData.animationFilePathArray[animIdx], regiseterAnimBank);
 						}
 
 					}
 					else
 					{
+						// AnimBankに登録済み
 						res = true;
 					}
 
@@ -186,12 +187,28 @@ namespace nsYMEngine
 				return;
 			}
 
+			void CAnimator::PlayAnimationFromMiddle(unsigned int animIdx, float timer) noexcept
+			{
+				if (animIdx >= static_cast<unsigned int>(m_animationClips.size()))
+				{
+					// 指定されたアニメーションインデックスが、アニメーション数を超えている。
+					return;
+				}
+				m_animationClips[m_animationIndex]->ResetAnimationParam();
+				m_animationIndex = animIdx;
+				m_animationTimer = timer;
+				m_isPlaying = true;
+
+				return;
+			}
+
+
 
 			void CAnimator::CalcAndGetAnimatedBoneTransforms(
 				std::vector<nsMath::CMatrix>* pMTransforms) noexcept
 			{
 				m_animationClips[m_animationIndex]->CalcAndGetAnimatedBoneTransforms(
-					m_animationTimer, pMTransforms, 0, m_isLoop);
+					m_animationTimer, pMTransforms,m_pSkelton, 0, m_isLoop);
 
 				m_isPlaying = !m_animationClips[m_animationIndex]->IsPlayedAnimationToEnd();
 

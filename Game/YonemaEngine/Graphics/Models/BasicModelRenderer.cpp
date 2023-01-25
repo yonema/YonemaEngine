@@ -118,6 +118,7 @@ namespace nsYMEngine
 					if (materialDH)
 					{
 						materialDH->Release();
+						delete materialDH;
 					}
 				}
 				
@@ -139,6 +140,24 @@ namespace nsYMEngine
 					diffuseTexture = nullptr;
 				}
 				m_diffuseTextures.clear();
+				for (auto& normalTexture : m_normalTextures)
+				{
+					if (normalTexture == nullptr)
+					{
+						continue;
+					}
+
+					if (normalTexture->IsShared())
+					{
+						normalTexture = nullptr;
+						continue;
+					}
+
+					normalTexture->Release();
+					delete normalTexture;
+					normalTexture = nullptr;
+				}
+				m_normalTextures.clear();
 				m_modelDH.Release();
 				m_modelCB.Release();
 				for (auto* indexBuffer : m_indexBuffers)
@@ -146,6 +165,8 @@ namespace nsYMEngine
 					if (indexBuffer)
 					{
 						indexBuffer->Release();
+						delete indexBuffer;
+						indexBuffer = nullptr;
 					}
 				}
 				for (auto* vertexBuffer : m_vertexBuffers)
@@ -153,15 +174,19 @@ namespace nsYMEngine
 					if (vertexBuffer)
 					{
 						vertexBuffer->Release();
+						delete vertexBuffer;
+						vertexBuffer = nullptr;
 					}
 				}
 				if (m_skelton)
 				{
 					delete m_skelton;
+					m_skelton = nullptr;
 				}
 				if (m_animator)
 				{
 					delete m_animator;
+					m_animator = nullptr;
 				}
 				return;
 			}
@@ -309,14 +334,14 @@ namespace nsYMEngine
 
 				EnableDrawing();
 
-				if (m_importerForLoadAsynchronous)
-				{
-					m_importerForLoadAsynchronous->FreeScene();
-					m_sceneForLoadAsynchronous = nullptr;
+				//if (m_importerForLoadAsynchronous)
+				//{
+				//	m_importerForLoadAsynchronous->FreeScene();
+				//	m_sceneForLoadAsynchronous = nullptr;
 
-					delete m_importerForLoadAsynchronous;
-					m_importerForLoadAsynchronous = nullptr;
-				}
+				//	delete m_importerForLoadAsynchronous;
+				//	m_importerForLoadAsynchronous = nullptr;
+				//}
 
 
 
@@ -503,6 +528,8 @@ namespace nsYMEngine
 						srcMesh.mTextureCoords[0][vertIdx] : zeroVec3D;
 					const auto& tangent = srcMesh.HasTangentsAndBitangents() ?
 						srcMesh.mTangents[vertIdx] : zeroVec3D;
+					const auto& biNormal = srcMesh.HasTangentsAndBitangents() ?
+						srcMesh.mBitangents[vertIdx] : zeroVec3D;
 					const auto& color = srcMesh.HasVertexColors(0) ?
 						srcMesh.mColors[0][vertIdx] : zeroColor4D;
 
@@ -512,7 +539,8 @@ namespace nsYMEngine
 					dstVertex.position = { position.x, position.y, position.z };
 					dstVertex.normal = { normal.x, normal.y, normal.z };
 					// @todo タンジェントはそのうち実装
-					//dstVertex.tangent = { tangent.x, tangent.y, tangent.z };
+					dstVertex.tangent = { tangent.x, tangent.y, tangent.z };
+					dstVertex.biNormal = { biNormal.x, biNormal.y, biNormal.z };
 					dstVertex.uv = { uv.x, uv.y };
 
 					if (IsSkeltalAnimationValid() != true)
@@ -555,6 +583,7 @@ namespace nsYMEngine
 			{
 				const unsigned int kNumMaterials = scene->mNumMaterials;
 				m_diffuseTextures.reserve(kNumMaterials);
+				m_normalTextures.reserve(kNumMaterials);
 				for (unsigned int matIdx = 0; matIdx < kNumMaterials; matIdx++)
 				{
 					const auto& srcMaterial = scene->mMaterials[matIdx];
@@ -564,6 +593,13 @@ namespace nsYMEngine
 						AI_MATKEY_TEXTURE_DIFFUSE(0),
 						&m_diffuseTextures
 						);
+
+					LoadTexture(
+						modelInitData,
+						*srcMaterial,
+						AI_MATKEY_TEXTURE_NORMALS(0),
+						&m_normalTextures
+					);
 				}
 
 				return;
@@ -580,6 +616,13 @@ namespace nsYMEngine
 			{
 				aiString relativeTexFilePath;
 				auto& textureBank = nsMemory::CResourceBankTable::GetInstance()->GetTextureBank();
+				const auto& defaultTextures = CGraphicsEngine::GetInstance()->GetDefaultTextures();
+
+				CDefaultTextures::EnTexType texType = CDefaultTextures::EnTexType::enDiffuse;
+				if (aiMaterialType == aiTextureType_NORMALS)
+				{
+					texType = CDefaultTextures::EnTexType::enNormal;
+				}
 
 				if (srcMaterial.Get(
 					aiMaterialKey, aiMaterialType, aiMaterialIndex, relativeTexFilePath
@@ -587,8 +630,8 @@ namespace nsYMEngine
 				{
 					// テクスチャが設定されていない
 
-					const auto* const filePath =
-						CGraphicsEngine::GetInstance()->GetWhiteTextureFilePath();
+					const auto* const filePath = 
+						CDefaultTextures::GetTextureFilePath(texType);
 					
 					auto* texture = textureBank.Get(filePath);
 					texturesOut->emplace_back(texture);
@@ -603,7 +646,7 @@ namespace nsYMEngine
 				{
 					// テクスチャは設定されているが、名前が設定されていない。
 					const auto* const filePath =
-						CGraphicsEngine::GetInstance()->GetWhiteTextureFilePath();
+						CDefaultTextures::GetTextureFilePath(texType);
 
 					auto* texture = textureBank.Get(filePath);
 					texturesOut->emplace_back(texture);
@@ -762,7 +805,7 @@ namespace nsYMEngine
 
 			bool CBasicModelRenderer::CreateMaterialSRV()
 			{
-				constexpr unsigned int numDescHeaps = 1;
+				constexpr unsigned int numDescHeaps = 2;
 				auto* device = CGraphicsEngine::GetInstance()->GetDevice();
 
 				D3D12_SHADER_RESOURCE_VIEW_DESC matSRVDesc = {};
@@ -771,21 +814,35 @@ namespace nsYMEngine
 				matSRVDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 				matSRVDesc.Texture2D.MipLevels = 1;
 
-				m_materialDHs.reserve(m_diffuseTextures.size());
-				for (const auto& diffuseTexture : m_diffuseTextures)
+				const auto inc = CGraphicsEngine::GetInstance()->GetDescriptorSizeOfCbvSrvUav();
+
+				unsigned int kNumTextures = static_cast<unsigned int>(m_diffuseTextures.size());
+				m_materialDHs.reserve(kNumTextures);
+				for (unsigned int texIdx = 0; texIdx < kNumTextures; texIdx++)
 				{
 					auto* materialDH = new nsDx12Wrappers::CDescriptorHeap();
+
 					materialDH->InitAsCbvSrvUav(numDescHeaps, L"MaterialDH");
 					auto matDescHandle = materialDH->GetCPUHandle();
 
-					matSRVDesc.Format = diffuseTexture->GetResource()->GetDesc().Format;
+					matSRVDesc.Format = m_diffuseTextures[texIdx]->GetResource()->GetDesc().Format;
 					device->CreateShaderResourceView(
-						diffuseTexture->GetResource(),
+						m_diffuseTextures[texIdx]->GetResource(),
+						&matSRVDesc,
+						matDescHandle
+					);
+
+					matDescHandle.ptr += inc;
+
+					matSRVDesc.Format = m_normalTextures[texIdx]->GetResource()->GetDesc().Format;
+					device->CreateShaderResourceView(
+						m_normalTextures[texIdx]->GetResource(),
 						&matSRVDesc,
 						matDescHandle
 					);
 
 					m_materialDHs.emplace_back(materialDH);
+
 				}
 
 				return true;
@@ -808,7 +865,7 @@ namespace nsYMEngine
 				bool res =
 					m_boneMatrixArraySB.Init(sizeof(nsMath::CMatrix), numBoneInfoArray);
 
-				if (FAILED(res))
+				if (res != true)
 				{
 					nsGameWindow::MessageBoxError(L"m_boneMatrixArraySBの生成に失敗しました。");
 					return false;
@@ -834,7 +891,7 @@ namespace nsYMEngine
 				bool res = 
 					m_worldMatrixArraySB.Init(sizeof(nsMath::CMatrix), modelInitData.maxInstance);
 
-				if (FAILED(res))
+				if (res != true)
 				{
 					nsGameWindow::MessageBoxError(L"m_worldMatrixArraySBの生成に失敗しました。");
 					return false;
@@ -888,9 +945,12 @@ namespace nsYMEngine
 
 				m_animator->UpdateAnimation(deltaTime);
 
-				m_animator->CalcAndGetAnimatedBoneTransforms(&m_boneMatrices);
+				if (m_geometryDataArray[0]->IsInViewFrustum())
+				{
+					m_animator->CalcAndGetAnimatedBoneTransforms(&m_boneMatrices);
+					m_boneMatrixArraySB.CopyToMappedStructuredBuffer(m_boneMatrices.data());
+				}
 
-				m_boneMatrixArraySB.CopyToMappedStructuredBuffer(m_boneMatrices.data());
 
 				return;
 			}
@@ -957,7 +1017,7 @@ namespace nsYMEngine
 				auto geomData = m_geometryDataArray.begin();
 				for (const auto& mWorld : worldMatrixArray)
 				{
-					(*geomData)->Update(mWorld);
+					(*geomData)->Update(m_bias * mWorld);
 					if ((*geomData)->IsInViewFrustum())
 					{
 						fixWorldMatrixArray.emplace_back(mWorld);

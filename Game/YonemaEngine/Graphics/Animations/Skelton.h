@@ -119,6 +119,11 @@ namespace nsYMEngine
 						m_mGlobalTransformInv;
 				}
 
+				constexpr auto* GetRootNode() noexcept
+				{
+					return m_rootNodeInfo;
+				}
+
 			private:
 
 				void InitializeRequiredNodeMap(const aiNode& node);
@@ -133,10 +138,13 @@ namespace nsYMEngine
 
 				void MarkRequiredNodesForBone(const aiBone& bone);
 
+				void InitSkeltonLength(const aiNode& node);
+
 
 			private:
 				nsMath::CMatrix m_mGlobalTransformInv;
 				std::unordered_map<std::string, SNodeInfo> m_requiredNodeMap = {};
+				SNodeInfo* m_rootNodeInfo = nullptr;
 				std::vector<SBoneInfo> m_boneInfoArray = {};
 				std::unordered_map<std::string, unsigned int> m_boneNameToIndexMap = {};
 				std::vector<SBasicMeshInfo>* m_meshesInfo = nullptr;

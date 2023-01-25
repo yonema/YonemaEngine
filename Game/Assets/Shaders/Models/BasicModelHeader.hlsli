@@ -4,6 +4,8 @@ struct SVSInput
 {
 	float4 pos : POSITION;
 	float3 normal : NORMAL;
+	float3 tangent : TANGENT;
+	float3 biNormal : BINORMAL;
 	float2 uv : TEXCOORD;
 	min16uint4 boneNo : BONE_NO;
 	min16uint4 weight : WEIGHT;
@@ -12,9 +14,11 @@ struct SVSInput
 // 頂点シェーダーからピクセルシェーダーへのやり取りに使用する構造体
 struct SPSInput
 {
-	float4 svpos : SV_POSITION;	// システム用頂点座標
-	float3 normal : NORMAL;	// 法線ベクトル
-	float2 uv : TEXCOORD;		// uv
+	float4 svpos : SV_POSITION;
+	float3 normal : NORMAL;
+	float3 tangent : TANGENT;
+	float3 biNormal : BINORMAL;
+	float2 uv : TEXCOORD;
 };
 
 
@@ -28,6 +32,7 @@ StructuredBuffer<float4x4> g_mBones : register(t0);
 StructuredBuffer<float4x4> g_worldMatrixArray : register(t1);
 // テクスチャ
 Texture2D<float4> g_diffuseTexture : register(t2);
+Texture2D<float4> g_normalTexture : register(t3);
 
 cbuffer ModelCB : register(b0)
 {

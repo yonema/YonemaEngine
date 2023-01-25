@@ -17,10 +17,10 @@ namespace nsAWA
 			enum class EnAnimType
 			{
 				enIdle,
-				enJumpAttack,
+				//enJumpAttack,
 				enNum
 			};
-			static const int m_kNumModels = 3;
+			static const int m_kNumModels = 5;
 			static const char* m_kModelFilePath[m_kNumModels];
 			static const char* m_kAnimFilePaths[static_cast<int>(EnAnimType::enNum)];
 

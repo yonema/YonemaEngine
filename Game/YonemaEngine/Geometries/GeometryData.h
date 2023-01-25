@@ -44,6 +44,9 @@ namespace nsYMEngine
 			}
 
 		private:
+			void DrawDebugLine(const nsMath::CVector3* vertexPos);
+
+		private:
 			CAABB m_aabb = {};
 			bool m_isInViewFrustum = false;
 		};

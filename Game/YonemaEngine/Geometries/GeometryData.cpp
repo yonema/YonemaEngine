@@ -1,6 +1,7 @@
 #include "GeometryData.h"
 #include "../Graphics/Models/BasicModelRenderer.h"
 #include "../Graphics/GraphicsEngine.h"
+#include "../Physics/PhysicsEngine.h"
 
 namespace nsYMEngine
 {
@@ -17,6 +18,8 @@ namespace nsYMEngine
 		{
 			nsMath::CVector3 vertexPos[CAABB::m_kNumVertesPos];
 			m_aabb.CalcVertexPositions(vertexPos, mWorld);
+
+			DrawDebugLine(vertexPos);
 
 			const auto& mViewProj = nsGraphics::CGraphicsEngine::GetInstance()->GetMatrixViewProj();
 			
@@ -68,6 +71,73 @@ namespace nsYMEngine
 				vMin.z < 1.0f)
 			{
 				m_isInViewFrustum = true;
+			}
+
+			return;
+		}
+
+
+		void CGeometryData::DrawDebugLine(const nsMath::CVector3* vertexPos)
+		{
+			constexpr int kNumLines = 12;
+			static const nsMath::CVector4 color = nsMath::CVector4::Green();
+			constexpr unsigned int X0Y0Z0 =
+				static_cast<unsigned int>(CAABB::EnVertexPos::enX0Y0Z0);	// 左下手前
+			constexpr unsigned int X0Y0Z1 =
+				static_cast<unsigned int>(CAABB::EnVertexPos::enX0Y0Z1);	// 左下奥
+			constexpr unsigned int X0Y1Z0 =
+				static_cast<unsigned int>(CAABB::EnVertexPos::enX0Y1Z0);	// 左上手前
+			constexpr unsigned int X0Y1Z1 =
+				static_cast<unsigned int>(CAABB::EnVertexPos::enX0Y1Z1);	// 左上奥
+			constexpr unsigned int X1Y0Z0 =
+				static_cast<unsigned int>(CAABB::EnVertexPos::enX1Y0Z0);	// 右下手前
+			constexpr unsigned int X1Y0Z1 =
+				static_cast<unsigned int>(CAABB::EnVertexPos::enX1Y0Z1);	// 右下奥
+			constexpr unsigned int X1Y1Z0 =
+				static_cast<unsigned int>(CAABB::EnVertexPos::enX1Y1Z0);	// 右上手前
+			constexpr unsigned int X1Y1Z1 =
+				static_cast<unsigned int>(CAABB::EnVertexPos::enX1Y1Z1);	// 右上奥
+			nsMath::CVector3 origin[kNumLines]
+			{
+				vertexPos[X0Y0Z0],	// 0
+				vertexPos[X1Y0Z0],	// 1
+				vertexPos[X1Y0Z1],	// 2
+				vertexPos[X0Y0Z1],	// 3
+				vertexPos[X0Y0Z0],	// 4
+				vertexPos[X1Y0Z0],	// 5
+				vertexPos[X1Y0Z1],	// 6
+				vertexPos[X0Y0Z1],	// 7
+				vertexPos[X0Y1Z0],	// 8
+				vertexPos[X1Y1Z0],	// 9
+				vertexPos[X1Y1Z1],	// 10
+				vertexPos[X0Y1Z1]	// 11
+			};
+			nsMath::CVector3 toPos[kNumLines] =
+			{
+				vertexPos[X0Y1Z0],
+				vertexPos[X1Y1Z0],
+				vertexPos[X1Y1Z1],
+				vertexPos[X0Y1Z1],
+				vertexPos[X1Y0Z0],
+				vertexPos[X1Y0Z1],
+				vertexPos[X0Y0Z1],
+				vertexPos[X0Y0Z0],
+				vertexPos[X1Y1Z0],
+				vertexPos[X1Y1Z1],
+				vertexPos[X0Y1Z1],
+				vertexPos[X0Y1Z0]
+			};
+
+
+			for (int i = 0; i < kNumLines; i++)
+			{
+				nsPhysics::CPhysicsEngine::GetInstance()->PushDebugLine(
+					nsPhysics::CPhysicsEngine::SMyDebugLine(
+						origin[i],
+						{ color.r, color.g, color.b },
+						toPos[i],
+						{ color.r, color.g, color.b }
+				));
 			}
 
 			return;

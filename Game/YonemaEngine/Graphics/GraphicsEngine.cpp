@@ -30,11 +30,6 @@ namespace nsYMEngine
 			D3D_FEATURE_LEVEL_11_0
 		};
 
-		const char* const CGraphicsEngine::m_kWhiteTextureFilePath = 
-			"Assets/Images/Presets/white.jpg";
-		const char* const CGraphicsEngine::m_kBlackTextureFilePath =
-			"Assets/Images/Presets/black.jpg";
-
 		using RendererType = nsRenderers::CRendererTable::EnRendererType;
 
 
@@ -135,16 +130,7 @@ namespace nsYMEngine
 			m_pBaseRenderTargetSprite = &m_simplePostEffectRenderTargetSprite;
 
 
-			m_whiteTexture = new nsDx12Wrappers::CTexture();
-			m_blackTexture = new nsDx12Wrappers::CTexture();
-			m_whiteTexture->Init(m_kWhiteTextureFilePath);
-			m_blackTexture->Init(m_kBlackTextureFilePath);
-
-			auto& textureBank = nsMemory::CResourceBankTable::GetInstance()->GetTextureBank();
-			m_whiteTexture->SetShared(true);
-			textureBank.Register(m_kWhiteTextureFilePath, m_whiteTexture);
-			m_blackTexture->SetShared(true);
-			textureBank.Register(m_kBlackTextureFilePath, m_blackTexture);
+			m_defaultTextures.Init();
 
 			m_mainCamera.SetPosition({ 0.0f,10.0f,-25.0f });
 			m_mainCamera.SetTargetPosition({ 0.0f,10.0f,0.0f });
@@ -166,22 +152,9 @@ namespace nsYMEngine
 			{
 				delete m_gfxMemForDirectXTK;
 			}
-			if (m_whiteTexture)
-			{
-				if (m_whiteTexture->IsShared() != true)
-				{
-					delete m_whiteTexture;
-				}
-				m_whiteTexture = nullptr;
-			}
-			if (m_blackTexture)
-			{
-				if (m_blackTexture->IsShared() != true)
-				{
-					delete m_blackTexture;
-				}
-				m_blackTexture = nullptr;
-			}
+
+			m_defaultTextures.Release();
+
 			nsFonts::CFontEngine::DeleteInstance();
 			m_sceneDataDH.Release();
 			m_sceneDataCB.Release();

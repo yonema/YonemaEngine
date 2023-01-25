@@ -44,7 +44,10 @@ namespace nsYMEngine
 
 				if (m_texture == nullptr)
 				{
-					this->InitFromTexture(CGraphicsEngine::GetInstance()->GetWhiteTexture());
+					this->InitFromTexture(
+						CGraphicsEngine::GetInstance()->GetDefaultTextures().GetTexture(
+							CDefaultTextures::EnTexType::enWhite)
+					);
 				}
 
 				SetDefaultName(filePath);

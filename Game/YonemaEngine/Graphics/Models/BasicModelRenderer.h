@@ -46,6 +46,8 @@ namespace nsYMEngine
 
 				nsMath::CVector3 position;
 				nsMath::CVector3 normal;
+				nsMath::CVector3 tangent;
+				nsMath::CVector3 biNormal;
 				nsMath::CVector2 uv;
 				unsigned short boneNo[4] = {};
 				unsigned short weights[4] = {};
@@ -138,6 +140,15 @@ namespace nsYMEngine
 					}
 				}
 
+				inline void PlayAnimationFromMiddle(unsigned int animIdx, float timer) noexcept
+				{
+					if (m_animator)
+					{
+						m_animator->PlayAnimationFromMiddle(animIdx, timer);
+					}
+				}
+
+
 				inline bool IsPlaying() const noexcept
 				{
 					return m_animator ? m_animator->IsPlaying() : false;
@@ -149,6 +160,11 @@ namespace nsYMEngine
 					{
 						m_animator->SetAnimationSpeed(animSpeed);
 					}
+				}
+
+				constexpr float GetAnimationSpeed() const noexcept
+				{
+					return m_animator ? m_animator->GetAnimationSpeed() : 1.0f;
 				}
 
 				inline void SetIsAnimationLoop(bool isLoop) noexcept
@@ -299,6 +315,7 @@ namespace nsYMEngine
 				nsDx12Wrappers::CDescriptorHeap m_worldMatrixArrayDH = {};
 
 				std::vector<nsDx12Wrappers::CTexture*> m_diffuseTextures = {};
+				std::vector<nsDx12Wrappers::CTexture*> m_normalTextures = {};
 				std::vector<nsDx12Wrappers::CDescriptorHeap*> m_materialDHs = {};
 
 				nsMath::CMatrix m_bias = nsMath::CMatrix::Identity();

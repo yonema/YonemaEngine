@@ -28,16 +28,7 @@ namespace nsYMEngine
 	{
 		class CPhysicsEngine : nsUtils::SNoncopyable
 		{
-		private:
-			static const bool m_kEnableCCD;
-			static const float m_kGravityStrength;
-			static const float m_kDefaultStaticFriction;
-			static const float m_kDefaultDynamicFriction;
-			static const float m_kDefaultRestitution;
-#ifdef _DEBUG
-			static const unsigned int m_kMaxMyDebugLine;
-#endif // _DEBUG
-
+		public:
 			struct SMyDebugLine
 			{
 				constexpr SMyDebugLine() = default;
@@ -56,6 +47,16 @@ namespace nsYMEngine
 				nsMath::CVector3 pos1;
 				nsMath::CVector3 color1;
 			};
+
+		private:
+			static const bool m_kEnableCCD;
+			static const float m_kGravityStrength;
+			static const float m_kDefaultStaticFriction;
+			static const float m_kDefaultDynamicFriction;
+			static const float m_kDefaultRestitution;
+#ifdef _DEBUG
+			static const unsigned int m_kMaxMyDebugLine;
+#endif // _DEBUG
 
 		private:
 			CPhysicsEngine();
@@ -196,6 +197,17 @@ namespace nsYMEngine
 			constexpr bool IsEnableAutoFitCullingBoxToMainCamera() noexcept
 			{
 				return m_enableAutoFitCullingBoxToMainCamera;
+			}
+
+			inline void PushDebugLine(const SMyDebugLine& debugLine)
+			{
+				m_myDebugLineArray.emplace_back(debugLine);
+				if (m_myDebugLineArray.size() > m_kMaxMyDebugLine)
+				{
+					nsGameWindow::MessageBoxError(L"ƒŒƒC‚Ì”‚ª‘½‚·‚¬‚Ü‚·B");
+					std::abort();
+				}
+				return;
 			}
 
 			// End DebugSystem

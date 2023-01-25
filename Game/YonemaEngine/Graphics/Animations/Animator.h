@@ -59,6 +59,8 @@ namespace nsYMEngine
 
 				void PlayAnimationFromBeginning(unsigned int animIdx) noexcept;
 
+				void PlayAnimationFromMiddle(unsigned int animIdx, float timer) noexcept;
+
 				void CalcAndGetAnimatedBoneTransforms(
 					std::vector<nsMath::CMatrix>* pMTransforms) noexcept;
 
@@ -68,6 +70,11 @@ namespace nsYMEngine
 				{
 					animSpeed >= 0.0f ?
 						m_animationSpeed = animSpeed : m_animationSpeed = m_animationSpeed;
+				}
+
+				constexpr float GetAnimationSpeed() const noexcept
+				{
+					return m_animationSpeed;
 				}
 
 				constexpr bool IsPlaying() const noexcept
