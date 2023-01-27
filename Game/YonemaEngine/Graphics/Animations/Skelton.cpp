@@ -8,6 +8,10 @@ namespace nsYMEngine
 	{
 		namespace nsAnimations
 		{
+			std::unordered_map<std::string, std::unordered_map<std::string, float>>
+				CSkelton::m_retargetScaleBase = {};
+
+
 			void CSkelton::SVertexBoneData::AddBoneData(unsigned int boneID, float weight) noexcept
 			{
 				if (CheckForDuplicateBones(boneID, weight) != true ||
@@ -116,10 +120,11 @@ namespace nsYMEngine
 
 
 			void CSkelton::LoadBones(
-				unsigned int numMeshes, 
-				const aiMesh* const*const& meshes,
+				unsigned int numMeshes,
+				const aiMesh* const* const& meshes,
 				const std::vector<unsigned int>& baseVertexNoArray,
-				unsigned int numVerteices
+				unsigned int numVerteices,
+				const std::string& retargetSkeltonName
 			)
 			{
 				// 全てのメッシュのボーンをロードする。
@@ -134,6 +139,37 @@ namespace nsYMEngine
 					const auto& mesh = meshes[meshIdx];
 					LoadMeshBones(*mesh, meshIdx);
 				}
+
+				if (retargetSkeltonName.empty())
+				{
+					return;
+				}
+
+				m_retargetSkeltonName = &retargetSkeltonName;
+
+				std::unordered_map<std::string, float>* pRetargetBase = nullptr;
+				auto retargetItr = m_retargetScaleBase.find(retargetSkeltonName);
+				if (retargetItr == m_retargetScaleBase.end())
+				{
+					m_retargetScaleBase.emplace(retargetSkeltonName, std::unordered_map<std::string, float>());
+					auto itr = m_retargetScaleBase.find(retargetSkeltonName);
+					pRetargetBase = &itr->second;
+				}
+
+				const aiNode* pNode = m_rootNodeInfo->pNode;
+				pNode = PreInitSkelton(*pNode);
+				auto boneNameToIndexitr = m_boneNameToIndexMap.find(pNode->mName.data);
+
+				if (boneNameToIndexitr != m_boneNameToIndexMap.end())
+				{
+					auto boneIdx = boneNameToIndexitr->second;
+					const auto& nodeTransform = m_boneInfoArray[boneIdx].mOffset;
+					InitSkeltonLength(*pNode, nsMath::CMatrix::Identity(), pRetargetBase);
+				}
+
+
+
+
 				return;
 			}
 
@@ -253,20 +289,118 @@ namespace nsYMEngine
 				return;
 			}
 
+			const aiNode* CSkelton::PreInitSkelton(const aiNode& node) const noexcept
+			{
+				std::string nodeName(node.mName.data);
+				auto boneNameToIndexitr = m_boneNameToIndexMap.find(nodeName);
+				if (boneNameToIndexitr != m_boneNameToIndexMap.end())
+				{
+					return &node;
+				}
 
-			void CSkelton::InitSkeltonLength(const aiNode& node)
+				for (unsigned int childIdx = 0; childIdx < node.mNumChildren; childIdx++)
+				{
+					auto* resPNode = PreInitSkelton(*node.mChildren[childIdx]);
+					if (resPNode != nullptr)
+					{
+						return resPNode;
+					}
+				}
+
+				return nullptr;
+			}
+
+			void CSkelton::InitSkeltonLength(
+				const aiNode& node,
+				const nsMath::CMatrix& parentTransform,
+				std::unordered_map<std::string, float>* pRetargetBase
+			)
 			{
 				std::string nodeName(node.mName.data);
 
-				auto itr = m_boneNameToIndexMap.find(nodeName);
+				auto boneNameToIndexitr = m_boneNameToIndexMap.find(nodeName);
 
-				if (itr != m_boneNameToIndexMap.end())
+				nsMath::CMatrix nodeTransform = parentTransform;
+
+				if (boneNameToIndexitr != m_boneNameToIndexMap.end())
 				{
-					unsigned int boneIdx = itr->second;
-					/*m_boneInfo[BoneIndex].FinalTransformation =
-						m_globalInverseTransform * GlobalTransformation * m_boneInfo[BoneIndex].OffsetMatrix;*/
-					//pSkelton->SetBoneFinalTransformMatrix(boneIdx, mGlobalTransform);
+					unsigned int boneIdx = boneNameToIndexitr->second;
+					nodeTransform = m_boneInfoArray[boneIdx].mOffset;
+
+					nsMath::CVector3 pos(
+						nodeTransform.m_vec4Mat[3].x,
+						nodeTransform.m_vec4Mat[3].y,
+						nodeTransform.m_vec4Mat[3].z
+					);
+
+					nsMath::CVector3 parentPos(
+						parentTransform.m_vec4Mat[3].x,
+						parentTransform.m_vec4Mat[3].y,
+						parentTransform.m_vec4Mat[3].z
+					);
+
+					auto diff = pos - parentPos;
+					m_boneInfoArray[boneIdx].length = diff.Length();
+					if (pRetargetBase)
+					{
+						(*pRetargetBase)[nodeName] = m_boneInfoArray[boneIdx].length;
+					}
 				}
+
+
+				for (unsigned int childIdx = 0; childIdx < node.mNumChildren; childIdx++)
+				{
+					std::string childName(node.mChildren[childIdx]->mName.data);
+
+					const auto& requiredNodeItr = m_requiredNodeMap.find(childName);
+					if (requiredNodeItr == m_requiredNodeMap.end())
+					{
+						continue;
+					}
+
+					if (requiredNodeItr->second.isRequired)
+					{
+						InitSkeltonLength(*node.mChildren[childIdx], nodeTransform, pRetargetBase);
+					}
+				}
+
+				return;
+			}
+
+			float CSkelton::GetAnimationScaled(
+				const std::string& nodeName,
+				unsigned int boneIdx) const noexcept
+			{
+				if (m_retargetSkeltonName == nullptr)
+				{
+					// リターゲット用のスケルトンを使用するように設定されていない
+					return 1.0f;
+				}
+
+				auto retargetBaseItr = m_retargetScaleBase.find(*m_retargetSkeltonName);
+				if (retargetBaseItr == m_retargetScaleBase.end())
+				{
+					// リターゲットのベースとなるスケルトンが設定されていない
+					return 1.0f;
+				}
+
+				const auto& retargetBase = retargetBaseItr->second;
+				auto itr = retargetBase.find(nodeName);
+
+				if (itr == retargetBase.end())
+				{
+					// リターゲットのベースに対象のボーンがない
+					return 1.0f;
+				}
+
+				if (fabsf(itr->second) <= FLT_EPSILON ||
+					fabsf(m_boneInfoArray[boneIdx].length) <= FLT_EPSILON)
+				{
+					// 長さ0は困る
+					return 1.0f;
+				}
+
+				return m_boneInfoArray[boneIdx].length / itr->second;
 			}
 
 

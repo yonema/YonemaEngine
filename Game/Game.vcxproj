@@ -151,6 +151,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="YonemaEngine\Graphics\Models\SkinNonCullingGenericRenderer.cpp" />
+    <ClCompile Include="YonemaEngine\Graphics\Models\InstancingNonCullingGenericRenderer.cpp" />
+    <ClCompile Include="YonemaEngine\Graphics\Models\BasicNonCullingGenericRenderer.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\DefaultTextures.cpp" />
     <ClCompile Include="Game\Samples\ShareAnimationSample.cpp" />
     <ClCompile Include="YonemaEngine\Geometries\GeometryData.cpp" />
@@ -265,6 +268,9 @@
     <Image Include="Assets\Images\StarMan.png" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="YonemaEngine\Graphics\Models\SkinNonCullingGenericRenderer.h" />
+    <ClInclude Include="YonemaEngine\Graphics\Models\InstancingNonCullingGenericRenderer.h" />
+    <ClInclude Include="YonemaEngine\Graphics\Models\BasicNonCullingGenericRenderer.h" />
     <ClInclude Include="YonemaEngine\Graphics\DefaultTextures.h" />
     <ClInclude Include="Game\Samples\ShareAnimationSample.h" />
     <ClInclude Include="YonemaEngine\Geometries\GeometryData.h" />

@@ -252,48 +252,24 @@ namespace nsYMEngine
 
 			m_commandList.SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-
-			// Basicƒ‚ƒfƒ‹‚Ì•`‰æİ’è
-			m_commandList.SetGraphicsRootSignatureAndPipelineState(
-				m_rendererTable.GetRootSignature(
-					RendererType::enBasicModel),
-				m_rendererTable.GetPipelineState(
-					RendererType::enBasicModel)
-			);
-
-			// Basicƒ‚ƒfƒ‹•`‰æ
-			for (auto renderer : m_rendererTable.GetRendererList(RendererType::enBasicModel))
+			using CRendererTable = nsRenderers::CRendererTable;
+			for (
+				unsigned int rendererType = CRendererTable::m_kFirstIndexOfModel;
+				rendererType <= CRendererTable::m_kLastIndexOfModel;
+				rendererType++
+				)
 			{
-				renderer->DrawWrapper(&m_commandList);
+				m_commandList.SetGraphicsRootSignatureAndPipelineState(
+					m_rendererTable.GetRootSignature(rendererType),
+					m_rendererTable.GetPipelineState(rendererType)
+				);
+
+				for (auto renderer : m_rendererTable.GetRendererList(rendererType))
+				{
+					renderer->DrawWrapper(&m_commandList);
+				}
 			}
 
-			// Skinƒ‚ƒfƒ‹‚Ì•`‰æİ’è
-			m_commandList.SetGraphicsRootSignatureAndPipelineState(
-				m_rendererTable.GetRootSignature(
-					RendererType::enSkinModel),
-				m_rendererTable.GetPipelineState(
-					RendererType::enSkinModel)
-			);
-
-			// Skinƒ‚ƒfƒ‹•`‰æ
-			for (auto renderer : m_rendererTable.GetRendererList(RendererType::enSkinModel))
-			{
-				renderer->DrawWrapper(&m_commandList);
-			}
-
-			// Instancingƒ‚ƒfƒ‹‚Ì•`‰æİ’è
-			m_commandList.SetGraphicsRootSignatureAndPipelineState(
-				m_rendererTable.GetRootSignature(
-					RendererType::enInstancingModel),
-				m_rendererTable.GetPipelineState(
-					RendererType::enInstancingModel)
-			);
-
-			// Instancingƒ‚ƒfƒ‹•`‰æ
-			for (auto renderer : m_rendererTable.GetRendererList(RendererType::enInstancingModel))
-			{
-				renderer->DrawWrapper(&m_commandList);
-			}
 
 
 			// •`‰æI—¹

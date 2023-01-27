@@ -25,6 +25,7 @@ namespace nsYMEngine
 				enLoadingAsynchronous,
 				enRegisterAnimationBank,
 				enRegisterTextureBank,
+				enCullingOff,
 				enNum
 			};
 
@@ -56,6 +57,7 @@ namespace nsYMEngine
 				nsPhysics::SMeshGeometryBuffer* physicsMeshGeomBuffer = nullptr;
 				unsigned int maxInstance = 1;
 				const char* textureRootPath = nullptr;
+				std::string retargetSkeltonName = {};
 
 			private:
 				std::bitset<static_cast<int>(EnModelInitDataFlags::enNum)> flags = kDefaultFlags;

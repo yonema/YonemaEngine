@@ -242,22 +242,39 @@ namespace nsYMEngine
 						localTransform.translation.y,
 						localTransform.translation.z);
 
+
 					// Combine the above transformations
 					//NodeTransformation = TranslationM * RotationM * ScalingM;
 					mNodeTransform = mScale * mRot * mTrans;
 				}
 
 				//nsMath::CMatrix GlobalTransformation = ParentTransform * NodeTransformation;
-				nsMath::CMatrix mGlobalTransform = mNodeTransform * parentTransform;
+				nsMath::CMatrix mGlobalTransform = nsMath::CMatrix::Identity();
 
 				const auto& boneNameToIndexMap = pSkelton->GetBoneNameToIndexMap();
 				auto itr = boneNameToIndexMap.find(nodeName);
 				if (itr != boneNameToIndexMap.end())
 				{
 					unsigned int boneIdx = itr->second;
+
+					if (pNodeAnim)
+					{
+						// アニメーションがあるボーンだけ、アニメーションスケールを適用する。
+						float scale = pSkelton->GetAnimationScaled(
+							nodeName, boneIdx);
+						mNodeTransform.m_vec4Mat[3].x *= scale;
+						mNodeTransform.m_vec4Mat[3].y *= scale;
+						mNodeTransform.m_vec4Mat[3].z *= scale;
+					}
+
+					mGlobalTransform = mNodeTransform * parentTransform;
 					/*m_boneInfo[BoneIndex].FinalTransformation =
 						m_globalInverseTransform * GlobalTransformation * m_boneInfo[BoneIndex].OffsetMatrix;*/
 					pSkelton->SetBoneFinalTransformMatrix(boneIdx, mGlobalTransform);
+				}
+				else
+				{
+					mGlobalTransform = mNodeTransform * parentTransform;
 				}
 
 				for (unsigned int childIdx = 0; childIdx < node.mNumChildren; childIdx++)

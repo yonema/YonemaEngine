@@ -46,6 +46,7 @@ namespace nsYMEngine
 					nsMath::CMatrix mOffset = nsMath::CMatrix::Identity();
 					nsMath::CMatrix mGlobalTransform = nsMath::CMatrix::Identity();
 					nsMath::CMatrix mFinalTransform = nsMath::CMatrix::Identity();
+					float length = 0.0f;
 				};
 
 				struct SVertexBoneData
@@ -80,7 +81,8 @@ namespace nsYMEngine
 					unsigned int numMeshes, 
 					const aiMesh* const* const& meshes,
 					const std::vector<unsigned int>& baseVertexNoArray,
-					unsigned int numVerteices
+					unsigned int numVerteices,
+					const std::string& retargetSkeltonName
 				);
 
 				_CONSTEXPR20_CONTAINER unsigned short GetVertexBoneID(
@@ -124,6 +126,9 @@ namespace nsYMEngine
 					return m_rootNodeInfo;
 				}
 
+				float GetAnimationScaled(
+					const std::string& nodeName, unsigned int boneIdx) const noexcept;
+
 			private:
 
 				void InitializeRequiredNodeMap(const aiNode& node);
@@ -138,10 +143,18 @@ namespace nsYMEngine
 
 				void MarkRequiredNodesForBone(const aiBone& bone);
 
-				void InitSkeltonLength(const aiNode& node);
+				const aiNode* PreInitSkelton(const aiNode& node) const noexcept;
+
+				void InitSkeltonLength(
+					const aiNode& node, 
+					const nsMath::CMatrix& parentTransform,
+					std::unordered_map<std::string, float>* pRetargetBase = nullptr
+				);
 
 
 			private:
+				static std::unordered_map<std::string, std::unordered_map<std::string, float>>
+					m_retargetScaleBase;
 				nsMath::CMatrix m_mGlobalTransformInv;
 				std::unordered_map<std::string, SNodeInfo> m_requiredNodeMap = {};
 				SNodeInfo* m_rootNodeInfo = nullptr;
@@ -150,6 +163,7 @@ namespace nsYMEngine
 				std::vector<SBasicMeshInfo>* m_meshesInfo = nullptr;
 				std::vector<unsigned int> m_baseVertexNoArray = {};
 				std::vector<SVertexBoneData> m_vertexBoneDataArray = {};
+				const std::string* m_retargetSkeltonName = nullptr;
 			};
 
 		}

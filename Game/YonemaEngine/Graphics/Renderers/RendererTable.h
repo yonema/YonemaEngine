@@ -27,6 +27,9 @@ namespace nsYMEngine
 					enBasicModel,
 					enSkinModel,
 					enInstancingModel,
+					enBasicNonCullingModel,
+					enSkinNonCullingModel,
+					enInstancingNonCullingModel,
 					enSkyCube,
 					enCollisionRenderer,
 					enSimplePostEffect,
@@ -34,6 +37,12 @@ namespace nsYMEngine
 					enTransSprite,
 					enNumType
 				};
+
+				static const unsigned int m_kFirstIndexOfModel =
+					static_cast<unsigned int>(EnRendererType::enBasicModel);
+				static const unsigned int m_kLastIndexOfModel =
+					static_cast<unsigned int>(EnRendererType::enInstancingNonCullingModel);
+
 			private:
 				using RendererList = std::list<IRenderer*>;
 
@@ -48,19 +57,36 @@ namespace nsYMEngine
 				{
 					return GetGenericRenderer(rendererType)->GetRootSignature();
 				}
+				constexpr auto GetRootSignature(unsigned int rendererType) noexcept
+				{
+					return GetGenericRenderer(rendererType)->GetRootSignature();
+				}
+
 				constexpr auto GetPipelineState(EnRendererType rendererType) noexcept
+				{
+					return GetGenericRenderer(rendererType)->GetPipelineState();
+				}
+				constexpr auto GetPipelineState(unsigned int rendererType) noexcept
 				{
 					return GetGenericRenderer(rendererType)->GetPipelineState();
 				}
 
 				constexpr IGenericRenderer* GetGenericRenderer(EnRendererType rendererType) noexcept
 				{
-					return m_genericRendererTable[static_cast<int>(rendererType)];
+					return GetGenericRenderer(static_cast<unsigned int>(rendererType));
+				}
+				constexpr IGenericRenderer* GetGenericRenderer(unsigned int rendererType) noexcept
+				{
+					return m_genericRendererTable[rendererType];
 				}
 
 				constexpr RendererList& GetRendererList(EnRendererType rendererType) noexcept
 				{
-					return m_rendererListTable[static_cast<int>(rendererType)];
+					return GetRendererList(static_cast<int>(rendererType));
+				}
+				constexpr RendererList& GetRendererList(unsigned int rendererType) noexcept
+				{
+					return m_rendererListTable[rendererType];
 				}
 
 				inline void RegisterRenderer(EnRendererType rendererType, IRenderer* renderer)

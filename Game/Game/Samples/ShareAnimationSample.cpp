@@ -12,6 +12,20 @@ namespace nsAWA
 			"Assets/Models/Humans/Player2.fbx",
 			"Assets/Models/Humans/Player3.fbx",
 			"Assets/Models/Humans/Goddess.fbx",
+			"Assets/Models/Humans/Chris.fbx",
+			"Assets/Models/Humans/Mary.fbx",
+			"Assets/Models/Humans/Rachel.fbx",
+			"Assets/Models/Humans/Barbara.fbx",
+			"Assets/Models/Humans/Michelle.fbx",
+			"Assets/Models/Humans/John.fbx",
+			"Assets/Models/Humans/Alain.fbx",
+			"Assets/Models/Humans/Sara.fbx",
+			"Assets/Models/Humans/Tom.fbx",
+			"Assets/Models/Humans/James.fbx",
+			"Assets/Models/Humans/Kevin.fbx",
+			"Assets/Models/Humans/Guardian.fbx",
+			"Assets/Models/Humans/MobMan.fbx",
+			"Assets/Models/Humans/MobWoman.fbx",
 		};
 
 		const char* CShareAnimationSample::
@@ -48,7 +62,9 @@ namespace nsAWA
 				modelInitData[i].vertexBias.SetRotationXDeg(90.0f);
 				modelInitData[i].SetFlags(EnModelInitDataFlags::enRegisterAnimationBank);
 				modelInitData[i].SetFlags(EnModelInitDataFlags::enRegisterTextureBank);
+				modelInitData[i].SetFlags(EnModelInitDataFlags::enCullingOff);
 				modelInitData[i].modelFilePath = m_kModelFilePath[i];
+				modelInitData[i].retargetSkeltonName = "PlayerSkelton";
 
 				m_modelRenderer[i] = NewGO<CModelRenderer>();
 				float posX = -distance * static_cast<float>(m_kNumModels) / 2.0f;

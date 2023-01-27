@@ -2,6 +2,9 @@
 #include "../Models/BasicGenericRenderer.h"
 #include "../Models/SkinGenericRenderer.h"
 #include "../Models/InstancingGenericRenderer.h"
+#include "../Models/BasicNonCullingGenericRenderer.h"
+#include "../Models/SkinNonCullingGenericRenderer.h"
+#include "../Models/InstancingNonCullingGenericRenderer.h"
 #include "../DebugRenderers/PhysicsDebugLineGenericRenderer.h"
 #include "../Sprites/SpriteGenericRenderer.h"
 #include "../Sprites/TransSpriteGenericRenderer.h"
@@ -34,6 +37,12 @@ namespace nsYMEngine
 					new nsModels::CSkinGenericRenderer();
 				m_genericRendererTable[static_cast<int>(EnRendererType::enInstancingModel)] =
 					new nsModels::CInstancingGenericRenderer();
+				m_genericRendererTable[static_cast<int>(EnRendererType::enBasicNonCullingModel)] =
+					new nsModels::CBasicNonCullingGenericRenderer();
+				m_genericRendererTable[static_cast<int>(EnRendererType::enSkinNonCullingModel)] =
+					new nsModels::CSkinNonCullingGenericRenderer();
+				m_genericRendererTable[static_cast<int>(EnRendererType::enInstancingNonCullingModel)] =
+					new nsModels::CInstancingNonCullingGenericRenderer();
 				m_genericRendererTable[static_cast<int>(EnRendererType::enCollisionRenderer)] =
 					new nsDebugRenderers::CPhysicsDebugLineGenericRenderer();
 				m_genericRendererTable[static_cast<int>(EnRendererType::enSimplePostEffect)] =

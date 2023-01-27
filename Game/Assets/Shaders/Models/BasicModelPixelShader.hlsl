@@ -5,7 +5,7 @@ float4 PSMain(SPSInput input) : SV_TARGET
 	float4 diffuseTexCol = g_diffuseTexture.Sample(g_sampler, input.uv);
 
 	// alphaClip
-	clip(diffuseTexCol.a <= 0.1f ? -1 : 1);
+	clip(diffuseTexCol.a <= 0.7f ? -1 : 1);
 
 	// CalcNormalWSFromNormalTS
 	float3 normalTS = g_normalTexture.Sample(g_sampler, input.uv).xyz;

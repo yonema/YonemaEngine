@@ -16,7 +16,13 @@ namespace nsYMEngine
 			{
 				if (m_loadingState != EnLoadingState::enAfterLoading)
 				{
-					int a = 1;
+					// ロード中は描画できない
+					return;
+				}
+
+				if (m_fixNumInstanceOnFrame <= 0)
+				{
+					// 描画するインスタンスがない
 					return;
 				}
 
@@ -282,7 +288,12 @@ namespace nsYMEngine
 					InitMeshInfoArray(
 						scene, kNumMeshes, &numVertices, &numIndices, &baseVertexNoArray);
 					m_skelton->LoadBones(
-						kNumMeshes, scene->mMeshes, baseVertexNoArray, numVertices);
+						kNumMeshes,
+						scene->mMeshes,
+						baseVertexNoArray,
+						numVertices, 
+						modelInitData.retargetSkeltonName
+					);
 				}
 				else
 				{
@@ -319,17 +330,38 @@ namespace nsYMEngine
 				else if (modelInitData.maxInstance > 2)
 				{
 					// インスタンシングが有効なら、インスタンシングタイプ
-					SetRenderType(nsRenderers::CRendererTable::EnRendererType::enInstancingModel);
+					if (modelInitData.GetFlags(EnModelInitDataFlags::enCullingOff))
+					{
+						SetRenderType(nsRenderers::CRendererTable::EnRendererType::enInstancingNonCullingModel);
+					}
+					else
+					{
+						SetRenderType(nsRenderers::CRendererTable::EnRendererType::enInstancingModel);
+					}
 				}
 				else if (IsSkeltalAnimationValid())
 				{
 					// スキンアニメーションが有効ならスキンタイプ
-					SetRenderType(nsRenderers::CRendererTable::EnRendererType::enSkinModel);
+					if (modelInitData.GetFlags(EnModelInitDataFlags::enCullingOff))
+					{
+						SetRenderType(nsRenderers::CRendererTable::EnRendererType::enSkinNonCullingModel);
+					}
+					else
+					{
+						SetRenderType(nsRenderers::CRendererTable::EnRendererType::enSkinModel);
+					}
 				}
 				else
 				{
 					// その他は基本モデルタイプ
-					SetRenderType(nsRenderers::CRendererTable::EnRendererType::enBasicModel);
+					if (modelInitData.GetFlags(EnModelInitDataFlags::enCullingOff))
+					{
+						SetRenderType(nsRenderers::CRendererTable::EnRendererType::enBasicNonCullingModel);
+					}
+					else
+					{
+						SetRenderType(nsRenderers::CRendererTable::EnRendererType::enBasicModel);
+					}
 				}
 
 				EnableDrawing();

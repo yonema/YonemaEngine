@@ -9,7 +9,7 @@ namespace nsYMEngine
 		namespace nsRenderers
 		{
 			const std::bitset<static_cast<int>(EnModelInitDataFlags::enNum)> 
-				SModelInitData::kDefaultFlags(std::string("0000"));
+				SModelInitData::kDefaultFlags(std::string("00000"));
 
 
 
