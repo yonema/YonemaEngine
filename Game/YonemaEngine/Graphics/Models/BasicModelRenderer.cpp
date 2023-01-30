@@ -968,7 +968,7 @@ namespace nsYMEngine
 				return;
 			}
 
-			void CBasicModelRenderer::UpdateAnimation(float deltaTime) noexcept
+			void CBasicModelRenderer::UpdateAnimation(float deltaTime, bool updateAnimMatrix) noexcept
 			{
 				if (IsSkeltalAnimationValid() != true)
 				{
@@ -977,7 +977,7 @@ namespace nsYMEngine
 
 				m_animator->UpdateAnimation(deltaTime);
 
-				if (m_geometryDataArray[0]->IsInViewFrustum())
+				if (m_geometryDataArray[0]->IsInViewFrustum() && updateAnimMatrix)
 				{
 					m_animator->CalcAndGetAnimatedBoneTransforms(&m_boneMatrices);
 					m_boneMatrixArraySB.CopyToMappedStructuredBuffer(m_boneMatrices.data());

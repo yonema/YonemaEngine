@@ -2,6 +2,7 @@
 #include "RendererTable.h"
 #include "../Models/BasicModelRenderer.h"
 #include "../Animations/Animator.h"
+#include "../Animations/UpdateAnimationController.h"
 
 namespace nsYMEngine
 {
@@ -58,6 +59,7 @@ namespace nsYMEngine
 				unsigned int maxInstance = 1;
 				const char* textureRootPath = nullptr;
 				std::string retargetSkeltonName = {};
+				float distanceToReducingUpdate = -1.0f;
 
 			private:
 				std::bitset<static_cast<int>(EnModelInitDataFlags::enNum)> flags = kDefaultFlags;
@@ -287,6 +289,7 @@ namespace nsYMEngine
 				bool m_enableLoadingAsynchronous = false;
 
 				SModelInitData m_modelInitData = {};
+				nsAnimations::CUpdateAnimationController m_updateAnimController = {};
 			};
 
 		}

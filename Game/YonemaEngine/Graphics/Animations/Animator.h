@@ -33,7 +33,7 @@ namespace nsYMEngine
 
 				void Init(
 					unsigned int numAnims,
-					const char* animFilePaths[]
+					const char* const animFilePaths[]
 				);
 
 				unsigned int numAnimations = 0;

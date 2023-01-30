@@ -1,5 +1,5 @@
 #include "ModelRenderer.h"
-#include "../Utils/StringManipulation.h"
+#include "../../Utils/StringManipulation.h"
 
 
 namespace nsYMEngine
@@ -47,7 +47,9 @@ namespace nsYMEngine
 					UpdateWorldMatrixArray();
 				}
 
-				m_renderer->UpdateAnimation(deltaTime);
+				m_updateAnimController.Update(m_position);
+				m_renderer->UpdateAnimation(deltaTime, m_updateAnimController.IsUpdatable());
+				m_updateAnimController.NotUpdatable();
 
 				return;
 			}
@@ -89,6 +91,8 @@ namespace nsYMEngine
 				{
 					m_renderer->SetNumInstances(m_modelInitData.maxInstance);
 				}
+
+				m_updateAnimController.Init(modelInitData.distanceToReducingUpdate);
 
 				return;
 			}

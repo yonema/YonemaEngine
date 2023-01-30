@@ -7,7 +7,7 @@ namespace nsAWA
 	{
 		const char* CShareAnimationSample::m_kModelFilePath[m_kNumModels] =
 		{
-			"Assets/Models/player.fbx",
+			"Assets/Models/Humans/Base.fbx",
 			"Assets/Models/Humans/Player1.fbx",
 			"Assets/Models/Humans/Player2.fbx",
 			"Assets/Models/Humans/Player3.fbx",
@@ -41,13 +41,11 @@ namespace nsAWA
 
 			// CameraSetting
 			MainCamera()->SetNearClip(0.01f);
+			MainCamera()->SetFarClip(1000.0f);
 			MainCamera()->SetPosition({ 0.0f,10.0f,-20.0f });
 
 
 			SModelInitData modelInitData[m_kNumModels];
-
-			modelInitData[0].textureRootPath = "player";
-
 
 			constexpr float distance = 10.0f;
 
@@ -65,6 +63,7 @@ namespace nsAWA
 				modelInitData[i].SetFlags(EnModelInitDataFlags::enCullingOff);
 				modelInitData[i].modelFilePath = m_kModelFilePath[i];
 				modelInitData[i].retargetSkeltonName = "PlayerSkelton";
+				modelInitData[i].distanceToReducingUpdate = 50.0f;
 
 				m_modelRenderer[i] = NewGO<CModelRenderer>();
 				float posX = -distance * static_cast<float>(m_kNumModels) / 2.0f;
@@ -95,6 +94,9 @@ namespace nsAWA
 
 		void CShareAnimationSample::Update(float deltaTime)
 		{
+
+			//nsGeometries::CGeometryData::DebugUpdate(deltaTime);
+
 			m_simpleMover->MoveCameraBySimpleMover();
 
 

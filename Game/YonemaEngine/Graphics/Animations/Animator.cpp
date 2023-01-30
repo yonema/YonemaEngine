@@ -25,7 +25,7 @@ namespace nsYMEngine
 
 			void SAnimationInitData::Init(
 				unsigned int numAnims,
-				const char* animFilePaths[]
+				const char* const animFilePaths[]
 			)
 			{
 				numAnimations = numAnims;

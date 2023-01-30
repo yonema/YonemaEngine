@@ -6,6 +6,10 @@ namespace nsYMEngine
 	namespace nsGraphics
 	{
 		class CGraphicsEngine; 
+		namespace nsAnimations
+		{
+			class CUpdateAnimationManager;
+		}
 	}
 	namespace nsInput
 	{
@@ -116,6 +120,7 @@ namespace nsYMEngine
 		nsEffect::CEffectEngine* m_effectEngine = nullptr;
 		nsSound::CSoundEngine* m_soundEngine = nullptr;
 		nsMemory::CResourceBankTable* m_resourceBankTable = nullptr;
+		nsGraphics::nsAnimations::CUpdateAnimationManager* m_updateAnimationManager = nullptr;
 		nsTime::CGameTime m_gameTime;
 		nsUtils::CRandom* m_random = nullptr;
 		nsThread::CLoadModelThread* m_loadModelThread = nullptr;

@@ -43,12 +43,33 @@ namespace nsYMEngine
 				return m_aabb;
 			}
 
+			static void DebugUpdate(float deltaTime);
+
 		private:
-			void DrawDebugLine(const nsMath::CVector3* vertexPos);
+			static void DrawDebugLine(
+				const nsMath::CVector3* vertexPos, const nsMath::CVector4& color);
+
+			static void CalcDebugViewProjMat(float deltaTime);
+
+			static void DrawCameraFrustum(
+				const nsMath::CVector3& cameraPos,
+				const nsMath::CVector3& cameraForward,
+				const nsMath::CVector3& cameraUp,
+				const nsMath::CVector3& cameraRight,
+				float nearDepth,
+				float farDepth,
+				float fovAngleY,
+				float aspectRatio
+			);
 
 		private:
 			CAABB m_aabb = {};
 			bool m_isInViewFrustum = false;
+#ifdef _DEBUG
+			static nsMath::CMatrix m_mViewProjDebug;
+			static bool m_isDebugDraw;
+#endif // _DEBUG
+
 		};
 
 	}

@@ -122,7 +122,7 @@ namespace nsYMEngine
 					const nsMath::CVector3& scale
 				) noexcept;
 
-				void UpdateAnimation(float deltaTime) noexcept;
+				void UpdateAnimation(float deltaTime, bool updateAnimMatrix) noexcept;
 
 				inline void PlayAnimation(unsigned int animIdx) noexcept
 				{
@@ -336,6 +336,8 @@ namespace nsYMEngine
 
 				std::vector<nsGeometries::CGeometryData*> m_geometryDataArray = {};
 				unsigned int m_fixNumInstanceOnFrame = 0;
+
+				int m_hoge = 0;
 			};
 
 		}

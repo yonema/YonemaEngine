@@ -5,6 +5,7 @@
 #include "Effect/EffectEngine.h"
 #include "Sound/SoundEngine.h"
 #include "Memory/ResourceBankTable.h"
+#include "Graphics/Animations/UpdateAnimationManager.h"
 #include "Utils/Random.h"
 #include "Thread/LoadModelThread.h"
 #include "DebugSystem/DisplayFPS.h"
@@ -38,6 +39,7 @@ namespace nsYMEngine
 		m_effectEngine = nsEffect::CEffectEngine::CreateInstance();
 		m_soundEngine = nsSound::CSoundEngine::CreateInstance();
 		m_loadModelThread = nsThread::CLoadModelThread::CreateInstance();
+		m_updateAnimationManager = nsGraphics::nsAnimations::CUpdateAnimationManager::CreateInstance();
 
 		//NewGO<nsAWA::CGame>(EnGOPriority::enMid, "AWAGame");
 		NewGO<nsAWA::nsSamples::CSampleMain> ("SampleMain");
@@ -70,7 +72,7 @@ namespace nsYMEngine
 		nsGameObject::CGameObjectManager::DeleteInstance();
 		m_gameObjectManager = nullptr;
 
-
+		nsGraphics::nsAnimations::CUpdateAnimationManager::DeleteInstance();
 		nsSound::CSoundEngine::DeleteInstance();
 		m_soundEngine = nullptr;
 		nsEffect::CEffectEngine::DeleteInstance();
@@ -102,6 +104,8 @@ namespace nsYMEngine
 		m_inputManager->Update(deltaTime);
 
 		m_gameObjectManager->Update(deltaTime);
+
+		m_updateAnimationManager->Update();
 
 		m_physicsWorld->Update(deltaTime);
 

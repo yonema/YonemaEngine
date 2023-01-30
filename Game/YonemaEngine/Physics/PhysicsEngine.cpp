@@ -21,7 +21,7 @@ namespace nsYMEngine
 		const float CPhysicsEngine::m_kDefaultDynamicFriction = 0.5f;
 		const float CPhysicsEngine::m_kDefaultRestitution = 0.6f;
 #ifdef _DEBUG
-		const unsigned int CPhysicsEngine::m_kMaxMyDebugLine = 100;
+		const unsigned int CPhysicsEngine::m_kMaxMyDebugLine = 1000;
 #endif // _DEBUG
 
 

@@ -21,6 +21,7 @@ namespace nsAWA
 				enNum
 			};
 			static const int m_kNumModels = 19;
+			//static const int m_kNumModels = 2;
 			static const char* m_kModelFilePath[m_kNumModels];
 			static const char* m_kAnimFilePaths[static_cast<int>(EnAnimType::enNum)];
 
