@@ -121,6 +121,8 @@ namespace nsYMEngine
 			m_simplePostEffectRenderTargetSprite.Init(initData);
 			m_rendererTable.RegisterRenderer(RendererType::enSimplePostEffect, &m_mainRenderTargetSprite);
 
+			//m_shadowMapRenderer.Init();
+
 			// 初期化が終わったら、DXGIFactoryはもういらないため破棄する。
 			dxgiFactory->Release();
 
@@ -158,6 +160,7 @@ namespace nsYMEngine
 			nsFonts::CFontEngine::DeleteInstance();
 			m_sceneDataDH.Release();
 			m_sceneDataCB.Release();
+			//m_shadowMapRenderer.Release();
 			m_simplePostEffectRenderTargetSprite.Release();
 			m_simplePostEffectRenderTarget.Release();
 			m_mainRenderTargetSprite.Release();
@@ -205,6 +208,8 @@ namespace nsYMEngine
 			// 描画開始処理。更新処理より後、描画処理より前に呼ぶこと。
 			BeginDraw();
 
+			DrawToShadowMap();
+
 			DrawToMainRenderTarget();
 
 			DrawWithSimplePostEffect();
@@ -231,6 +236,14 @@ namespace nsYMEngine
 
 			return;
 		}
+
+		void CGraphicsEngine::DrawToShadowMap()
+		{
+			//m_shadowMapRenderer.Draw();
+
+			return;
+		}
+
 
 		void CGraphicsEngine::DrawToMainRenderTarget()
 		{

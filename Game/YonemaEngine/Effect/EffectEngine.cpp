@@ -1,6 +1,9 @@
 #include "EffectEngine.h"
 #include "../Graphics/GraphicsEngine.h"
 #include "../Graphics/Dx12Wrappers/CommandList.h"
+#include "../Sound/SoundEngine.h"
+#include "EffectSound.h"
+
 
 namespace nsYMEngine
 {
@@ -24,6 +27,9 @@ namespace nsYMEngine
 
 		void CEffectEngine::Terminate()
 		{
+			m_efkManager->StopAllEffects();
+			m_effectMap.clear();
+
 			return;
 		}
 
@@ -63,6 +69,25 @@ namespace nsYMEngine
 					m_efkRenderer->GetGraphicsDevice(), m_efkMemoryPool);
 
 			m_efkRenderer->SetCommandList(m_efkCommandList);
+
+
+			auto* xAudio = nsSound::CSoundEngine::GetInstance()->GetXAudio();
+
+			auto sound = Effekseer::MakeRefPtr<EffekseerSound::SoundImplemented>();
+			sound->Initialize(xAudio, 16, 16);
+			m_efkSound = sound;
+
+
+			m_efkSoundLoader = ::Effekseer::MakeRefPtr<CEffectSoundLoader>(sound);
+			m_efkManager->SetSoundLoader(m_efkSoundLoader);
+			//m_efkManager->SetSoundLoader(m_efkSound->CreateSoundLoader());
+
+			m_efkSoundPlayer = ::Effekseer::MakeRefPtr<CEffectSoundPlayer>(sound);
+			m_efkManager->SetSoundPlayer(m_efkSoundPlayer);
+			//m_efkManager->SetSoundPlayer(m_efkSound->CreateSoundPlayer());
+			
+
+
 
 
 			return true;

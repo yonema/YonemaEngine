@@ -7,7 +7,7 @@ namespace nsAWA
 		const wchar_t* const CEffectSample::
 			m_kEffectFilePathArray[static_cast<int>(EnEffectType::enNum)] =
 		{
-			L"Assets/Effects/Samples/Laser01.efkefc",
+			L"Assets/Effects/Samples/hoge.efk",
 			L"Assets/Effects/Samples/square_g.efkefc",
 			L"Assets/Effects/Samples/distortion.efkefc",
 			L"Assets/Effects/Samples/TriggerLaser.efkefc",

@@ -36,8 +36,9 @@ namespace nsYMEngine
 		m_gameObjectManager = nsGameObject::CGameObjectManager::CreateInstance();
 		m_inputManager = new nsInput::CInputManager();
 		m_physicsWorld = nsPhysics::CPhysicsEngine::CreateInstance();
-		m_effectEngine = nsEffect::CEffectEngine::CreateInstance();
+		// サウンドエンジンはエフェクトエンジンより先に生成する
 		m_soundEngine = nsSound::CSoundEngine::CreateInstance();
+		m_effectEngine = nsEffect::CEffectEngine::CreateInstance();
 		m_loadModelThread = nsThread::CLoadModelThread::CreateInstance();
 		m_updateAnimationManager = nsGraphics::nsAnimations::CUpdateAnimationManager::CreateInstance();
 
@@ -73,10 +74,10 @@ namespace nsYMEngine
 		m_gameObjectManager = nullptr;
 
 		nsGraphics::nsAnimations::CUpdateAnimationManager::DeleteInstance();
-		nsSound::CSoundEngine::DeleteInstance();
-		m_soundEngine = nullptr;
 		nsEffect::CEffectEngine::DeleteInstance();
 		m_effectEngine = nullptr;
+		nsSound::CSoundEngine::DeleteInstance();
+		m_soundEngine = nullptr;
 		nsPhysics::CPhysicsEngine::DeleteInstance();
 		m_physicsWorld = nullptr;
 		if (m_inputManager)

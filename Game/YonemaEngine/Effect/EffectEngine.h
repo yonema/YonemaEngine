@@ -1,6 +1,8 @@
 #pragma once
 #include <Effekseer.h>
 #include <EffekseerRendererDX12.h>
+#include <EffekseerSoundXAudio2.h>
+//#include "EffectSound.h"
 
 namespace nsYMEngine
 {
@@ -10,6 +12,12 @@ namespace nsYMEngine
 		{
 			class CCommandList;
 		}
+	}
+
+	namespace nsEffect
+	{
+		class CEffectSoundLoader;
+		class CEffectSoundPlayer;
 	}
 }
 
@@ -89,10 +97,14 @@ namespace nsYMEngine
 
 		private:
 			static CEffectEngine* m_instance;
+
 			Effekseer::ManagerRef m_efkManager = nullptr;
 			EffekseerRenderer::RendererRef m_efkRenderer = nullptr;
 			Effekseer::RefPtr<EffekseerRenderer::SingleFrameMemoryPool> m_efkMemoryPool = nullptr;
 			Effekseer::RefPtr<EffekseerRenderer::CommandList> m_efkCommandList = nullptr;
+			EffekseerSound::SoundRef m_efkSound = nullptr;
+			Effekseer::RefPtr<CEffectSoundPlayer> m_efkSoundPlayer = nullptr;
+			Effekseer::RefPtr<CEffectSoundLoader> m_efkSoundLoader = nullptr;
 
 			std::unordered_map<std::wstring, Effekseer::EffectRef> m_effectMap = {};
 			int m_totalEffectKey = 0;

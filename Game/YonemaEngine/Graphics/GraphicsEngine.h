@@ -3,6 +3,7 @@
 #include "Sprites/Sprite.h"
 #include "Renderers/RendererTable.h"
 #include "DefaultTextures.h"
+#include "Shadow/ShadowMapRenderer.h"
 
 namespace nsYMEngine
 {
@@ -184,6 +185,8 @@ namespace nsYMEngine
 
 			void BeginDraw();
 
+			void DrawToShadowMap();
+
 			void DrawToMainRenderTarget();
 
 			void DrawWithSimplePostEffect();
@@ -213,11 +216,15 @@ namespace nsYMEngine
 			nsDx12Wrappers::CRenderTarget m_simplePostEffectRenderTarget;
 			nsSprites::CSprite m_simplePostEffectRenderTargetSprite;
 			nsSprites::CSprite* m_pBaseRenderTargetSprite = nullptr;
+			//nsShadow::CShadowMapRenderer m_shadowMapRenderer = {};
+
 			nsDx12Wrappers::CConstantBuffer m_sceneDataCB;
 			nsDx12Wrappers::CDescriptorHeap m_sceneDataDH;
 			nsRenderers::CRendererTable m_rendererTable;
 			CCamera m_mainCamera;
+
 			CDefaultTextures m_defaultTextures = {};
+
 			unsigned int m_descriptorSizeOfCbvSrvUav = 0;
 			unsigned int m_descriptorSizeOfRtv = 0;
 

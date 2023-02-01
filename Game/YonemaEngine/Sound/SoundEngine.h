@@ -61,6 +61,11 @@ namespace nsYMEngine
 				return volume;
 			}
 
+			constexpr auto* GetXAudio() noexcept
+			{
+				return m_xAudio;
+			}
+
 		private:
 			void Init();
 
