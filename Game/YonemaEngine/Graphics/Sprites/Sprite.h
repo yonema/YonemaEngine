@@ -67,6 +67,11 @@ namespace nsYMEngine
 					return m_constantBufferCPU.mulColor;
 				}
 
+				constexpr auto* GetTexture() noexcept
+				{
+					return &m_texture;
+				}
+
 			private:
 				void Terminate();
 

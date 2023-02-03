@@ -1,22 +1,20 @@
-#include "BasicGenericRenderer.h"
-#include "../GraphicsEngine.h"
-
+#include "ShadowMapGenericRenderer.h"
 namespace nsYMEngine
 {
 	namespace nsGraphics
 	{
-		namespace nsModels
+		namespace nsShadow
 		{
-			const wchar_t* const CBasicGenericRenderer::m_kVsFilePath =
-				L"Assets/Shaders/Models/BasicModelVertexShader.hlsl";
-			const char* const CBasicGenericRenderer::m_kVsEntryFuncName = "VSMain";
-			const wchar_t* const CBasicGenericRenderer::m_kPsFilePath =
-				L"Assets/Shaders/Models/BasicModelPixelShader.hlsl";
-			const char* const CBasicGenericRenderer::m_kPsEntryFuncName = "PSMain";
+			const wchar_t* const CShadowMapGenericRenderer::m_kVsFilePath =
+				L"Assets/Shaders/Shadow/ShadowMapVertexShader.hlsl";
+			const char* const CShadowMapGenericRenderer::m_kVsEntryFuncName = "VSMain";
+			const wchar_t* const CShadowMapGenericRenderer::m_kPsFilePath =
+				L"Assets/Shaders/Shadow/ShadowMapPixelShader.hlsl";
+			const char* const CShadowMapGenericRenderer::m_kPsEntryFuncName = "PSMain";
 
 
 
-			void CBasicGenericRenderer::CreateRootParameter(
+			void CShadowMapGenericRenderer::CreateRootParameter(
 				std::vector<CD3DX12_DESCRIPTOR_RANGE1>* pDescTblRanges,
 				std::vector<CD3DX12_ROOT_PARAMETER1>* pRootParameters
 			) const noexcept
@@ -32,10 +30,6 @@ namespace nsYMEngine
 					static_cast<unsigned int>(EnDescRangeType::enSrvForBoneMatrixArray);
 				constexpr unsigned int kRangeNoForWorldMatrixArraySRV =
 					static_cast<unsigned int>(EnDescRangeType::enSrvForWorldMatrixArray);
-				constexpr unsigned int kRangeNoForShadowMapSRV =
-					static_cast<unsigned int>(EnDescRangeType::enSRVForShadowMap);
-				constexpr unsigned int kRangeNoForMaterialSRV =
-					static_cast<unsigned int>(EnDescRangeType::enSrvForMaterial);
 
 				pDescTblRanges->resize(kNumDescTblRanges);
 				pDescTblRanges->at(kRangeNoForModelCB).Init(
@@ -44,11 +38,6 @@ namespace nsYMEngine
 					D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, numSRVs++);
 				pDescTblRanges->at(kRangeNoForWorldMatrixArraySRV).Init(
 					D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, numSRVs++);
-				pDescTblRanges->at(kRangeNoForShadowMapSRV).Init(
-					D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, numSRVs++);
-				// diffuse‚Ænormal‚Ì2–‡
-				pDescTblRanges->at(kRangeNoForMaterialSRV).Init(
-					D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 2, numSRVs++);
 
 
 				constexpr unsigned int kNumRootParameters =
@@ -59,10 +48,6 @@ namespace nsYMEngine
 					static_cast<unsigned int>(EnRootParameterType::enBoneMatrixArray);
 				constexpr unsigned int kParamNoForWorldMatrixArray =
 					static_cast<unsigned int>(EnRootParameterType::enWorldMatrixArray);
-				constexpr unsigned int kParamNoForShadowMap =
-					static_cast<unsigned int>(EnRootParameterType::enShadowMap);
-				constexpr unsigned int kParamNoForMaterial =
-					static_cast<unsigned int>(EnRootParameterType::enMaterial);
 
 				pRootParameters->resize(kNumRootParameters);
 
@@ -81,21 +66,13 @@ namespace nsYMEngine
 					&pDescTblRanges->at(kRangeNoForWorldMatrixArraySRV),
 					D3D12_SHADER_VISIBILITY_VERTEX
 				);
-				pRootParameters->at(kParamNoForShadowMap).InitAsDescriptorTable(
-					1,
-					&pDescTblRanges->at(kRangeNoForShadowMapSRV),
-					D3D12_SHADER_VISIBILITY_PIXEL
-				);
-				pRootParameters->at(kParamNoForMaterial).InitAsDescriptorTable(
-					1,
-					&pDescTblRanges->at(kRangeNoForMaterialSRV),
-					D3D12_SHADER_VISIBILITY_PIXEL
-				);
+
+
 
 				return;
 			}
 
-			bool CBasicGenericRenderer::CreateShader(
+			bool CShadowMapGenericRenderer::CreateShader(
 				nsDx12Wrappers::CBlob* pVsBlob,
 				nsDx12Wrappers::CBlob* pPsBlob
 			) const noexcept
@@ -110,7 +87,7 @@ namespace nsYMEngine
 				);
 			}
 
-			void CBasicGenericRenderer::CreateInputLayout(
+			void CShadowMapGenericRenderer::CreateInputLayout(
 				std::vector<D3D12_INPUT_ELEMENT_DESC>* pInputLayout) const noexcept
 			{
 				constexpr D3D12_INPUT_ELEMENT_DESC inputLayout[] =
@@ -188,8 +165,6 @@ namespace nsYMEngine
 				}
 				return;
 			}
-
-
 		}
 	}
 }

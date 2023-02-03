@@ -1,5 +1,5 @@
 #include "BasicModelHeader.hlsli"
-
+#include "../CalcSkinMatrixHeader.hlsli"
 
 
 /**
@@ -9,15 +9,20 @@ SPSInput VSMainCore(in SVSInput input, in float4x4 mWorldLocal)
 {
 	SPSInput output =
 	{
-		{0.0f,0.0f,0.0f,0.0f},	// svpos
-		{0.0f,0.0f,0.0f},		// normal
-		{0.0f,0.0f,0.0f},		// tangent
-		{0.0f,0.0f,0.0f},		// biNormal
-		{0.0f,0.0f}				// uv
+		{ 0.0f, 0.0f, 0.0f, 0.0f },	// svpos
+		{ 0.0f, 0.0f, 0.0f },		// normal
+		{ 0.0f, 0.0f, 0.0f },		// tangent
+		{ 0.0f, 0.0f, 0.0f },		// biNormal
+		{ 0.0f, 0.0f },				// uv
+		{ 0.0f, 0.0f,0.0f, 0.0f },	// posInLVP
+		{ 0.0f, 0.0f,0.0f, 0.0f },	// posInLVP
 	};
 
-	output.svpos = mul(mWorldLocal, input.pos);
-	output.svpos = mul(g_mViewProj, output.svpos);
+	output.posInWorld = mul(mWorldLocal, input.pos);
+	output.svpos = mul(g_mViewProj, output.posInWorld);
+
+	output.posInLVP = mul(g_mLightViewProj, output.posInWorld);
+
 
 	// 法線関係は、平行移動成分を除去する。
 	float3x3 mWorldLocal3x3 = (float3x3)mWorldLocal;
@@ -26,6 +31,8 @@ SPSInput VSMainCore(in SVSInput input, in float4x4 mWorldLocal)
 	output.biNormal = normalize(mul(mWorldLocal3x3, input.biNormal));
 
 	output.uv = input.uv;
+
+
 
 	return output;
 }

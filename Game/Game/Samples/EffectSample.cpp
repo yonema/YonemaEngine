@@ -1,4 +1,5 @@
 #include "EffectSample.h"
+#include "../../YonemaEngine/DebugSystem/SimpleMover.h"
 
 namespace nsAWA
 {
@@ -20,7 +21,20 @@ namespace nsAWA
 			{
 				m_effectArray[i] = NewGO<CEffectPlayer>();
 				m_effectArray[i]->Init(m_kEffectFilePathArray[i]);
+				m_effectArray[i]->SetPosition(nsMath::CVector3::Zero());
 			}
+
+			// CreateSimpleMover
+			m_simpleMover = NewGO<nsDebugSystem::CSimpleMover>();
+			m_simpleMover->SetPosition({ 0.0f,0.0f,-5.0f });
+
+			auto model = NewGO<CModelRenderer>();
+			SModelInitData initData = {};
+			initData.modelFilePath = "Assets/Models/Humans/Player1.fbx";
+			initData.vertexBias.SetRotationXDeg(90.0f);
+			model->Init(initData);
+			model->SetPosition({ 0.0f,0.0f,1.0f });
+			model->SetScale(0.1f);
 
 			return true;
 		}
@@ -36,6 +50,7 @@ namespace nsAWA
 
 		void CEffectSample::Update(float deltaTime)
 		{
+			m_simpleMover->MoveCameraBySimpleMover();
 			// タイマー更新
 			constexpr float kHalfMaxTime = 10.0f;
 			m_timer += deltaTime;
@@ -64,9 +79,9 @@ namespace nsAWA
 
 			for (int i = 0; i < static_cast<int>(EnEffectType::enNum); i++)
 			{
-				m_effectArray[i]->SetPosition({ currentX, 20.0f, 0.0f });
-				m_effectArray[i]->SetRotation(rot);
-				m_effectArray[i]->SetScale(currentScale);
+				//m_effectArray[i]->SetPosition({ currentX, 20.0f, 0.0f });
+				//m_effectArray[i]->SetRotation(rot);
+				//m_effectArray[i]->SetScale(currentScale);
 			}
 
 

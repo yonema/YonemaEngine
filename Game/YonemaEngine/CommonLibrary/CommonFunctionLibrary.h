@@ -83,9 +83,6 @@ namespace nsYMEngine
 	*/
 	static inline const std::vector<nsGameObject::IGameObject*>& FindGOs(const char* objectsName)
 	{
-		std::function < bool(std::string* str)> func;
-		sizeof(func);
-		sizeof(&func);
 		return nsGameObject::CGameObjectManager::GetInstance()->FindGameObjects(objectsName);
 	}
 

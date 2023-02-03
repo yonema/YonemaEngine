@@ -151,6 +151,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="YonemaEngine\Graphics\ImageProcessing\GaussianBlurXGenericRenderer.cpp" />
+    <ClCompile Include="YonemaEngine\Graphics\ImageProcessing\GaussianBlurYGenericRenderer.cpp" />
+    <ClCompile Include="YonemaEngine\Graphics\ImageProcessing\GaussianBlurBaseGenericRenderer.cpp" />
+    <ClCompile Include="YonemaEngine\Graphics\ImageProcessing\GaussianBlur.cpp" />
+    <ClCompile Include="YonemaEngine\Graphics\Shadow\ShadowMapInstancingGenericRenderer.cpp" />
+    <ClCompile Include="YonemaEngine\Graphics\Shadow\ShadowMapSkinGenericRenderer.cpp" />
+    <ClCompile Include="YonemaEngine\Graphics\Shadow\ShadowModelRenderer.cpp" />
+    <ClCompile Include="YonemaEngine\Graphics\Shadow\ShadowMapGenericRenderer.cpp" />
     <ClCompile Include="YonemaEngine\Effect\EffectSound.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\Shadow\ShadowMapRenderer.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\Animations\UpdateAnimationManager.cpp" />
@@ -272,6 +280,14 @@
     <Image Include="Assets\Images\StarMan.png" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="YonemaEngine\Graphics\ImageProcessing\GaussianBlurXGenericRenderer.h" />
+    <ClInclude Include="YonemaEngine\Graphics\ImageProcessing\GaussianBlurYGenericRenderer.h" />
+    <ClInclude Include="YonemaEngine\Graphics\ImageProcessing\GaussianBlurBaseGenericRenderer.h" />
+    <ClInclude Include="YonemaEngine\Graphics\ImageProcessing\GaussianBlur.h" />
+    <ClInclude Include="YonemaEngine\Graphics\Shadow\ShadowMapInstancingGenericRenderer.h" />
+    <ClInclude Include="YonemaEngine\Graphics\Shadow\ShadowMapSkinGenericRenderer.h" />
+    <ClInclude Include="YonemaEngine\Graphics\Shadow\ShadowModelRenderer.h" />
+    <ClInclude Include="YonemaEngine\Graphics\Shadow\ShadowMapGenericRenderer.h" />
     <ClInclude Include="YonemaEngine\Effect\EffectSound.h" />
     <ClInclude Include="YonemaEngine\Graphics\Shadow\ShadowMapRenderer.h" />
     <ClInclude Include="YonemaEngine\Graphics\Animations\UpdateAnimationManager.h" />
@@ -405,6 +421,14 @@
     <ClInclude Include="YonemaEngine\CommonLibrary\CommonFunctionLibrary.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\Shaders\CalcSkinMatrixHeader.hlsli">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
+    <None Include="Assets\Shaders\ImageProcessing\GaussianBlurHeader.hlsli">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
     <None Include="Assets\Shaders\PhysicsDebugLine\PhysicsDebugLineHeader.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </None>
@@ -415,6 +439,10 @@
     <None Include="Assets\Shaders\PeraPolygonHeader.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </None>
+    <None Include="Assets\Shaders\Shadow\ShadowMapHeader.hlsli">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
     <None Include="Assets\Shaders\SimplePostEffectHeader.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </None>
@@ -424,6 +452,22 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="Assets\Shaders\ImageProcessing\GaussianBlurPixelShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Assets\Shaders\ImageProcessing\GaussianBlurVertexShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="Assets\Shaders\PhysicsDebugLine\PhysicsDebugLinePixelShader.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
@@ -451,6 +495,22 @@
     </FxCompile>
     <FxCompile Include="Assets\Shaders\PeraPolygonVertexShader.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Assets\Shaders\Shadow\ShadowMapPixelShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Assets\Shaders\Shadow\ShadowMapVertexShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="Assets\Shaders\SpritePixelShader.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>

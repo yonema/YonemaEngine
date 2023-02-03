@@ -59,6 +59,15 @@ namespace nsYMEngine
 					return m_dsvClearValue;
 				}
 
+				constexpr unsigned int GetWidth() const noexcept
+				{
+					return m_width;
+				}
+				constexpr unsigned int GetHeight() const noexcept
+				{
+					return m_height;
+				}
+
 				void SetName(const wchar_t* objectName);
 
 			private:
@@ -92,6 +101,8 @@ namespace nsYMEngine
 				nsMath::CVector4 m_rtvClearColor = nsMath::CVector4::White();
 				float m_dsvClearValue = 1.0f;
 
+				unsigned int m_width = 0;
+				unsigned int m_height = 0;
 			};
 
 		}

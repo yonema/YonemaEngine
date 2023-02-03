@@ -24,6 +24,11 @@ namespace nsYMEngine
 				enum class EnRendererType
 				{
 					enNone = -1,
+					enShadowModel,
+					enShadowSkinModel,
+					enShadowInstancingModel,
+					enGaussianBlurXForShadowMap,
+					enGaussianBlurYForShadowMap,
 					enBasicModel,
 					enSkinModel,
 					enInstancingModel,
@@ -42,6 +47,11 @@ namespace nsYMEngine
 					static_cast<unsigned int>(EnRendererType::enBasicModel);
 				static const unsigned int m_kLastIndexOfModel =
 					static_cast<unsigned int>(EnRendererType::enInstancingNonCullingModel);
+
+				static const unsigned int m_kFirstIndexOfShadowModel =
+					static_cast<unsigned int>(EnRendererType::enShadowModel);
+				static const unsigned int m_kLastIndexOfShadowModel =
+					static_cast<unsigned int>(EnRendererType::enShadowInstancingModel);
 
 			private:
 				using RendererList = std::list<IRenderer*>;

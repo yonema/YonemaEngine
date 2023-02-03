@@ -27,30 +27,27 @@ namespace nsYMEngine
 				}
 
 				// モデルごとの定数バッファのセット
-				{
-					ID3D12DescriptorHeap* descHeaps[] = { m_modelDH.Get() };
-					commandList->SetDescriptorHeaps(1, descHeaps);
-				}
-				auto descriptorHeapH = m_modelDH.GetGPUHandle();
-				commandList->SetGraphicsRootDescriptorTable(0, descriptorHeapH);
+				commandList->SetDescriptorHeap(m_modelDH);
+				commandList->SetGraphicsRootDescriptorTable(0, m_modelDH);
 
 				// スケルたタルアニメーションが有効なら、ボーン行列の配列をセット
 				if (IsSkeltalAnimationValid())
 				{
-					ID3D12DescriptorHeap* descHeaps[] = { m_boneMatrixArrayDH.Get() };
-					commandList->SetDescriptorHeaps(1, descHeaps);
-					descriptorHeapH = m_boneMatrixArrayDH.GetGPUHandle();
-					commandList->SetGraphicsRootDescriptorTable(1, descriptorHeapH);
+					commandList->SetDescriptorHeap(m_boneMatrixArrayDH);
+					commandList->SetGraphicsRootDescriptorTable(1, m_boneMatrixArrayDH);
 				}
 
 				// インスタンシングが有効なら、ワールド行列の配列をセット
 				if (m_worldMatrixArrayDH.IsValid())
 				{
-					ID3D12DescriptorHeap* descHeaps[] = { m_worldMatrixArrayDH.Get() };
-					commandList->SetDescriptorHeaps(1, descHeaps);
-					descriptorHeapH = m_worldMatrixArrayDH.GetGPUHandle();
-					commandList->SetGraphicsRootDescriptorTable(2, descriptorHeapH);
+					commandList->SetDescriptorHeap(m_worldMatrixArrayDH);
+					commandList->SetGraphicsRootDescriptorTable(2, m_worldMatrixArrayDH);
 				}
+
+				// シャドウマップをセット
+				commandList->SetDescriptorHeap(m_shadowMapDH);
+				commandList->SetGraphicsRootDescriptorTable(3, m_shadowMapDH);				
+				
 
 				// マテリアルごとに描画
 				// 最初にマテリアルごとにメッシュ分解しているため、メッシュごとに描画と同意。
@@ -64,9 +61,8 @@ namespace nsYMEngine
 					// マテリアルごとの定数バッファをセット
 					const auto* materialDH = m_materialDHs.at(meshInfo.materialIndex);
 					ID3D12DescriptorHeap* materialDescHeaps[] = { materialDH->Get() };
-					commandList->SetDescriptorHeaps(1, materialDescHeaps);
-					descriptorHeapH = materialDH->GetGPUHandle();
-					commandList->SetGraphicsRootDescriptorTable(3, descriptorHeapH);
+					commandList->SetDescriptorHeap(*materialDH);
+					commandList->SetGraphicsRootDescriptorTable(4, *materialDH);
 
 					// 頂点バッファとインデックスバッファをセット
 					commandList->SetIndexBuffer(*indexBuffer);
@@ -105,6 +101,8 @@ namespace nsYMEngine
 				m_isImportedModelScene = false;
 				m_loadingState = EnLoadingState::enBeforeLoading;
 
+				m_shadowModelRenderer.Release();
+
 				for (auto& geomData : m_geometryDataArray)
 				{
 					if (geomData)
@@ -115,6 +113,7 @@ namespace nsYMEngine
 				}
 				m_geometryDataArray.clear();
 
+				m_shadowMapDH.Release();
 				m_boneMatrixArrayDH.Release();
 				m_boneMatrixArraySB.Release();
 				m_worldMatrixArrayDH.Release();
@@ -202,7 +201,7 @@ namespace nsYMEngine
 				m_isImportedModelScene = false;
 				m_modelInitDataRef = &modelInitData;
 
-				if (modelInitData.GetFlags(EnModelInitDataFlags::enLoadingAsynchronous))
+				if (modelInitData.GetFlags(nsRenderers::EnModelInitDataFlags::enLoadingAsynchronous))
 				{
 					m_loadingState = EnLoadingState::enNowLoading;
 					nsThread::CLoadModelThread::GetInstance()->PushLoadModelProcess(
@@ -309,6 +308,7 @@ namespace nsYMEngine
 				CreateMaterialSRV();
 				CreateBoneMatrisArraySB();
 				CreateWorldMatrixArraySB(modelInitData);
+				CreateShadowMapSRV();
 
 				m_geometryDataArray.reserve(modelInitData.maxInstance);
 				m_geometryDataArray.emplace_back(new nsGeometries::CGeometryData());
@@ -321,8 +321,10 @@ namespace nsYMEngine
 
 				m_bias.MakeRotationFromQuaternion(modelInitData.vertexBias);
 
-				if (modelInitData.rendererType != 
-					nsRenderers::CRendererTable::EnRendererType::enBasicModel)
+				using EnRendererType = nsRenderers::CRendererTable::EnRendererType;
+				using EnModelInitDataFlags = nsRenderers::EnModelInitDataFlags;
+
+				if (modelInitData.rendererType != EnRendererType::enBasicModel)
 				{
 					// 初期化データにレンダラータイプが設定されていたら、それを優先する。
 					SetRenderType(modelInitData.rendererType);
@@ -332,11 +334,11 @@ namespace nsYMEngine
 					// インスタンシングが有効なら、インスタンシングタイプ
 					if (modelInitData.GetFlags(EnModelInitDataFlags::enCullingOff))
 					{
-						SetRenderType(nsRenderers::CRendererTable::EnRendererType::enInstancingNonCullingModel);
+						SetRenderType(EnRendererType::enInstancingNonCullingModel);
 					}
 					else
 					{
-						SetRenderType(nsRenderers::CRendererTable::EnRendererType::enInstancingModel);
+						SetRenderType(EnRendererType::enInstancingModel);
 					}
 				}
 				else if (IsSkeltalAnimationValid())
@@ -344,11 +346,11 @@ namespace nsYMEngine
 					// スキンアニメーションが有効ならスキンタイプ
 					if (modelInitData.GetFlags(EnModelInitDataFlags::enCullingOff))
 					{
-						SetRenderType(nsRenderers::CRendererTable::EnRendererType::enSkinNonCullingModel);
+						SetRenderType(EnRendererType::enSkinNonCullingModel);
 					}
 					else
 					{
-						SetRenderType(nsRenderers::CRendererTable::EnRendererType::enSkinModel);
+						SetRenderType(EnRendererType::enSkinModel);
 					}
 				}
 				else
@@ -356,11 +358,11 @@ namespace nsYMEngine
 					// その他は基本モデルタイプ
 					if (modelInitData.GetFlags(EnModelInitDataFlags::enCullingOff))
 					{
-						SetRenderType(nsRenderers::CRendererTable::EnRendererType::enBasicNonCullingModel);
+						SetRenderType(EnRendererType::enBasicNonCullingModel);
 					}
 					else
 					{
-						SetRenderType(nsRenderers::CRendererTable::EnRendererType::enBasicModel);
+						SetRenderType(EnRendererType::enBasicModel);
 					}
 				}
 
@@ -375,6 +377,16 @@ namespace nsYMEngine
 				//	m_importerForLoadAsynchronous = nullptr;
 				//}
 
+				if (modelInitData.GetFlags(EnModelInitDataFlags::enShadowCaster))
+				{
+					m_shadowModelRenderer.Init(
+						[&](nsDx12Wrappers::CCommandList* commandList)
+						{
+							DrawShadowModel(commandList);
+						},
+						GetRenderType()
+					);
+				}
 
 
 				return;
@@ -505,7 +517,7 @@ namespace nsYMEngine
 					LoadMesh(&dstMesh, *srcMesh, node->mMeshes[meshIdx]);
 
 					if (
-						modelInitData.GetFlags(EnModelInitDataFlags::enNodeTransform)
+						modelInitData.GetFlags(nsRenderers::EnModelInitDataFlags::enNodeTransform)
 							== true &&
 						IsSkeltalAnimationValid() != true
 						)
@@ -812,21 +824,30 @@ namespace nsYMEngine
 			{
 				// 定数バッファ作成
 
-				// ワールド行列 + ワールドビュープロジェクション行列 = 2
-				auto cbSize = sizeof(nsMath::CMatrix) * 2;
+				// ワールド行列 + ワールドビュープロジェクション行列 + 
+				// ライトビュープロジェクション行列 = 3
+				auto cbSize = sizeof(SCconstantBufferData);
 
 				m_modelCB.Init(static_cast<unsigned int>(cbSize), L"ModelCB");
 
 				const auto& mWorld = nsMath::CMatrix::Identity();
 				const auto& mViewProj = CGraphicsEngine::GetInstance()->GetMatrixViewProj();
 				auto* mappedCB =
-					static_cast<nsMath::CMatrix*>(m_modelCB.GetMappedConstantBuffer());
-				mappedCB[0] = mWorld;
-				mappedCB[1] = mViewProj;
+					static_cast<SCconstantBufferData*>(m_modelCB.GetMappedConstantBuffer());
+				auto* shadowCamera =
+					CGraphicsEngine::GetInstance()->GetShadowMapRenderer()->GetCamera();
+				const auto& mLightViewProj = shadowCamera->GetViewProjectionMatirx();
+				const auto& lightPos = shadowCamera->GetPosition();
+				mappedCB->mWorld = mWorld;
+				mappedCB->mViewProj = mViewProj;
+				mappedCB->mLightViewProj = mLightViewProj;
+				mappedCB->lightPos = lightPos;
+				mappedCB->isShadowReceiver = 
+					m_modelInitDataRef->GetFlags(nsRenderers::EnModelInitDataFlags::enShadowReceiver);
 
 				// ディスクリプタヒープ作成
 				constexpr unsigned int kNumDescHeaps = 1;
-				m_modelDH.InitAsCbvSrvUav(kNumDescHeaps, L"ModelCB");
+				m_modelDH.InitAsCbvSrvUav(kNumDescHeaps, L"ModelDH");
 
 				// 定数バッファビュー作成
 				m_modelCB.CreateConstantBufferView(m_modelDH.GetCPUHandle());
@@ -934,6 +955,31 @@ namespace nsYMEngine
 				return true;
 			}
 
+			bool CBasicModelRenderer::CreateShadowMapSRV()
+			{
+				auto* device = CGraphicsEngine::GetInstance()->GetDevice();
+				auto* shadowMapTexture =
+					CGraphicsEngine::GetInstance()->GetShadowMapRenderer()->GetShadowBokeTexture();
+					//CGraphicsEngine::GetInstance()->GetShadowMapRenderer()->GetShadowMapSprite()->GetTexture();
+				m_shadowMapDH.InitAsCbvSrvUav(1, L"ShadowMapDH");
+				auto matDescHandle = m_shadowMapDH.GetCPUHandle();
+
+				D3D12_SHADER_RESOURCE_VIEW_DESC matSRVDesc = {};
+				matSRVDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+				matSRVDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+				matSRVDesc.Texture2D.MipLevels = 1;
+				matSRVDesc.Format = shadowMapTexture->GetResource()->GetDesc().Format;
+
+				device->CreateShaderResourceView(
+					shadowMapTexture->GetResource(),
+					&matSRVDesc,
+					matDescHandle
+				);
+
+				return true;
+			}
+
+
 
 			void CBasicModelRenderer::UpdateWorldMatrix(
 				const nsMath::CVector3& position,
@@ -950,10 +996,15 @@ namespace nsYMEngine
 
 				// 定数バッファにコピー。
 				auto mappedCB =
-					static_cast<nsMath::CMatrix*>(m_modelCB.GetMappedConstantBuffer());
-				mappedCB[0] = m_worldMatrix;
-				auto mViewProj = CGraphicsEngine::GetInstance()->GetMatrixViewProj();
-				mappedCB[1] = mViewProj;
+					static_cast<SCconstantBufferData*>(m_modelCB.GetMappedConstantBuffer());
+				mappedCB->mWorld = m_worldMatrix;
+				const auto& mViewProj = CGraphicsEngine::GetInstance()->GetMatrixViewProj();
+				mappedCB->mViewProj = mViewProj;
+				auto* shadowCamera = 
+					CGraphicsEngine::GetInstance()->GetShadowMapRenderer()->GetCamera();
+				const auto& mLightViewProj = shadowCamera->GetViewProjectionMatirx();
+				mappedCB->mLightViewProj = mLightViewProj;
+				mappedCB->lightPos = shadowCamera->GetPosition();
 
 
 				m_fixNumInstanceOnFrame = 0;
@@ -963,6 +1014,11 @@ namespace nsYMEngine
 				if (m_geometryDataArray[0]->IsInViewFrustum())
 				{
 					m_fixNumInstanceOnFrame++;
+				}
+
+				if (m_shadowModelRenderer.IsValid())
+				{
+					m_shadowModelRenderer.Update(m_worldMatrix);
 				}
 
 				return;
@@ -1064,6 +1120,59 @@ namespace nsYMEngine
 
 				return;
 			}
+
+
+			void CBasicModelRenderer::DrawShadowModel(nsDx12Wrappers::CCommandList* commandList)
+			{
+				if (m_loadingState != EnLoadingState::enAfterLoading)
+				{
+					// ロード中は描画できない
+					return;
+				}
+
+				if (m_fixNumInstanceOnFrame <= 0)
+				{
+					// 描画するインスタンスがない
+					return;
+				}
+
+				// モデルごとの定数バッファのはCShadowModelRendererで設定している。
+
+				// スケルたタルアニメーションが有効なら、ボーン行列の配列をセット
+				if (IsSkeltalAnimationValid())
+				{
+					commandList->SetDescriptorHeap(m_boneMatrixArrayDH);
+					commandList->SetGraphicsRootDescriptorTable(1, m_boneMatrixArrayDH);
+				}
+
+				// インスタンシングが有効なら、ワールド行列の配列をセット
+				if (m_worldMatrixArrayDH.IsValid())
+				{
+					commandList->SetDescriptorHeap(m_worldMatrixArrayDH);
+					commandList->SetGraphicsRootDescriptorTable(2, m_worldMatrixArrayDH);
+				}
+
+				// マテリアルごとに描画
+				// 最初にマテリアルごとにメッシュ分解しているため、メッシュごとに描画と同意。
+				const unsigned int numMeshes = static_cast<unsigned int>(m_meshInfoArray.size());
+				for (unsigned int meshIdx = 0; meshIdx < numMeshes; meshIdx++)
+				{
+					const auto* indexBuffer = m_indexBuffers.at(meshIdx);
+					const auto* vertexBuffer = m_vertexBuffers.at(meshIdx);
+					const auto& meshInfo = m_meshInfoArray.at(meshIdx);
+
+					// 頂点バッファとインデックスバッファをセット
+					commandList->SetIndexBuffer(*indexBuffer);
+					commandList->SetVertexBuffer(*vertexBuffer);
+
+					// 描画
+					commandList->DrawInstanced(meshInfo.numIndices, m_fixNumInstanceOnFrame);
+
+				}
+
+				return;
+			}
+
 
 
 		}

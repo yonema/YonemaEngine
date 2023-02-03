@@ -1,4 +1,7 @@
 #include "RendererTable.h"
+#include "../Shadow/ShadowMapGenericRenderer.h"
+#include "../Shadow/ShadowMapSkinGenericRenderer.h"
+#include "../Shadow/ShadowMapInstancingGenericRenderer.h"
 #include "../Models/BasicGenericRenderer.h"
 #include "../Models/SkinGenericRenderer.h"
 #include "../Models/InstancingGenericRenderer.h"
@@ -9,6 +12,8 @@
 #include "../Sprites/SpriteGenericRenderer.h"
 #include "../Sprites/TransSpriteGenericRenderer.h"
 #include "../SimplePostEffectGenericRenderer.h"
+#include "../ImageProcessing/GaussianBlurXGenericRenderer.h"
+#include "../ImageProcessing/GaussianBlurYGenericRenderer.h"
 
 namespace nsYMEngine
 {
@@ -31,6 +36,16 @@ namespace nsYMEngine
 
 			void CRendererTable::InitGenericRenderTable()
 			{
+				m_genericRendererTable[static_cast<int>(EnRendererType::enShadowModel)] =
+					new nsShadow::CShadowMapGenericRenderer();
+				m_genericRendererTable[static_cast<int>(EnRendererType::enShadowSkinModel)] =
+					new nsShadow::CShadowMapSkinGenericRenderer();
+				m_genericRendererTable[static_cast<int>(EnRendererType::enShadowInstancingModel)] =
+					new nsShadow::CShadowMapInstancingGenericRenderer();
+				m_genericRendererTable[static_cast<int>(EnRendererType::enGaussianBlurXForShadowMap)] =
+					new nsImageProcessing::CGaussianBlurXGenericRenderer();
+				m_genericRendererTable[static_cast<int>(EnRendererType::enGaussianBlurYForShadowMap)] =
+					new nsImageProcessing::CGaussianBlurYGenericRenderer();
 				m_genericRendererTable[static_cast<int>(EnRendererType::enBasicModel)] =
 					new nsModels::CBasicGenericRenderer();
 				m_genericRendererTable[static_cast<int>(EnRendererType::enSkinModel)] =

@@ -354,6 +354,30 @@
     <ClCompile Include="YonemaEngine\Effect\EffectSound.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="YonemaEngine\Graphics\Shadow\ShadowMapGenericRenderer.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YonemaEngine\Graphics\Shadow\ShadowModelRenderer.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YonemaEngine\Graphics\Shadow\ShadowMapSkinGenericRenderer.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YonemaEngine\Graphics\Shadow\ShadowMapInstancingGenericRenderer.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YonemaEngine\Graphics\ImageProcessing\GaussianBlur.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YonemaEngine\Graphics\ImageProcessing\GaussianBlurBaseGenericRenderer.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YonemaEngine\Graphics\ImageProcessing\GaussianBlurXGenericRenderer.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YonemaEngine\Graphics\ImageProcessing\GaussianBlurYGenericRenderer.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Images\StarMan.png">
@@ -754,6 +778,30 @@
     <ClInclude Include="YonemaEngine\Effect\EffectSound.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="YonemaEngine\Graphics\Shadow\ShadowMapGenericRenderer.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YonemaEngine\Graphics\Shadow\ShadowModelRenderer.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YonemaEngine\Graphics\Shadow\ShadowMapSkinGenericRenderer.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YonemaEngine\Graphics\Shadow\ShadowMapInstancingGenericRenderer.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YonemaEngine\Graphics\ImageProcessing\GaussianBlur.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YonemaEngine\Graphics\ImageProcessing\GaussianBlurBaseGenericRenderer.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YonemaEngine\Graphics\ImageProcessing\GaussianBlurXGenericRenderer.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YonemaEngine\Graphics\ImageProcessing\GaussianBlurYGenericRenderer.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\SpriteHeader.hlsli" />
@@ -762,6 +810,9 @@
     <None Include="Assets\Shaders\Models\BasicModelHeader.hlsli" />
     <None Include="packages.config" />
     <None Include="Assets\Shaders\PhysicsDebugLine\PhysicsDebugLineHeader.hlsli" />
+    <None Include="Assets\Shaders\Shadow\ShadowMapHeader.hlsli" />
+    <None Include="Assets\Shaders\CalcSkinMatrixHeader.hlsli" />
+    <None Include="Assets\Shaders\ImageProcessing\GaussianBlurHeader.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Assets\Shaders\SpriteVertexShader.hlsl" />
@@ -771,5 +822,9 @@
     <FxCompile Include="Assets\Shaders\Models\BasicModelPixelShader.hlsl" />
     <FxCompile Include="Assets\Shaders\PhysicsDebugLine\PhysicsDebugLineVertexShader.hlsl" />
     <FxCompile Include="Assets\Shaders\PhysicsDebugLine\PhysicsDebugLinePixelShader.hlsl" />
+    <FxCompile Include="Assets\Shaders\Shadow\ShadowMapPixelShader.hlsl" />
+    <FxCompile Include="Assets\Shaders\Shadow\ShadowMapVertexShader.hlsl" />
+    <FxCompile Include="Assets\Shaders\ImageProcessing\GaussianBlurPixelShader.hlsl" />
+    <FxCompile Include="Assets\Shaders\ImageProcessing\GaussianBlurVertexShader.hlsl" />
   </ItemGroup>
 </Project>

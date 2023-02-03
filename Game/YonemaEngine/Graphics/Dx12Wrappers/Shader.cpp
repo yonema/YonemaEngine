@@ -11,15 +11,13 @@ namespace nsYMEngine
 			bool CShader::LoadAsVertexShader(
 				const wchar_t* filePath, const char* entryFuncName, CBlob* pShaderBlob)
 			{
-				Load(filePath, entryFuncName, pShaderBlob, m_kVertexShaderModelName);
-				return true;
+				return Load(filePath, entryFuncName, pShaderBlob, m_kVertexShaderModelName);
 			}
 
 			bool CShader::LoadAsPixelShader(
 				const wchar_t* filePath, const char* entryFuncName, CBlob* pShaderBlob)
 			{
-				Load(filePath, entryFuncName, pShaderBlob, m_kPixelShaderModelName);
-				return true;
+				return Load(filePath, entryFuncName, pShaderBlob, m_kPixelShaderModelName);
 			}
 
 			bool CShader::Load(

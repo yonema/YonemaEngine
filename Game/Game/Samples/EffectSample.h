@@ -1,4 +1,11 @@
 #pragma once
+namespace nsYMEngine
+{
+	namespace nsDebugSystem
+	{
+		class CSimpleMover;
+	}
+}
 namespace nsAWA
 {
 	namespace nsSamples
@@ -34,6 +41,8 @@ namespace nsAWA
 			int m_currentIdx = 0;
 			float m_timer = 0.0f;
 			bool m_isAutoPlay = false;
+			nsYMEngine::nsDebugSystem::CSimpleMover* m_simpleMover = nullptr;
+
 		};
 
 	}

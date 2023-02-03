@@ -1,13 +1,13 @@
 #pragma once
-#include "BasicGenericRenderer.h"
+#include "ShadowMapGenericRenderer.h"
 
 namespace nsYMEngine
 {
 	namespace nsGraphics
 	{
-		namespace nsModels
+		namespace nsShadow
 		{
-			class CInstancingGenericRenderer : public CBasicGenericRenderer
+			class CShadowMapInstancingGenericRenderer : public CShadowMapGenericRenderer
 			{
 			private:
 				static const wchar_t* const m_kVsFilePath;
@@ -18,7 +18,7 @@ namespace nsYMEngine
 			private:
 				inline std::wstring CreateRootSignatureName() const noexcept override
 				{
-					return L"InstancingGenericRenderer";
+					return L"ShadowMapInstancingGenericRenderer";
 				}
 
 				bool CreateShader(
@@ -28,12 +28,12 @@ namespace nsYMEngine
 
 				inline std::wstring CreatePipelineStateName() const noexcept override
 				{
-					return L"InstancingGenericRenderer";
+					return L"ShadowMapInstancingGenericRenderer";
 				}
 
 			public:
-				constexpr CInstancingGenericRenderer() = default;
-				~CInstancingGenericRenderer() = default;
+				constexpr CShadowMapInstancingGenericRenderer() = default;
+				~CShadowMapInstancingGenericRenderer() = default;
 
 			private:
 

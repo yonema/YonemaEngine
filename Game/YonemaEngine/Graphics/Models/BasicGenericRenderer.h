@@ -15,6 +15,7 @@ namespace nsYMEngine
 					enCbvForModel,
 					enSrvForBoneMatrixArray,
 					enSrvForWorldMatrixArray,
+					enSRVForShadowMap,
 					enSrvForMaterial,
 					enNumDescRangeTypes
 				};
@@ -23,6 +24,7 @@ namespace nsYMEngine
 					enModel,
 					enBoneMatrixArray,
 					enWorldMatrixArray,
+					enShadowMap,
 					enMaterial,
 					enNumRootParamerterTypes
 				};

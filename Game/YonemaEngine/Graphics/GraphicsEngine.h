@@ -158,6 +158,11 @@ namespace nsYMEngine
 
 			void WaitForCommandExecutionToComplete();
 
+			constexpr auto* GetShadowMapRenderer() noexcept
+			{
+				return &m_shadowMapRenderer;
+			}
+
 		private:
 
 			void Terminate();
@@ -179,8 +184,6 @@ namespace nsYMEngine
 			bool CreateFence();
 
 			bool CreateMainRenderTarget();
-
-			bool CreateSeceneConstantBuff();
 
 
 			void BeginDraw();
@@ -216,10 +219,8 @@ namespace nsYMEngine
 			nsDx12Wrappers::CRenderTarget m_simplePostEffectRenderTarget;
 			nsSprites::CSprite m_simplePostEffectRenderTargetSprite;
 			nsSprites::CSprite* m_pBaseRenderTargetSprite = nullptr;
-			//nsShadow::CShadowMapRenderer m_shadowMapRenderer = {};
+			nsShadow::CShadowMapRenderer m_shadowMapRenderer = {};
 
-			nsDx12Wrappers::CConstantBuffer m_sceneDataCB;
-			nsDx12Wrappers::CDescriptorHeap m_sceneDataDH;
 			nsRenderers::CRendererTable m_rendererTable;
 			CCamera m_mainCamera;
 

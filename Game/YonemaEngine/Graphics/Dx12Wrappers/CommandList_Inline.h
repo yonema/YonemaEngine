@@ -283,6 +283,25 @@ namespace nsYMEngine
 
 				return;
 			}
+			inline void CCommandList::SetViewportAndScissorRect(const CRenderTarget& renderTarget)
+			{
+				D3D12_VIEWPORT viewport;
+				viewport.TopLeftX = 0;
+				viewport.TopLeftY = 0;
+				viewport.Width = static_cast<float>(renderTarget.GetWidth());
+				viewport.Height = static_cast<float>(renderTarget.GetHeight());
+				viewport.MinDepth = D3D12_MIN_DEPTH;
+				viewport.MaxDepth = D3D12_MAX_DEPTH;
+				SetViewport(viewport);
+
+				D3D12_RECT srect;
+				srect.top = 0;
+				srect.left = 0;
+				srect.right = renderTarget.GetWidth();
+				srect.bottom = renderTarget.GetHeight();
+				SetScissorRect(srect);
+			}
+
 
 			inline void CCommandList::SetGraphicsRootSignature(ID3D12RootSignature* rootSignature)
 			{

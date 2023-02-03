@@ -147,6 +147,15 @@ namespace nsYMEngine
 				return m_farClip;
 			}
 
+			inline void SetOrthographicProjectionSize(const nsMath::CVector2& size) noexcept
+			{
+				m_orthographicProjectionSize = size;
+			}
+			constexpr const auto& GetOrthographicProjectionSize() const noexcept
+			{
+				return m_orthographicProjectionSize;
+			}
+
 		private:
 
 			void UpdateProjectionMatrix() noexcept;
@@ -169,6 +178,7 @@ namespace nsYMEngine
 			float m_fieldOfViewAngleY = nsMath::DegToRad(60.0f);
 			float m_nearClip = 1.0f;
 			float m_farClip = 100.0f;
+			nsMath::CVector2 m_orthographicProjectionSize = nsMath::CVector2::Zero();
 
 			bool m_isDirtyProjectionMatrix = true;
 

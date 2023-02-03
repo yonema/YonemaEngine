@@ -3,7 +3,7 @@
 #include "../Animations/Animator.h"
 #include "../Animations/Skelton.h"
 #include "../Geometries/GeometryData.h"
-
+#include "../Shadow/ShadowModelRenderer.h"
 
 namespace nsYMEngine
 {
@@ -69,7 +69,7 @@ namespace nsYMEngine
 			class CBasicModelRenderer : public nsRenderers::IRenderer
 			{
 			private:
-				void Draw(nsDx12Wrappers::CCommandList* commandList) override;
+				void Draw(nsDx12Wrappers::CCommandList* commandList) override final;
 
 			private:
 
@@ -100,6 +100,15 @@ namespace nsYMEngine
 					unsigned int baseVertexNo = 0;
 					unsigned int baseIndexNo = 0;
 					unsigned int materialIndex = 0;
+				};
+
+				struct SCconstantBufferData
+				{
+					nsMath::CMatrix mWorld;
+					nsMath::CMatrix mViewProj;
+					nsMath::CMatrix mLightViewProj;
+					nsMath::CVector3 lightPos;
+					bool isShadowReceiver;
 				};
 
 			public:
@@ -303,6 +312,10 @@ namespace nsYMEngine
 
 				bool CreateWorldMatrixArraySB(const nsRenderers::SModelInitData& modelInitData);
 
+				bool CreateShadowMapSRV();
+
+				void DrawShadowModel(nsDx12Wrappers::CCommandList* commandList);
+
 			private:
 				std::vector<nsDx12Wrappers::CVertexBuffer*> m_vertexBuffers = {};
 				std::vector<nsDx12Wrappers::CIndexBuffer*> m_indexBuffers = {};
@@ -317,6 +330,8 @@ namespace nsYMEngine
 				std::vector<nsDx12Wrappers::CTexture*> m_diffuseTextures = {};
 				std::vector<nsDx12Wrappers::CTexture*> m_normalTextures = {};
 				std::vector<nsDx12Wrappers::CDescriptorHeap*> m_materialDHs = {};
+
+				nsDx12Wrappers::CDescriptorHeap m_shadowMapDH = {};
 
 				nsMath::CMatrix m_bias = nsMath::CMatrix::Identity();
 				nsMath::CMatrix m_worldMatrix = nsMath::CMatrix::Identity();
@@ -337,7 +352,7 @@ namespace nsYMEngine
 				std::vector<nsGeometries::CGeometryData*> m_geometryDataArray = {};
 				unsigned int m_fixNumInstanceOnFrame = 0;
 
-				int m_hoge = 0;
+				nsShadow::CShadowModelRenderer m_shadowModelRenderer = {};
 			};
 
 		}

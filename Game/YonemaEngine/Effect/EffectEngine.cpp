@@ -116,7 +116,7 @@ namespace nsYMEngine
 		{
 			const auto* camera = nsGraphics::CGraphicsEngine::GetInstance()->GetMainCamera();
 			const auto& mView = camera->GetViewMatirx();
-			const auto& mProj = camera->GetViewProjectionMatirx();
+			const auto& mProj = camera->GetProjectionMatirx();
 
 			Effekseer::Matrix44 efkMView = {};
 			Effekseer::Matrix44 efkMProj = {};

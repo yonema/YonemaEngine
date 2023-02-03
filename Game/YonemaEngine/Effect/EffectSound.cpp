@@ -5,36 +5,65 @@ namespace nsYMEngine
 {
 	namespace nsEffect
 	{
-		//////// CEffectSoundLoader ////////
+		////////// CEffectSoundLoader ////////
 
-		void CEffectSoundLoader::Unload(::Effekseer::SoundDataRef soundData)
+		//void CEffectSoundLoader::Unload(::Effekseer::SoundDataRef soundData)
+		//{
+		//	if (soundData != nullptr)
+		//	{
+		//		// stop a voice which plays this data
+		//		auto& sound = GetSound();
+		//		sound->StopData(soundData);
+		//		EffekseerSound::SoundData* soundDataImpl = (EffekseerSound::SoundData*)soundData.Get();
+
+		//		// ‚È‚ñ‚©Ž~‚Ü‚Á‚Ä‚­‚ê‚È‚¢‚©‚çA’¼ÚSourceVoice‚ðŽæ‚èo‚µ‚ÄŽ~‚ß‚éB
+		//		auto* container = sound->GetContainer();
+		//		for (int channelIdx = 0; channelIdx < 2; channelIdx++)
+		//		{
+		//			auto& voiceList = container[channelIdx]->GetVoiceList();
+		//			for (auto voice : voiceList)
+		//			{
+		//				auto* sourceVoice = voice->GetSourceVoice();
+		//				sourceVoice->FlushSourceBuffers();
+		//				sourceVoice->DestroyVoice();
+		//			}
+		//			voiceList.clear();
+		//		}
+
+		//		ES_SAFE_DELETE_ARRAY(soundDataImpl->GetBufferRef().pAudioData);
+		//	}
+
+		//	return;
+		//}
+
+
+		CEffectSoundLoader::~CEffectSoundLoader()
 		{
-			if (soundData != nullptr)
+			Terminate();
+
+			return;
+		}
+
+		void CEffectSoundLoader::Terminate()
+		{
+			// ‚È‚ñ‚©Ž~‚Ü‚Á‚Ä‚­‚ê‚È‚¢‚©‚çA’¼ÚSourceVoice‚ðŽæ‚èo‚µ‚ÄŽ~‚ß‚éB
+			auto& sound = GetSound();
+			auto* container = sound->GetContainer();
+			for (int channelIdx = 0; channelIdx < 2; channelIdx++)
 			{
-				// stop a voice which plays this data
-				auto& sound = GetSound();
-				sound->StopData(soundData);
-				EffekseerSound::SoundData* soundDataImpl = (EffekseerSound::SoundData*)soundData.Get();
-
-				// ‚È‚ñ‚©Ž~‚Ü‚Á‚Ä‚­‚ê‚È‚¢‚©‚çA’¼ÚSourceVoice‚ðŽæ‚èo‚µ‚ÄŽ~‚ß‚éB
-				auto* container = sound->GetContainer();
-				for (int channelIdx = 0; channelIdx < 2; channelIdx++)
+				auto& voiceList = container[channelIdx]->GetVoiceList();
+				for (auto voice : voiceList)
 				{
-					auto& voiceList = container[channelIdx]->GetVoiceList();
-					for (auto voice : voiceList)
-					{
-						auto* sourceVoice = voice->GetSourceVoice();
-						sourceVoice->FlushSourceBuffers();
-						sourceVoice->DestroyVoice();
-					}
-					voiceList.clear();
+					auto* sourceVoice = voice->GetSourceVoice();
+					sourceVoice->FlushSourceBuffers();
+					sourceVoice->DestroyVoice();
 				}
-
-				ES_SAFE_DELETE_ARRAY(soundDataImpl->GetBufferRef().pAudioData);
+				voiceList.clear();
 			}
 
 			return;
 		}
+
 
 
 		//////// CEffectSoundPlayer ////////

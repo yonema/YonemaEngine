@@ -50,9 +50,11 @@ namespace nsYMEngine
 			)
 			{
 				m_rtvClearColor = clearColor;
+				m_width = width;
+				m_height = height;
 				auto device = CGraphicsEngine::GetInstance()->GetDevice();
 
-				if (CreateRenderTarget(device, width, height, colorFormat, clearColor) != true)
+				if (CreateRenderTarget(device, m_width, m_height, colorFormat, clearColor) != true)
 				{
 					Release();
 					return false;
@@ -64,11 +66,19 @@ namespace nsYMEngine
 					Release();
 					return false;
 				}
+				if (depthStencilFormat != DXGI_FORMAT_UNKNOWN)
+				{
+					if (m_dsvDescriptorHeap.InitAsDSV(L"ShadowMap::DepthStencilBuffer") != true)
+					{
+						Release();
+						return false;
+					}
+				}
 
 				CreateRenderTargetView(device, colorFormat);
 
 
-				if (CreateDepthStencilBuffer(device, width, height, depthStencilFormat) != true)
+				if (CreateDepthStencilBuffer(device, m_width, m_height, depthStencilFormat) != true)
 				{
 					Release();
 					return false;

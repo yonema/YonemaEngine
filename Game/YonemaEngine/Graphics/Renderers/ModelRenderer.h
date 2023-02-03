@@ -27,6 +27,8 @@ namespace nsYMEngine
 				enRegisterAnimationBank,
 				enRegisterTextureBank,
 				enCullingOff,
+				enShadowCaster,
+				enShadowReceiver,
 				enNum
 			};
 

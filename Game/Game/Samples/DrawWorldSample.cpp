@@ -76,6 +76,7 @@ namespace nsAWA
 			modelInitData.SetFlags(EnModelInitDataFlags::enRegisterAnimationBank);
 			modelInitData.SetFlags(EnModelInitDataFlags::enRegisterTextureBank);
 			modelInitData.SetFlags(EnModelInitDataFlags::enCullingOff);
+			modelInitData.SetFlags(EnModelInitDataFlags::enShadowCaster);
 			modelInitData.retargetSkeltonName = m_kRetargetSkeltonName;
 			modelInitData.distanceToReducingUpdate = 50.0f;
 
@@ -120,6 +121,7 @@ namespace nsAWA
 			modelInitData.SetFlags(EnModelInitDataFlags::enRegisterAnimationBank);
 			modelInitData.SetFlags(EnModelInitDataFlags::enRegisterTextureBank);
 			modelInitData.SetFlags(EnModelInitDataFlags::enCullingOff);
+			modelInitData.SetFlags(EnModelInitDataFlags::enShadowCaster);
 			modelInitData.retargetSkeltonName = CHumans::m_kRetargetSkeltonName;
 			modelInitData.distanceToReducingUpdate = 50.0f;
 
@@ -207,6 +209,7 @@ namespace nsAWA
 						SModelInitData modelInitData;
 						modelInitData.modelFilePath = townFilePath;
 						modelInitData.SetFlags(EnModelInitDataFlags::enNodeTransform);
+						modelInitData.SetFlags(EnModelInitDataFlags::enShadowCaster);
 
 						auto* townMR = NewGO<CModelRenderer>();
 						townMR->Init(modelInitData);

@@ -10,7 +10,8 @@ namespace nsYMEngine
 			const auto kWindowWidth = CApplication::GetInstance()->GetWindowWidth();
 			const auto kWindowHeight = CApplication::GetInstance()->GetWindowHeight();
 			m_aspectRatio = static_cast<float>(kWindowWidth) / static_cast<float>(kWindowHeight);
-
+			m_orthographicProjectionSize = 
+			{ static_cast<float>(kWindowWidth), static_cast<float>(kWindowHeight) };
 			return;
 		}
 
@@ -61,12 +62,9 @@ namespace nsYMEngine
 			}
 			else
 			{
-				const auto kWindowWidth = CApplication::GetInstance()->GetWindowWidth();
-				const auto kWindowHeight = CApplication::GetInstance()->GetWindowHeight();
-
 				m_projectionMatrix.MakeOrthoProjectionMatrix(
-					static_cast<float>(kWindowWidth),
-					static_cast<float>(kWindowHeight),
+					m_orthographicProjectionSize.x,
+					m_orthographicProjectionSize.y,
 					m_nearClip,
 					m_farClip
 				);

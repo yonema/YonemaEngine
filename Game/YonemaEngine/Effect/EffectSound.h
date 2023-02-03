@@ -19,9 +19,12 @@ namespace nsYMEngine
 			{
 				return;
 			}
-			~CEffectSoundLoader() = default;
+			~CEffectSoundLoader();
 
-			void Unload(::Effekseer::SoundDataRef soundData) override final;
+			//void Unload(::Effekseer::SoundDataRef soundData) override final;
+
+		private:
+			void Terminate();
 		};
 
 

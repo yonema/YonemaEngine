@@ -96,6 +96,7 @@ namespace nsYMEngine
 				inline void SetViewportAndScissorRect(
 					const D3D12_VIEWPORT& viewport, const D3D12_RECT& scissorRect);
 				inline void SetViewportAndScissorRect(const D3D12_VIEWPORT& viewport);
+				inline void SetViewportAndScissorRect(const CRenderTarget& renderTarget);
 
 				inline void SetGraphicsRootSignature(ID3D12RootSignature* rootSignature);
 				inline void SetGraphicsRootSignature(CRootSignature* rootSignature);
