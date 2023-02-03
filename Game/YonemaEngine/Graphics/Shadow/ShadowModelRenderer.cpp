@@ -46,7 +46,7 @@ namespace nsYMEngine
 			)
 			{
 				// シャドウマップ確認用スプライト
-#define NONE
+//#define NONE
 #ifdef NONE
 				static int a = 0;
 				if (a == 0)

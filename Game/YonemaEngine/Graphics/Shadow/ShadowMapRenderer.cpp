@@ -10,7 +10,7 @@ namespace nsYMEngine
 		{
 			const float CShadowMapRenderer::m_kShadowMapSize = 512.0f;
 			const DXGI_FORMAT CShadowMapRenderer::m_kShadowMapFormat = DXGI_FORMAT_R32G32_FLOAT;
-			const nsMath::CVector4 CShadowMapRenderer::m_kClearColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+			const nsMath::CVector4 CShadowMapRenderer::m_kClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
 			const DXGI_FORMAT CShadowMapRenderer::m_kDepthStencilFormat = DXGI_FORMAT_D32_FLOAT;
 
 			const float CShadowMapRenderer::m_kShadowCameraOrthographicProjectionSize = 256.0f;

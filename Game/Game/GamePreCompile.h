@@ -5,6 +5,7 @@
 #include "../YonemaEngine/Graphics/Renderers/ModelRenderer.h"
 #include "../YonemaEngine/Graphics/Animations/Animator.h"
 #include "../YonemaEngine/Graphics/Renderers/SpriteRenderer.h"
+#include "../YonemaEngine/Graphics/Renderers/AnimatedSpriteRenderer.h"
 #include "../YonemaEngine/Graphics/Sprites/Sprite.h"
 #include "../YonemaEngine/Graphics/Fonts/FontRenderer.h"
 #include "../YonemaEngine/Physics/PhysicsEngine.h"
@@ -45,6 +46,7 @@ using EnModelInitDataFlags = nsGraphics::nsRenderers::EnModelInitDataFlags;
 using CSpriteRenderer = nsGraphics::nsRenderers::CSpriteRenderer;
 using SSpriteInitData = nsGraphics::nsSprites::SSpriteInitData;
 using EnAlphaBlendMode = nsGraphics::nsSprites::EnAlphaBlendMode;
+using CAnimatedSpriteRenderer = nsGraphics::nsRenderers::CAnimatedSpriteRenderer;
 
 // フォント
 using CFontRenderer = nsGraphics::nsFonts::CFontRenderer;
@@ -74,6 +76,7 @@ using CPathFinding = nsAI::nsNavigations::CPathFinding;
 
 // レベル3D
 using CLevel3D = nsLevel3D::CLevel3D;
+using CLevel2D = nsLevel2D::CLevel2D;
 using SLevelChipData = nsLevel3D::SLevelChipData;
 using SLevel3DInitData = nsLevel3D::SLevel3DinitData;
 
