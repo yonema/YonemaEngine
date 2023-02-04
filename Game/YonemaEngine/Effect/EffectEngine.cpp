@@ -38,14 +38,13 @@ namespace nsYMEngine
 			auto* device = nsGraphics::CGraphicsEngine::GetInstance()->GetDevice();
 			auto* commandQueue = nsGraphics::CGraphicsEngine::GetInstance()->GetCommandQueue();
 			DXGI_FORMAT bbFormats[m_kNumRenderTargets] = { DXGI_FORMAT_R8G8B8A8_UNORM };
-
 			m_efkRenderer = EffekseerRendererDX12::Create(
 				static_cast<ID3D12Device*>(device),
 				commandQueue,
 				m_kNumBackBuffers,
 				bbFormats,
 				m_kNumRenderTargets,
-				DXGI_FORMAT_UNKNOWN,
+				DXGI_FORMAT_D32_FLOAT,
 				false,
 				m_kMaxParticles
 				);
