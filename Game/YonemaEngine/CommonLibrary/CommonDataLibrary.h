@@ -37,7 +37,8 @@ namespace nsYMEngine
 
 		// 優先度の最大値
 		// これより高い値の優先度を作ってはいけません。
-		enMax = nsCommonDataLibrary::g_kMaxGameObjectPriority
+		enMax = nsCommonDataLibrary::g_kMaxGameObjectPriority,
+		enNum
 	};
 
 	/**

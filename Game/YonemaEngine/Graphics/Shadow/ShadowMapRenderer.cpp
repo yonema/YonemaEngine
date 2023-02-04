@@ -125,9 +125,12 @@ namespace nsYMEngine
 					);
 
 					// •`‰æ
-					for (auto renderer : rendererTable->GetRendererList(rendererType))
+					for (auto& rendererList : rendererTable->GetRendererListArray(rendererType))
 					{
-						renderer->DrawWrapper(commandList);
+						for (auto& renderer : rendererList)
+						{
+							renderer->DrawWrapper(commandList);
+						}
 					}
 				}
 

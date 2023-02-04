@@ -76,7 +76,7 @@ namespace nsYMEngine
 
 		private:
 			static CGameObjectManager* m_instance;
-			std::array<GameObjectList, static_cast<int>(EnGOPriority::enMax)> 
+			std::array<GameObjectList, static_cast<int>(EnGOPriority::enNum)> 
 				m_gameObjectListArray = {};
 
 		};

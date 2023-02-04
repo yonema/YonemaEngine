@@ -273,9 +273,12 @@ namespace nsYMEngine
 					m_rendererTable.GetPipelineState(rendererType)
 				);
 
-				for (auto renderer : m_rendererTable.GetRendererList(rendererType))
+				for (auto& rendererList : m_rendererTable.GetRendererListArray(rendererType))
 				{
-					renderer->DrawWrapper(&m_commandList);
+					for (auto& renderer : rendererList)
+					{
+						renderer->DrawWrapper(&m_commandList);
+					}
 				}
 			}
 
@@ -311,9 +314,12 @@ namespace nsYMEngine
 					RendererType::enSimplePostEffect)
 			);
 			// シンプルなポストエフェクトをかけて描画
-			for (auto renderer : m_rendererTable.GetRendererList(RendererType::enSimplePostEffect))
+			for (auto& rendererList : m_rendererTable.GetRendererListArray(RendererType::enSimplePostEffect))
 			{
-				renderer->DrawWrapper(&m_commandList);
+				for (auto& renderer : rendererList)
+				{
+					renderer->DrawWrapper(&m_commandList);
+				}
 			}
 
 			// 描画終了
@@ -350,9 +356,12 @@ namespace nsYMEngine
 					RendererType::enCollisionRenderer)
 			);
 
-			for (auto renderer : m_rendererTable.GetRendererList(RendererType::enCollisionRenderer))
+			for (auto& rendererList : m_rendererTable.GetRendererListArray(RendererType::enCollisionRenderer))
 			{
-				renderer->DrawWrapper(&m_commandList);
+				for (auto& renderer : rendererList)
+				{
+					renderer->DrawWrapper(&m_commandList);
+				}
 			}
 
 			// 描画終了
@@ -394,9 +403,12 @@ namespace nsYMEngine
 			m_pBaseRenderTargetSprite->Draw(&m_commandList);
 
 			// 不透明スプライト描画
-			for (auto renderer : m_rendererTable.GetRendererList(RendererType::enSprite))
+			for (auto& rendererList : m_rendererTable.GetRendererListArray(RendererType::enSprite))
 			{
-				renderer->DrawWrapper(&m_commandList);
+				for (auto& renderer : rendererList)
+				{
+					renderer->DrawWrapper(&m_commandList);
+				}
 			}
 
 			// 半透明スプライトの描画設定
@@ -407,9 +419,12 @@ namespace nsYMEngine
 					RendererType::enTransSprite)
 			);
 			// 半透明スプライト描画
-			for (auto renderer : m_rendererTable.GetRendererList(RendererType::enTransSprite))
+			for (auto& rendererList : m_rendererTable.GetRendererListArray(RendererType::enTransSprite))
 			{
-				renderer->DrawWrapper(&m_commandList);
+				for (auto& renderer : rendererList)
+				{
+					renderer->DrawWrapper(&m_commandList);
+				}
 			}
 
 			// 描画終了

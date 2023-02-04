@@ -41,7 +41,7 @@ namespace nsYMEngine
 					m_sprite->SetRenderType(CRendererTable::EnRendererType::enSprite);
 				}
 
-				m_sprite->EnableDrawing();
+				m_sprite->EnableDrawing(spriteInitData.priority);
 
 				return;
 			}

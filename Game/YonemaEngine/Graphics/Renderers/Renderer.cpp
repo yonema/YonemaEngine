@@ -7,7 +7,7 @@ namespace nsYMEngine
 	{
 		namespace nsRenderers
 		{
-			void IRenderer::EnableDrawing()
+			void IRenderer::EnableDrawing(EnRendererPriority priority)
 			{
 				if (IsEnableDrawing())
 				{
@@ -19,7 +19,7 @@ namespace nsYMEngine
 				}
 
 				CGraphicsEngine::GetInstance()->GetRendererTable()->RegisterRenderer(
-					GetRenderType(), this);
+					GetRenderType(), this, priority);
 
 				m_isEnableDrawing = true;
 				return;

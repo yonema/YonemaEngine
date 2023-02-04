@@ -1,16 +1,17 @@
 #pragma once
+#include "GenericRenderer.h"
+#include "../../../Game/RendererPriority.h"
+
 namespace nsYMEngine
 {
 	namespace nsGraphics
 	{
 		namespace nsRenderers
 		{
-			class IGenericRenderer;
 			class IRenderer;
 		}
 	}
 }
-#include "GenericRenderer.h"
 
 namespace nsYMEngine
 {
@@ -53,8 +54,10 @@ namespace nsYMEngine
 				static const unsigned int m_kLastIndexOfShadowModel =
 					static_cast<unsigned int>(EnRendererType::enShadowInstancingModel);
 
+
 			private:
 				using RendererList = std::list<IRenderer*>;
+				using RendererListArray = std::array<RendererList, g_kNumRendererPriority>;
 
 
 			public:
@@ -90,23 +93,54 @@ namespace nsYMEngine
 					return m_genericRendererTable[rendererType];
 				}
 
-				constexpr RendererList& GetRendererList(EnRendererType rendererType) noexcept
+				constexpr RendererListArray& GetRendererListArray(EnRendererType rendererType) noexcept
 				{
-					return GetRendererList(static_cast<int>(rendererType));
+					return GetRendererListArray(static_cast<int>(rendererType));
 				}
-				constexpr RendererList& GetRendererList(unsigned int rendererType) noexcept
+				constexpr RendererListArray& GetRendererListArray(unsigned int rendererType) noexcept
 				{
-					return m_rendererListTable[rendererType];
+					return m_rendererListArrayTable[rendererType];
 				}
 
-				inline void RegisterRenderer(EnRendererType rendererType, IRenderer* renderer)
+				inline void RegisterRenderer(
+					EnRendererType rendererType,
+					IRenderer* renderer,
+					EnRendererPriority priority = EnRendererPriority::enMid
+				)
 				{
-					GetRendererList(rendererType).emplace_back(renderer);
+					RegisterRenderer(rendererType, renderer, static_cast<unsigned int>(priority));
 				}
+				inline void RegisterRenderer(
+					EnRendererType rendererType, IRenderer* renderer, unsigned int priority)
+				{
+					GetRendererListArray(rendererType)[priority].emplace_back(renderer);
+				}
+
 
 				inline void RemoveRenderer(EnRendererType rendererType, IRenderer* renderer)
 				{
-					GetRendererList(rendererType).remove(renderer);
+					auto& rendererListArray = GetRendererListArray(rendererType);
+					for (auto& rendererList : rendererListArray)
+					{
+						bool isRemoved = false;
+						rendererList.remove_if(
+							[&](IRenderer* item)
+							{
+								if (item == renderer)
+								{
+									isRemoved = true;
+									return true;
+								}
+
+								return false;
+							}
+						);
+
+						if (isRemoved)
+						{
+							break;
+						}
+					}
 				}
 
 			private:
@@ -118,7 +152,7 @@ namespace nsYMEngine
 			private:
 				IGenericRenderer* 
 					m_genericRendererTable[static_cast<int>(EnRendererType::enNumType)] = {nullptr};
-				RendererList m_rendererListTable[static_cast<int>(EnRendererType::enNumType)] = {};
+				RendererListArray m_rendererListArrayTable[static_cast<int>(EnRendererType::enNumType)] = {};
 			};
 		}
 	}

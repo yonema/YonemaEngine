@@ -46,6 +46,7 @@ using EnModelInitDataFlags = nsGraphics::nsRenderers::EnModelInitDataFlags;
 using CSpriteRenderer = nsGraphics::nsRenderers::CSpriteRenderer;
 using SSpriteInitData = nsGraphics::nsSprites::SSpriteInitData;
 using EnAlphaBlendMode = nsGraphics::nsSprites::EnAlphaBlendMode;
+using EnRendererPriority = nsGraphics::nsRenderers::EnRendererPriority;
 using CAnimatedSpriteRenderer = nsGraphics::nsRenderers::CAnimatedSpriteRenderer;
 
 // ƒtƒHƒ“ƒg

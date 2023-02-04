@@ -21,6 +21,7 @@ namespace nsYMEngine
 				nsMath::CVector2 spriteSize = nsMath::CVector2::Zero();
 				EnAlphaBlendMode alphaBlendMode = EnAlphaBlendMode::enNone;
 				DXGI_FORMAT colorFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+				nsRenderers::EnRendererPriority priority = nsRenderers::EnRendererPriority::enMid;
 			};
 
 			class CSprite : public nsRenderers::IRenderer
@@ -72,6 +73,16 @@ namespace nsYMEngine
 					return &m_texture;
 				}
 
+				constexpr bool IsDrawingFlag() const noexcept
+				{
+					return m_isDrawingFlag;
+				}
+
+				constexpr void SetDrawingFlag(bool drawingFlag) noexcept
+				{
+					m_isDrawingFlag = drawingFlag;
+				}
+
 			private:
 				void Terminate();
 
@@ -95,6 +106,7 @@ namespace nsYMEngine
 				SConstantBufferCPU m_constantBufferCPU = {};
 				nsMath::CVector2 m_spriteSize = nsMath::CVector2::Zero();
 				nsMath::CMatrix m_worldMatrix = nsMath::CMatrix::Identity();
+				bool m_isDrawingFlag = false;
 			};
 		}
 

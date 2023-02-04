@@ -22,7 +22,7 @@ namespace nsYMEngine
 				{
 					return m_renderType;
 				}
-				void EnableDrawing();
+				void EnableDrawing(EnRendererPriority priority = EnRendererPriority::enMid);
 
 				void DisableDrawing();
 

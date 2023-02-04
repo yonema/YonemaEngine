@@ -6,7 +6,8 @@ namespace nsAWA
 		class CSpriteSample : public IGameObject
 		{
 		private:
-			static const char* m_kSpriteFilePath;
+			static const unsigned int m_kNumSprites = 2;
+			static const char* m_kSpriteFilePath[m_kNumSprites];
 
 		public:
 			bool Start() override final;
@@ -20,7 +21,7 @@ namespace nsAWA
 			~CSpriteSample() = default;
 
 		private:
-			CSpriteRenderer* m_spriteRenderer = nullptr;
+			CSpriteRenderer* m_spriteRenderer[m_kNumSprites] = {};
 		};
 	}
 }

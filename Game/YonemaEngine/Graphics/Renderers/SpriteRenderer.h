@@ -95,6 +95,16 @@ namespace nsYMEngine
 					return m_sprite ? m_sprite->GetMulColor() : nsMath::CVector4::White();
 				}
 
+				constexpr bool IsDrawingFlag() const noexcept
+				{
+					return m_sprite ? m_sprite->IsDrawingFlag() : false;
+				}
+
+				constexpr void SetDrawingFlag(bool isDrawingFlag) noexcept
+				{
+					m_sprite ? m_sprite->SetDrawingFlag(isDrawingFlag) : static_cast<void>(this);
+				}
+
 			private:
 				void Terminate();
 

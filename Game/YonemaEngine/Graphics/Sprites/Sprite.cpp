@@ -28,6 +28,11 @@ namespace nsYMEngine
 
 			void CSprite::Draw(nsDx12Wrappers::CCommandList* commandList)
 			{
+				if (IsDrawingFlag() != true)
+				{
+					return;
+				}
+
 				static auto mainCamera = CGraphicsEngine::GetInstance()->GetMainCamera();
 				const auto& viewport = commandList->GetCurrentViewport();
 
@@ -110,6 +115,8 @@ namespace nsYMEngine
 					m_frameBufferHalfSize = { width, height };
 					m_frameBufferHalfSize.Scale(0.5f);
 				}
+
+				SetDrawingFlag(true);
 
 				return true;
 			}
