@@ -106,7 +106,7 @@ namespace nsYMEngine
 
 			void CAnimation2D::RegisterEvent(std::string eventName, std::function<void(const SAnimation2DFrameData&)> eventFunc)
 			{
-				int count = m_animationData->m_eventNameMap.count(eventName);
+				int count = static_cast<int>(m_animationData->m_eventNameMap.count(eventName));
 
 				if (count != 1)
 				{

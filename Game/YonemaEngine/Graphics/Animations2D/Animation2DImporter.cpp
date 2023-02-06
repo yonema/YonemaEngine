@@ -50,18 +50,17 @@ namespace nsYMEngine
 				int animKeyFrameNum = 0;
 				fread(&animKeyFrameNum, sizeof(int), 1, fp);
 
-				//キーフレームが何フレーム目か
-				for (int i = 0;i < animKeyFrameNum;i++)
-				{
-					int animKeyFrame = 0;
-					fread(&animKeyFrame, sizeof(int), 1, fp);
-				}
+				//キーフレームの読み込みをスキップ
+				fseek(fp, sizeof(int) * animKeyFrameNum, SEEK_CUR);
 
 
 				//アニメーションイベントの数
 				int animEventNum = 0;
 				fread(&animEventNum, sizeof(int), 1, fp);
 
+				//デフォルトのフレームデータ
+				//ゲーム側では使用しないので読み込みはスキップする
+				fseek(fp, sizeof(SAnimation2DFrameData), SEEK_CUR);
 
 				//アニメーションのフレームデータ
 				for (int i = 0;i < animationData->m_totalFrame;i++)
