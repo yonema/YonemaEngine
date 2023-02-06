@@ -113,6 +113,7 @@ namespace nsYMEngine
 				frameBuffResDesc.Format,
 				m_frameBuffer.GetRtvClearColor(),
 				DXGI_FORMAT_UNKNOWN,
+				D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
 				L"SimplePostEffectRenderTarget"
 			);
 
@@ -214,8 +215,6 @@ namespace nsYMEngine
 			nsEffect::CEffectEngine::GetInstance()->Draw(&m_commandList);
 
 			Draw2D();
-
-			m_fontEngine->ExecuteDraw(&m_commandList);
 
 			EndDraw();
 
@@ -426,6 +425,11 @@ namespace nsYMEngine
 					renderer->DrawWrapper(&m_commandList);
 				}
 			}
+
+
+			// フォントも、スプライトと一緒に描画
+			m_fontEngine->ExecuteDraw(&m_commandList);
+
 
 			// 描画終了
 			m_commandList.TransitionFromRenderTargetToPresent(m_frameBuffer);
@@ -688,6 +692,7 @@ namespace nsYMEngine
 				frameBuffResDesc.Format,
 				m_frameBuffer.GetRtvClearColor(),
 				DXGI_FORMAT_UNKNOWN,
+				D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
 				L"MainRenderTarget"
 			);
 

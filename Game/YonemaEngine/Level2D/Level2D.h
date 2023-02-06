@@ -15,9 +15,34 @@ namespace nsYMEngine
 			*/
 			void Load(const char* path, std::function<bool(const SLevel2DSpriteData&)> hookFunc = nullptr);
 
+			/**
+			 * @brief レベルに存在するスプライトを削除する
+			*/
+			void Clear()
+			{
+				for (nsGraphics::nsRenderers::CAnimatedSpriteRenderer* sprite : m_spritesList)
+				{
+					DeleteGO(sprite);
+				}
+
+				m_spritesList.resize(0);
+			}
+
+			/**
+			 * @brief レベルに存在するスプライトのアニメーションを再生する
+			 * @param animationName アニメーションの名前
+			*/
+			void PlayAnimation(std::string animationName)
+			{
+				for (nsGraphics::nsRenderers::CAnimatedSpriteRenderer* sprite : m_spritesList)
+				{
+					sprite->PlayAnimation(animationName);
+				}
+			}
+
 			~CLevel2D()
 			{
-				for (nsGraphics::nsRenderers::CSpriteRenderer* sprite : m_spritesList)
+				for (nsGraphics::nsRenderers::CAnimatedSpriteRenderer* sprite : m_spritesList)
 				{
 					DeleteGO(sprite);
 				}
@@ -34,10 +59,10 @@ namespace nsYMEngine
 			 * @param spriteData 
 			 * @return 作成したスプライトレンダラー
 			*/
-			nsGraphics::nsRenderers::CSpriteRenderer* CreateNewSpriteFromData(const SLevel2DSpriteData& spriteData);
+			nsGraphics::nsRenderers::CAnimatedSpriteRenderer* CreateNewSpriteFromData(const SLevel2DSpriteData& spriteData);
 
 			//スプライトのリスト
-			std::list<nsGraphics::nsRenderers::CSpriteRenderer*> m_spritesList;
+			std::list<nsGraphics::nsRenderers::CAnimatedSpriteRenderer*> m_spritesList;
 		};
 	}
 }

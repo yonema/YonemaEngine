@@ -10,6 +10,7 @@ namespace nsYMEngine
 			class CGaussianBlur : private nsUtils::SNoncopyable
 			{
 			private:
+				static const D3D12_RESOURCE_STATES m_kXBlurResourceState;
 				static const unsigned int m_kNumWeights = 8;
 
 			public:
@@ -45,8 +46,8 @@ namespace nsYMEngine
 				nsDx12Wrappers::CRenderTarget m_yBlurRenderTarget;
 				nsSprites::CSprite m_xBlurSprite;
 				nsSprites::CSprite m_yBlurSprite;
-				nsDx12Wrappers::CConstantBuffer m_constantBuffer = {};
-				nsDx12Wrappers::CDescriptorHeap m_descHeap = {};
+				nsDx12Wrappers::CConstantBuffer m_XBlurCB = {};
+				nsDx12Wrappers::CConstantBuffer m_YBlurCB = {};
 			};
 
 

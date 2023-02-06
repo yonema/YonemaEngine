@@ -26,9 +26,9 @@ namespace nsYMEngine
 			{
 			private:
 				static const float m_kShadowMapSize;
-				static const DXGI_FORMAT m_kShadowMapFormat;
 				static const nsMath::CVector4 m_kClearColor;
 				static const DXGI_FORMAT m_kDepthStencilFormat;
+				static const D3D12_RESOURCE_STATES m_kResourceState;
 
 				static const float m_kShadowCameraOrthographicProjectionSize;
 				static const float m_kShadowCameraNearClip;

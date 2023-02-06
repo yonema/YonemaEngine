@@ -55,45 +55,45 @@ namespace nsYMEngine
 
 			void CAnimator::Release()
 			{
-				for (auto& animClip : m_animationClips)
+				if (m_animationClips.empty() != true)
 				{
-					if (animClip == nullptr)
+					for (auto& animClip : m_animationClips)
 					{
-						continue;
-					}
+						if (animClip == nullptr)
+						{
+							continue;
+						}
 
-					if (animClip->IsShared())
-					{
+						if (animClip->IsShared())
+						{
+							animClip = nullptr;
+							continue;
+						}
+
+						delete animClip;
 						animClip = nullptr;
-						continue;
 					}
 
-					delete animClip;
-					animClip = nullptr;
+					m_animationClips.clear();
 				}
-
-				m_animationClips.clear();
 
 				return;
 			}
 
 			bool CAnimator::Init(
 				const SAnimationInitData& animInitData, 
-				CSkelton* pSkelton, 
 				bool loadingAsynchronous,
 				bool regiseterAnimBank
 			)
 			{
-				m_pSkelton = pSkelton;
 				bool res = InitAnimationClips(
-					animInitData, pSkelton, loadingAsynchronous, regiseterAnimBank);
+					animInitData, loadingAsynchronous, regiseterAnimBank);
 
 				return res;
 			}
 
 			bool CAnimator::InitAnimationClips(
 				const SAnimationInitData& animInitData,
-				CSkelton* pSkelton,
 				bool loadingAsynchronous,
 				bool regiseterAnimBank
 			)
@@ -122,9 +122,9 @@ namespace nsYMEngine
 							nsThread::CLoadModelThread::GetInstance()->PushLoadModelProcess(
 								nsThread::CLoadModelThread::EnLoadProcessType::enLoadAnim,
 								nullptr,
+								nullptr,
 								animClip,
 								animFilePath,
-								pSkelton,
 								regiseterAnimBank
 							);
 							res = true;
@@ -205,10 +205,12 @@ namespace nsYMEngine
 
 
 			void CAnimator::CalcAndGetAnimatedBoneTransforms(
-				std::vector<nsMath::CMatrix>* pMTransforms) noexcept
+				std::vector<nsMath::CMatrix>* pMTransforms,
+				CSkelton* pSkelton
+				) noexcept
 			{
 				m_animationClips[m_animationIndex]->CalcAndGetAnimatedBoneTransforms(
-					m_animationTimer, pMTransforms,m_pSkelton, 0, m_isLoop);
+					m_animationTimer, pMTransforms, pSkelton, 0, m_isLoop);
 
 				m_isPlaying = !m_animationClips[m_animationIndex]->IsPlayedAnimationToEnd();
 

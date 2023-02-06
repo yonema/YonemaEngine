@@ -52,16 +52,18 @@ namespace nsYMEngine
 					return flags.test(static_cast<int>(enFlags));
 				}
 
-				const char* modelFilePath = nullptr;
+				std::string modelFilePath = {};
 				CRendererTable::EnRendererType rendererType = 
 					CRendererTable::EnRendererType::enBasicModel;
 				nsMath::CQuaternion vertexBias = nsMath::CQuaternion::Identity();
 				nsAnimations::SAnimationInitData animInitData = {};
 				nsPhysics::SMeshGeometryBuffer* physicsMeshGeomBuffer = nullptr;
 				unsigned int maxInstance = 1;
-				const char* textureRootPath = nullptr;
+				std::string textureRootPath = {};
 				std::string retargetSkeltonName = {};
 				float distanceToReducingUpdate = -1.0f;
+				std::string lodMedelFilePath = {};
+				float distanceToLOD = -1.0f;
 
 			private:
 				std::bitset<static_cast<int>(EnModelInitDataFlags::enNum)> flags = kDefaultFlags;
@@ -270,16 +272,32 @@ namespace nsYMEngine
 					return m_enableLoadingAsynchronous;
 				}
 
+				inline bool IsEnableLOD() const noexcept
+				{
+					return m_modelInitData.lodMedelFilePath.empty() != true &&
+						m_modelInitData.distanceToLOD > 0.0f;
+				}
+
 
 			private:
 				void Terminate() noexcept;
 
 				void CreateRenderer(const SModelInitData& modelInitData) noexcept;
 
+				bool UpdateLoadingAsynchronous() noexcept;
+
+				void UpdateDistanceFromCamera();
+
 				void UpdateWorldMatrix() noexcept;
+
+				void UpdateAnimation(float deltaTime, bool updateAnimMatrix) noexcept;
+
+				void SwitchingLOD() noexcept;
+
 
 			private:
 				nsModels::CBasicModelRenderer* m_renderer = nullptr;
+				nsModels::CBasicModelRenderer* m_lodRenderer = nullptr;
 				CRendererTable::EnRendererType m_rendererType =
 					CRendererTable::EnRendererType::enNumType;
 
@@ -292,6 +310,7 @@ namespace nsYMEngine
 
 				SModelInitData m_modelInitData = {};
 				nsAnimations::CUpdateAnimationController m_updateAnimController = {};
+				float m_distanceFromCamera = 0.0f;
 			};
 
 		}

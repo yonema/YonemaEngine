@@ -8,9 +8,34 @@ namespace nsYMEngine
 		{
 			void CShadowModelRenderer::Draw(nsDx12Wrappers::CCommandList* commandList)
 			{
-				// モデルごとの定数バッファのセット
-				commandList->SetDescriptorHeap(m_modelDH);
-				commandList->SetGraphicsRootDescriptorTable(0, m_modelDH);
+				if (m_drawingFlag != true)
+				{
+					return;
+				}
+
+				// ディスクリプタヒープと各種バッファをセット
+				commandList->SetDescriptorHeap(m_descriptorHeap);
+
+				// モデルごとの定数バッファをセット
+				auto handle = m_descHandle.GetGpuHandle(
+					static_cast<unsigned int>(EnDescHeapLayout::enModelCB));
+				commandList->SetGraphicsRootDescriptorTable(0, handle);
+
+				// スケルたタルアニメーションが有効なら、ボーン行列の配列をセット
+				if (m_isSkeltalAnimation)
+				{
+					handle = m_descHandle.GetGpuHandle(
+						static_cast<unsigned int>(EnDescHeapLayout::enBoneMatrixArraySRV));
+					commandList->SetGraphicsRootDescriptorTable(1, handle);
+				}
+
+				// インスタンシングが有効なら、ワールド行列の配列をセット
+				if (m_isInstancing)
+				{
+					handle = m_descHandle.GetGpuHandle(
+						static_cast<unsigned int>(EnDescHeapLayout::enWorldMatrixArraySRV));
+					commandList->SetGraphicsRootDescriptorTable(2, handle);
+				}
 
 				m_drawFunc(commandList);
 
@@ -34,7 +59,8 @@ namespace nsYMEngine
 			{
 				DisableDrawing();
 
-				m_modelDH.Release();
+				m_worldMatrixArraySB.Release();
+				m_boneMatrixArraySB.Release();
 				m_modelCB.Release();
 
 				return;
@@ -42,7 +68,9 @@ namespace nsYMEngine
 
 			void CShadowModelRenderer::Init(
 				const std::function<void(nsDx12Wrappers::CCommandList* commandList)>& drawFunc,
-				nsRenderers::CRendererTable::EnRendererType baseModelType
+				nsRenderers::CRendererTable::EnRendererType baseModelType,
+				const std::vector<nsMath::CMatrix>* pBoneMatrixArray,
+				unsigned int maxInstance
 			)
 			{
 				// シャドウマップ確認用スプライト
@@ -72,7 +100,18 @@ namespace nsYMEngine
 
 				m_drawFunc = drawFunc;
 
+				constexpr auto kNumDescHeaps = static_cast<unsigned int>(EnDescHeapLayout::enNum);
+				m_descriptorHeap.InitAsCbvSrvUav(kNumDescHeaps, L"ShadowModelDescHeap");
+				m_descHandle.Init(
+					kNumDescHeaps,
+					m_descriptorHeap.GetCPUHandle(),
+					m_descriptorHeap.GetGPUHandle()
+				);
+
 				CreateModelCBV();
+				CreateBoneMatrixArraySB(pBoneMatrixArray);
+				CreateWorldMatrixArraySB(maxInstance);
+
 
 				using EnRendererType = nsRenderers::CRendererTable::EnRendererType;
 
@@ -126,12 +165,64 @@ namespace nsYMEngine
 				mappedCB->mLightViewProj = mLightViewProj;
 				mappedCB->lightPos = shadowCamera->GetPosition();
 
-				// ディスクリプタヒープ作成
-				constexpr unsigned int kNumDescHeaps = 1;
-				m_modelDH.InitAsCbvSrvUav(kNumDescHeaps, L"ShadowModelDH");
-
+				auto handle = m_descHandle.GetCpuHandle(
+					static_cast<unsigned int>(EnDescHeapLayout::enModelCB));
 				// 定数バッファビュー作成
-				m_modelCB.CreateConstantBufferView(m_modelDH.GetCPUHandle());
+				m_modelCB.CreateConstantBufferView(handle);
+			}
+
+			void CShadowModelRenderer::CreateBoneMatrixArraySB(
+				const std::vector<nsMath::CMatrix>* pBoneMatrixArray)
+			{
+				if (pBoneMatrixArray == nullptr || pBoneMatrixArray->empty())
+				{
+					return;
+				}
+
+				m_isSkeltalAnimation = true;
+
+
+				bool res =
+					m_boneMatrixArraySB.Init(
+						sizeof(nsMath::CMatrix), static_cast<unsigned int>(pBoneMatrixArray->size()));
+
+				if (res != true)
+				{
+					nsGameWindow::MessageBoxError(L"m_boneMatrixArraySBの生成に失敗しました。");
+					return;
+				}
+
+				auto handle = m_descHandle.GetCpuHandle(
+					static_cast<unsigned int>(EnDescHeapLayout::enBoneMatrixArraySRV));
+				m_boneMatrixArraySB.RegistShaderResourceView(handle);
+
+
+				return;
+			}
+
+			void CShadowModelRenderer::CreateWorldMatrixArraySB(unsigned int maxInstance)
+			{
+				if (maxInstance <= 1)
+				{
+					return;
+				}
+
+				m_isInstancing = true;
+
+				bool res =
+					m_worldMatrixArraySB.Init(sizeof(nsMath::CMatrix), maxInstance);
+
+				if (res != true)
+				{
+					nsGameWindow::MessageBoxError(L"m_worldMatrixArraySBの生成に失敗しました。");
+				}
+
+				auto handle = m_descHandle.GetCpuHandle(
+					static_cast<unsigned int>(EnDescHeapLayout::enWorldMatrixArraySRV));
+				m_worldMatrixArraySB.RegistShaderResourceView(handle);
+
+
+				return;
 			}
 
 
@@ -148,6 +239,35 @@ namespace nsYMEngine
 				mappedCB->mLightViewProj = mLightViewProj;
 				mappedCB->lightPos = shadowCamera->GetPosition();
 
+				return;
+			}
+
+			void CShadowModelRenderer::UpdateBoneMatrixArray(
+				const std::vector<nsMath::CMatrix>* pBoneMatrixArray) noexcept
+			{
+				if (pBoneMatrixArray == nullptr || m_isSkeltalAnimation != true)
+				{
+					return;
+				}
+
+				m_boneMatrixArraySB.CopyToMappedStructuredBuffer(pBoneMatrixArray->data());
+
+				return;
+			}
+
+			void CShadowModelRenderer::UpdateWorldMatrixArray(
+				const std::vector<nsMath::CMatrix>* pWrldMatrixArray,
+				unsigned int fixNumInstanceOnFrame
+			) noexcept
+			{
+				if (pWrldMatrixArray || m_isInstancing != true)
+				{
+					return;
+				}
+
+				m_worldMatrixArraySB.CopyToMappedStructuredBuffer(
+					pWrldMatrixArray->data(),
+					sizeof(nsMath::CMatrix) * fixNumInstanceOnFrame);
 
 				return;
 			}

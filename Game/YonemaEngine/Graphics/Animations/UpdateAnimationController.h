@@ -19,7 +19,7 @@ namespace nsYMEngine
 					m_distanceToReducingUpdate = distToReducingUpdate;
 				}
 
-				void Update(const nsMath::CVector3& pos);
+				void Update(float distance);
 
 
 				constexpr bool GetReducingUpdate() const noexcept

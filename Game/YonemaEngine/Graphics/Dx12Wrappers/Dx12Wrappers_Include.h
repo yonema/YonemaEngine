@@ -8,6 +8,7 @@
 #include "IndexBuffer.h"
 #include "VertexBuffer.h"
 #include "DescriptorHeap.h"
+#include "DescriptorHandle.h"
 #include "FrameBuffer.h"
 #include "Texture.h"
 #include "RenderTarget.h"

@@ -48,10 +48,23 @@ namespace nsYMEngine
 				m_constantBuffer.CopyToMappedConstantBuffer(&m_constantBufferCPU, sizeof(m_constantBufferCPU));
 
 				commandList->SetVertexBuffer(m_vertexBuffer);
-				commandList->SetDescriptorHeap(m_cbvDescriptorHeap);
-				commandList->SetGraphicsRootDescriptorTable(0, m_cbvDescriptorHeap);
-				commandList->SetDescriptorHeap(m_srvDescriptorHeap);
-				commandList->SetGraphicsRootDescriptorTable(1, m_srvDescriptorHeap);
+
+				commandList->SetDescriptorHeap(m_descriptorHeap);
+				auto handle = m_descHandle.GetGpuHandle(
+					static_cast<unsigned int>(EnDescHeapLayout::enSpriteCBV));
+				commandList->SetGraphicsRootDescriptorTable(0, handle);
+				handle = m_descHandle.GetGpuHandle(
+					static_cast<unsigned int>(EnDescHeapLayout::enImageSRV));
+				commandList->SetGraphicsRootDescriptorTable(1, handle);
+
+				if (m_pExpandConstantBuffer)
+				{
+					// 拡張定数バッファがあれば更新
+					handle = m_descHandle.GetGpuHandle(
+						static_cast<unsigned int>(EnDescHeapLayout::enNum));
+					commandList->SetGraphicsRootDescriptorTable(2, handle);
+				}
+
 				// インデックスなし。4頂点。
 				commandList->Draw(4);
 
@@ -74,8 +87,7 @@ namespace nsYMEngine
 			{
 				m_constantBuffer.Release();
 				m_vertexBuffer.Release();
-				m_srvDescriptorHeap.Release();
-				m_cbvDescriptorHeap.Release();
+				m_descriptorHeap.Release();
 				m_texture.Release();
 				return;
 			}
@@ -84,6 +96,7 @@ namespace nsYMEngine
 			bool CSprite::Init(const SSpriteInitData& initData)
 			{
 				m_spriteSize = initData.spriteSize;
+				m_pExpandConstantBuffer = initData.pExpandConstantBuffer;
 
 				if (InitTexture(initData) != true)
 				{
@@ -142,9 +155,20 @@ namespace nsYMEngine
 
 			bool CSprite::CreateDescriptorHeap()
 			{
-				auto r1 = m_srvDescriptorHeap.InitAsCbvSrvUav(1, L"SpriteSRV");
-				auto r2 = m_cbvDescriptorHeap.InitAsCbvSrvUav(1, L"SpriteCBV");
-				return r1 && r2;
+				const unsigned int kNumDescHeapsOfSprite = 
+					static_cast<unsigned int>(EnDescHeapLayout::enNum);
+				const unsigned int kNumDescHeaps = 
+					kNumDescHeapsOfSprite + (m_pExpandConstantBuffer ? 1 : 0);
+
+				auto res = m_descriptorHeap.InitAsCbvSrvUav(kNumDescHeaps, L"SpriteDH");
+
+				m_descHandle.Init(
+					kNumDescHeaps,
+					m_descriptorHeap.GetCPUHandle(), 
+					m_descriptorHeap.GetGPUHandle()
+				);
+
+				return res;
 			}
 
 			bool CSprite::CreateVertexBuffer()
@@ -177,7 +201,9 @@ namespace nsYMEngine
 				auto device = CGraphicsEngine::GetInstance()->GetDevice();
 
 				// 〇定数バッファビューの作成
-				m_constantBuffer.CreateConstantBufferView(m_cbvDescriptorHeap.GetCPUHandle());
+				auto handle = m_descHandle.GetCpuHandle(
+					static_cast<unsigned int>(EnDescHeapLayout::enSpriteCBV));
+				m_constantBuffer.CreateConstantBufferView(handle);
 
 				// 〇シェーダーリソースビューの作成
 
@@ -194,8 +220,17 @@ namespace nsYMEngine
 				srvDesc.Texture2D.MipLevels = m_texture.GetMipLevels();
 				srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 
-				device->CreateShaderResourceView(m_texture.GetResource(), &srvDesc,
-					m_srvDescriptorHeap.GetCPUHandle());
+				handle = m_descHandle.GetCpuHandle(
+					static_cast<unsigned int>(EnDescHeapLayout::enImageSRV));
+				device->CreateShaderResourceView(m_texture.GetResource(), &srvDesc, handle);
+
+
+				if (m_pExpandConstantBuffer != nullptr)
+				{
+					handle = m_descHandle.GetCpuHandle(
+						static_cast<unsigned int>(EnDescHeapLayout::enNum));
+					m_pExpandConstantBuffer->CreateConstantBufferView(handle);
+				}
 
 
 				return;

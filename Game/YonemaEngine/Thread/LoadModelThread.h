@@ -13,8 +13,8 @@ namespace nsYMEngine
 		}
 		namespace nsAnimations
 		{
+			class CAnimator;
 			class CAnimationClip;
-			class CSkelton;
 		}
 	}
 }
@@ -40,16 +40,16 @@ namespace nsYMEngine
 				constexpr SLoadModelProcess(
 					EnLoadProcessType loadProcessType,
 					nsGraphics::nsModels::CBasicModelRenderer* modelRef,
+					std::shared_ptr<nsGraphics::nsAnimations::CAnimator>* animator,
 					nsGraphics::nsAnimations::CAnimationClip* animClipRef,
 					const char* animFilePath,
-					nsGraphics::nsAnimations::CSkelton* skeltonRef,
 					bool registerAnimBank
 				)
 					:loadProcessType(loadProcessType),
 					modelRef(modelRef),
+					animatorRef(animator),
 					animClipRef(animClipRef),
 					animFilePath(animFilePath),
-					skeltonRef(skeltonRef),
 					registerAnimBank(registerAnimBank)
 				{};
 
@@ -57,9 +57,9 @@ namespace nsYMEngine
 
 				EnLoadProcessType loadProcessType = EnLoadProcessType::enLoadModel;
 				nsGraphics::nsModels::CBasicModelRenderer* modelRef = nullptr;
+				std::shared_ptr<nsGraphics::nsAnimations::CAnimator>* animatorRef = nullptr;
 				nsGraphics::nsAnimations::CAnimationClip* animClipRef = nullptr;
 				const char* animFilePath = nullptr;
-				nsGraphics::nsAnimations::CSkelton* skeltonRef = nullptr;
 				bool registerAnimBank = false;
 			};
 
@@ -109,14 +109,14 @@ namespace nsYMEngine
 			inline void PushLoadModelProcess(
 				EnLoadProcessType loadProcessType,
 				nsGraphics::nsModels::CBasicModelRenderer* modelRef,
+				std::shared_ptr<nsGraphics::nsAnimations::CAnimator>* animator = nullptr,
 				nsGraphics::nsAnimations::CAnimationClip* animClipRef = nullptr,
 				const char* animFilePath = nullptr,
-				nsGraphics::nsAnimations::CSkelton* skeltonRef = nullptr,
 				bool registerAnimBank = false
 			) noexcept
 			{
 				m_loadModelProcess[m_threadIdx].emplace_back(
-					loadProcessType, modelRef, animClipRef, animFilePath, skeltonRef, registerAnimBank);
+					loadProcessType, modelRef, animator, animClipRef, animFilePath, registerAnimBank);
 				m_threadIdx++;
 				if (m_threadIdx >= m_kNumThread)
 				{

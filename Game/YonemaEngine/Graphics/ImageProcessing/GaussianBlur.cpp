@@ -7,6 +7,11 @@ namespace nsYMEngine
 	{
 		namespace nsImageProcessing
 		{
+			// ガウシアンブラーをかけるとき、頂点シェーダーでもピクセルシェーダーでも
+			// リソースにアクセスするためALLを指定。
+			const D3D12_RESOURCE_STATES CGaussianBlur::m_kXBlurResourceState =
+				D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE;
+
 			CGaussianBlur::~CGaussianBlur()
 			{
 				Terminate();
@@ -24,8 +29,8 @@ namespace nsYMEngine
 
 			void CGaussianBlur::Release()
 			{
-				m_descHeap.Release();
-				m_constantBuffer.Release();
+				m_XBlurCB.Release();
+				m_YBlurCB.Release();
 				m_xBlurRenderTarget.Release();
 				m_yBlurRenderTarget.Release();
 				m_xBlurSprite.Release();
@@ -43,9 +48,9 @@ namespace nsYMEngine
 
 				InitRenderTargets();
 
-				InitSprites();
-
 				InitCBV();
+
+				InitSprites();
 
 				return;
 			}
@@ -55,7 +60,11 @@ namespace nsYMEngine
 				//// Xブラーを実行 ////
 
 				// 描画先を設定
-				commandList->TransitionFromShaderResourceToRenderTarget(m_xBlurRenderTarget);
+				commandList->TransitionResourceState(
+					m_xBlurRenderTarget,
+					m_kXBlurResourceState,
+					D3D12_RESOURCE_STATE_RENDER_TARGET
+				);
 				commandList->SetRenderTarget(m_xBlurRenderTarget);
 
 				// ビューポートとシザリング矩形を設定
@@ -73,15 +82,15 @@ namespace nsYMEngine
 					rendererTable->GetPipelineState(EnRendererType::enGaussianBlurXForShadowMap)
 				);
 
-				// ブラー用の定数バッファを設定
-				commandList->SetDescriptorHeap(m_descHeap);
-				commandList->SetGraphicsRootDescriptorTable(2, m_descHeap);
-
 				// Xブラー実行
 				m_xBlurSprite.Draw(commandList);
 
 				// Xブラー終了
-				commandList->TransitionFromRenderTargetToShaderResource(m_xBlurRenderTarget);
+				commandList->TransitionResourceState(
+					m_xBlurRenderTarget,
+					D3D12_RESOURCE_STATE_RENDER_TARGET,
+					m_kXBlurResourceState
+				);
 
 
 				//// Yブラー実行 ////
@@ -105,10 +114,6 @@ namespace nsYMEngine
 					rendererTable->GetPipelineState(EnRendererType::enGaussianBlurYForShadowMap)
 				);
 
-				// ブラー用の定数バッファを設定
-				commandList->SetDescriptorHeap(m_descHeap);
-				commandList->SetGraphicsRootDescriptorTable(2, m_descHeap);
-
 				// Yブラー実行
 				m_yBlurSprite.Draw(commandList);
 
@@ -131,6 +136,7 @@ namespace nsYMEngine
 					m_originalTexture->GetFormat(),
 					nsMath::CVector4::Black(),
 					DXGI_FORMAT_UNKNOWN,
+					m_kXBlurResourceState,
 					L"XBlur"
 				);
 
@@ -141,6 +147,7 @@ namespace nsYMEngine
 					m_originalTexture->GetFormat(),
 					nsMath::CVector4::Black(),
 					DXGI_FORMAT_UNKNOWN,
+					D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
 					L"YBlur"
 				);
 
@@ -158,6 +165,7 @@ namespace nsYMEngine
 					initData.texture = m_originalTexture;
 					//描き込むレンダリングターゲットのフォーマットを指定する。
 					initData.colorFormat = m_xBlurRenderTarget.Get()->GetDesc().Format;
+					initData.pExpandConstantBuffer = &m_XBlurCB;
 
 					m_xBlurSprite.Init(initData);
 				}
@@ -172,6 +180,7 @@ namespace nsYMEngine
 					initData.texture = m_xBlurRenderTarget.GetRenderTargetTexture();
 					//描き込むレンダリングターゲットのフォーマットを指定する。
 					initData.colorFormat = m_yBlurRenderTarget.Get()->GetDesc().Format;
+					initData.pExpandConstantBuffer = &m_YBlurCB;
 
 					m_yBlurSprite.Init(initData);
 				}
@@ -181,13 +190,13 @@ namespace nsYMEngine
 
 			void CGaussianBlur::InitCBV()
 			{
-				m_constantBuffer.Init(static_cast<unsigned int>(sizeof(m_weights)), L"GaussianBlurCB");
+				m_XBlurCB.Init(static_cast<unsigned int>(sizeof(m_weights)), L"GaussianBlurCB");
 
-				m_constantBuffer.CopyToMappedConstantBuffer(m_weights, sizeof(m_weights));
+				m_XBlurCB.CopyToMappedConstantBuffer(m_weights, sizeof(m_weights));
 
-				m_descHeap.InitAsCbvSrvUav(1, L"GaussianBlueDH");
+				m_YBlurCB.Init(static_cast<unsigned int>(sizeof(m_weights)), L"GaussianBlurCB");
 
-				m_constantBuffer.CreateConstantBufferView(m_descHeap.GetCPUHandle());
+				m_YBlurCB.CopyToMappedConstantBuffer(m_weights, sizeof(m_weights));
 
 				return;
 			}

@@ -2,7 +2,6 @@
 #include "../Graphics/Models/BasicModelRenderer.h"
 #include "../Graphics/Animations/AnimationClip.h"
 #include "../Graphics/Renderers/ModelRenderer.h"
-#include "../Graphics/Animations/Skelton.h"
 
 namespace nsYMEngine
 {
@@ -73,7 +72,7 @@ namespace nsYMEngine
 			case EnLoadProcessType::enLoadModel:
 				if (itr->modelRef)
 				{
-					itr->modelRef->InitAsynchronous();
+					itr->modelRef->InitAsynchronous(itr->animatorRef);
 				}
 				break;
 			case EnLoadProcessType::enLoadAnim:

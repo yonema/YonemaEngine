@@ -87,7 +87,7 @@ namespace nsYMEngine
 
 			nsMath::CVector2 screenPos;
 			screenPos.x = (screenPosMatrix.x / screenPosMatrix.w) * half_w;
-			screenPos.y = (screenPosMatrix.y / screenPosMatrix.w) * half_h;
+			screenPos.y = (screenPosMatrix.y / screenPosMatrix.w) * -half_h;
 
 			return screenPos;
 		}

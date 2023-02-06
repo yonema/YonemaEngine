@@ -26,6 +26,8 @@ namespace nsYMEngine
 
 			void EndTimeMeasurement() noexcept;
 
+			void CalcDeltaTime() noexcept;
+
 		private:
 
 			void PushDeltaTimeToQue(float deltaTime) noexcept;

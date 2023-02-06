@@ -15,6 +15,7 @@
 #include "CharacterControllerSample.h"
 #include "DrawWorldSample.h"
 #include "ShareAnimationSample.h"
+#include "LODSample.h"
 
 namespace nsAWA
 {
@@ -31,6 +32,7 @@ namespace nsAWA
 				enLoadAsynchronous,
 				enDrawInstancing,
 				enShareAnimation,
+				enLOD,
 				enSprite,
 				enFont,
 				enEffect,
@@ -42,7 +44,7 @@ namespace nsAWA
 				enDrawWorld,
 			};
 
-			constexpr EnSampleIdx g_kSampleIdx = EnSampleIdx::enEffect;
+			constexpr EnSampleIdx g_kSampleIdx = EnSampleIdx::enDrawWorld;
 		}
 
 		bool CSampleMain::Start()
@@ -69,6 +71,9 @@ namespace nsAWA
 				break;
 			case EnSampleIdx::enShareAnimation:
 				m_sampleGO = NewGO<CShareAnimationSample>("ShareAnimationSample");
+				break;
+			case EnSampleIdx::enLOD:
+				m_sampleGO = NewGO<CLODSample>("LODSample");
 				break;
 			case EnSampleIdx::enSprite:
 				m_sampleGO = NewGO<CSpriteSample>("SpriteSample");

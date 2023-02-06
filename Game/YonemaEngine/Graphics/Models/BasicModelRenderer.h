@@ -111,9 +111,28 @@ namespace nsYMEngine
 					bool isShadowReceiver;
 				};
 
+				enum class EnDescHeapLayoutPerModel
+				{
+					enModelCBV,
+					enShadowMapSRV,
+					enBoneMatrixArraySRV,
+					enWorldMatrixArraySRV,
+					enNum
+				};
+
+				enum class EnDescHeapLayoutPerMaterial
+				{
+					enDiffuse,
+					enNormal,
+					enNum
+				};
+
 			public:
 				CBasicModelRenderer(
-					const nsRenderers::SModelInitData& modelInitData);
+					const nsRenderers::SModelInitData& modelInitData,
+					bool isLODModel = false,
+					std::shared_ptr<nsAnimations::CAnimator>* pAnimator = nullptr
+				);
 				~CBasicModelRenderer();
 
 				void InitAfterImportScene(
@@ -203,6 +222,11 @@ namespace nsYMEngine
 					}
 				}
 
+				constexpr auto* GetAnimator() noexcept
+				{
+					return &m_animator;
+				}
+
 				unsigned int FindBoneId(const std::string& boneName) const noexcept;
 
 				inline const nsMath::CMatrix& GetBoneMatrix(
@@ -218,7 +242,7 @@ namespace nsYMEngine
 					return m_worldMatrix;
 				}
 
-				constexpr bool IsSkeltalAnimationValid() const noexcept
+				inline bool IsSkeltalAnimationValid() const noexcept
 				{
 					return m_animator && m_skelton;
 				}
@@ -230,7 +254,8 @@ namespace nsYMEngine
 
 				void CheckLoaded() noexcept;
 
-				bool InitAsynchronous() noexcept;
+				bool InitAsynchronous(
+					std::shared_ptr<nsAnimations::CAnimator>* pAnimator = nullptr) noexcept;
 
 				constexpr void SetNumInstances(unsigned int numInstances) noexcept
 				{
@@ -243,6 +268,17 @@ namespace nsYMEngine
 				}
 
 				void UpdateWorldMatrixArray(const std::vector<nsMath::CMatrix>& worldMatrixArray);
+
+				constexpr bool IsDrawingFlag() const noexcept
+				{
+					return m_drawingFlag;
+				}
+
+				constexpr void SetDrawingFlag(bool drawingFlag) noexcept
+				{
+					m_drawingFlag = drawingFlag;
+					m_shadowModelRenderer.SetDrawingFlag(drawingFlag);
+				} 
 
 			private:
 				bool Init(const nsRenderers::SModelInitData& modelInitData) noexcept;
@@ -304,6 +340,8 @@ namespace nsYMEngine
 					unsigned int numIndices
 				);
 
+				void CreateDescriptorHeap();
+
 				bool CreateModelCBV();
 
 				bool CreateMaterialSRV();
@@ -316,22 +354,29 @@ namespace nsYMEngine
 
 				void DrawShadowModel(nsDx12Wrappers::CCommandList* commandList);
 
+				constexpr bool CheckIsDrawing() const noexcept
+				{
+					return m_loadingState == EnLoadingState::enAfterLoading &&
+						m_fixNumInstanceOnFrame > 0 &&
+						IsDrawingFlag();
+				}
+
 			private:
 				std::vector<nsDx12Wrappers::CVertexBuffer*> m_vertexBuffers = {};
 				std::vector<nsDx12Wrappers::CIndexBuffer*> m_indexBuffers = {};
 
+				nsDx12Wrappers::CDescriptorHeap m_descriptorHeap = {};
+				nsDx12Wrappers::CDescriptorHandle m_descHandlePerModel;
+				nsDx12Wrappers::CDescriptorHandle m_descHandlePerMaterial;
+
 				nsDx12Wrappers::CConstantBuffer m_modelCB = {};
-				nsDx12Wrappers::CDescriptorHeap m_modelDH = {};
+
 				nsDx12Wrappers::CStructuredBuffer m_boneMatrixArraySB = {};
-				nsDx12Wrappers::CDescriptorHeap m_boneMatrixArrayDH = {};
 				nsDx12Wrappers::CStructuredBuffer m_worldMatrixArraySB = {};
-				nsDx12Wrappers::CDescriptorHeap m_worldMatrixArrayDH = {};
 
 				std::vector<nsDx12Wrappers::CTexture*> m_diffuseTextures = {};
 				std::vector<nsDx12Wrappers::CTexture*> m_normalTextures = {};
-				std::vector<nsDx12Wrappers::CDescriptorHeap*> m_materialDHs = {};
 
-				nsDx12Wrappers::CDescriptorHeap m_shadowMapDH = {};
 
 				nsMath::CMatrix m_bias = nsMath::CMatrix::Identity();
 				nsMath::CMatrix m_worldMatrix = nsMath::CMatrix::Identity();
@@ -339,7 +384,7 @@ namespace nsYMEngine
 				std::vector<SBasicMeshInfo> m_meshInfoArray = {};
 				std::vector<nsMath::CMatrix> m_boneMatrices = {};
 				nsAnimations::CSkelton* m_skelton = nullptr;
-				nsAnimations::CAnimator* m_animator = nullptr;
+				std::shared_ptr<nsAnimations::CAnimator> m_animator = nullptr;
 
 				EnLoadingState m_loadingState = EnLoadingState::enBeforeLoading;
 				bool m_isImportedModelScene = false;
@@ -353,6 +398,9 @@ namespace nsYMEngine
 				unsigned int m_fixNumInstanceOnFrame = 0;
 
 				nsShadow::CShadowModelRenderer m_shadowModelRenderer = {};
+
+				bool m_isLODModel = false;
+				bool m_drawingFlag = false;
 			};
 
 		}

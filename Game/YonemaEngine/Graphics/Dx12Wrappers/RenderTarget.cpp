@@ -46,6 +46,7 @@ namespace nsYMEngine
 				DXGI_FORMAT colorFormat,
 				const nsMath::CVector4& clearColor,
 				DXGI_FORMAT depthStencilFormat,
+				D3D12_RESOURCE_STATES initialResourceState,
 				const wchar_t* objectName
 			)
 			{
@@ -54,7 +55,9 @@ namespace nsYMEngine
 				m_height = height;
 				auto device = CGraphicsEngine::GetInstance()->GetDevice();
 
-				if (CreateRenderTarget(device, m_width, m_height, colorFormat, clearColor) != true)
+				if (CreateRenderTarget(
+					device, m_width, m_height, colorFormat, clearColor, initialResourceState)
+					!= true)
 				{
 					Release();
 					return false;
@@ -96,7 +99,8 @@ namespace nsYMEngine
 				unsigned int width,
 				unsigned int height,
 				DXGI_FORMAT colorFormat,
-				const nsMath::CVector4& clearColor
+				const nsMath::CVector4& clearColor,
+				D3D12_RESOURCE_STATES initialResourceState
 			)
 			{
 				D3D12_HEAP_PROPERTIES heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
@@ -124,7 +128,7 @@ namespace nsYMEngine
 					&resDesc,
 					// D3D12_RESOURCE_STATE_RENDER_TARGETではない。
 					// 後でステートを切り替えるまでは、テクスチャとして扱う。
-					D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
+					initialResourceState,
 					&clearValue,
 					IID_PPV_ARGS(&m_renderTarget)
 				);

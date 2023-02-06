@@ -10,7 +10,7 @@ namespace nsYMEngine
 			private:
 				static const wchar_t* const m_kNamePrefix;
 				static const unsigned int m_kMaxNumRenderTargets = 8;
-				static const unsigned int m_kMaxNumDescriptorHeaps = 4;
+				static const unsigned int m_kMaxNumDescriptorHeaps = 2;
 
 			public:
 				constexpr CCommandList() = default;
@@ -37,20 +37,32 @@ namespace nsYMEngine
 					ID3D12PipelineState* pipelineState = nullptr
 				);
 
+				inline void TransitionResourceState(
+					ID3D12Resource* renderTarget,
+					D3D12_RESOURCE_STATES stateBefore,
+					D3D12_RESOURCE_STATES stateAfter);
+				inline void TransitionResourceState(
+					const CRenderTarget& renderTarget,
+					D3D12_RESOURCE_STATES stateBefore,
+					D3D12_RESOURCE_STATES stateAfter);
+
 				inline void TransitionFromShaderResourceToRenderTarget(
 					ID3D12Resource* renderTarget);
 				inline void TransitionFromShaderResourceToRenderTarget(
 					const CRenderTarget& renderTarget);
+
 				inline void TransitionFromRenderTargetToShaderResource(
 					ID3D12Resource* renderTarget);
 				inline void TransitionFromRenderTargetToShaderResource(
 					const CRenderTarget& renderTarget);
+
 				inline void TransitionFromPresentToRenderTarget(
 					ID3D12Resource* renderTarget);
 				inline void TransitionFromPresentToRenderTarget(
 					const CRenderTarget& renderTarget);
 				inline void TransitionFromPresentToRenderTarget(
 					const CFrameBuffer& frameBuffer);
+
 				inline void TransitionFromRenderTargetToPresent(
 					ID3D12Resource* renderTarget);
 				inline void TransitionFromRenderTargetToPresent(
@@ -143,7 +155,6 @@ namespace nsYMEngine
 
 			private:
 				ID3D12GraphicsCommandList4* m_commandList = nullptr;
-				ID3D12DescriptorHeap* m_descriptorHeaps[m_kMaxNumDescriptorHeaps] = { nullptr };
 				D3D12_VIEWPORT m_currentViewport = {};
 				
 			};

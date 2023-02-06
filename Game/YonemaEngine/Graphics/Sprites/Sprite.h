@@ -22,6 +22,7 @@ namespace nsYMEngine
 				EnAlphaBlendMode alphaBlendMode = EnAlphaBlendMode::enNone;
 				DXGI_FORMAT colorFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 				nsRenderers::EnRendererPriority priority = nsRenderers::EnRendererPriority::enMid;
+				nsDx12Wrappers::CConstantBuffer* pExpandConstantBuffer = nullptr;
 			};
 
 			class CSprite : public nsRenderers::IRenderer
@@ -37,6 +38,13 @@ namespace nsYMEngine
 					nsMath::CMatrix mWorldViewProj;
 					nsMath::CVector4 mulColor;
 					nsMath::CVector4 screenParam;
+				};
+
+				enum class EnDescHeapLayout
+				{
+					enSpriteCBV,
+					enImageSRV,
+					enNum
 				};
 
 			public:
@@ -98,11 +106,12 @@ namespace nsYMEngine
 
 			private:
 				static nsMath::CVector2 m_frameBufferHalfSize;
-				nsDx12Wrappers::CTexture m_texture;
-				nsDx12Wrappers::CDescriptorHeap m_srvDescriptorHeap;
-				nsDx12Wrappers::CDescriptorHeap m_cbvDescriptorHeap;
-				nsDx12Wrappers::CVertexBuffer m_vertexBuffer;
-				nsDx12Wrappers::CConstantBuffer m_constantBuffer;
+				nsDx12Wrappers::CTexture m_texture = {};
+				nsDx12Wrappers::CDescriptorHeap m_descriptorHeap = {};
+				nsDx12Wrappers::CDescriptorHandle m_descHandle = {};
+				nsDx12Wrappers::CVertexBuffer m_vertexBuffer = {};
+				nsDx12Wrappers::CConstantBuffer m_constantBuffer = {};
+				nsDx12Wrappers::CConstantBuffer* m_pExpandConstantBuffer = nullptr;
 				SConstantBufferCPU m_constantBufferCPU = {};
 				nsMath::CVector2 m_spriteSize = nsMath::CVector2::Zero();
 				nsMath::CMatrix m_worldMatrix = nsMath::CMatrix::Identity();

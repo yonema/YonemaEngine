@@ -21,6 +21,7 @@ namespace nsYMEngine
 					DXGI_FORMAT colorFormat,
 					const nsMath::CVector4& clearColor = nsMath::CVector4::Black(),
 					DXGI_FORMAT depthStencilFormat = DXGI_FORMAT_UNKNOWN,
+					D3D12_RESOURCE_STATES initialResourceState = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
 					const wchar_t* objectName = nullptr
 					);
 
@@ -78,7 +79,8 @@ namespace nsYMEngine
 					unsigned int width,
 					unsigned int height,
 					DXGI_FORMAT colorFormat,
-					const nsMath::CVector4& clearColor
+					const nsMath::CVector4& clearColor,
+					D3D12_RESOURCE_STATES initialResourceState
 					);
 
 				void CreateRenderTargetView(ID3D12Device5* device, DXGI_FORMAT colorFormat);

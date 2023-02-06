@@ -127,6 +127,8 @@ namespace nsYMEngine
 				const std::string& retargetSkeltonName
 			)
 			{
+				m_isLoaded = true;
+
 				// 全てのメッシュのボーンをロードする。
 
 				CopyBaseVertexNoArray(numMeshes, baseVertexNoArray);

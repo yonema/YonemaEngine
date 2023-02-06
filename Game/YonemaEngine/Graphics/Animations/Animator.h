@@ -48,7 +48,6 @@ namespace nsYMEngine
 
 				bool Init(
 					const SAnimationInitData& animInitData,
-					CSkelton* pSkelton,
 					bool loadingAsynchronous,
 					bool regiseterAnimBank
 				);
@@ -62,7 +61,9 @@ namespace nsYMEngine
 				void PlayAnimationFromMiddle(unsigned int animIdx, float timer) noexcept;
 
 				void CalcAndGetAnimatedBoneTransforms(
-					std::vector<nsMath::CMatrix>* pMTransforms) noexcept;
+					std::vector<nsMath::CMatrix>* pMTransforms,
+					CSkelton* pSkelton
+					) noexcept;
 
 				void UpdateAnimation(float deltaTime) noexcept;
 
@@ -136,7 +137,6 @@ namespace nsYMEngine
 
 				bool InitAnimationClips(
 					const SAnimationInitData& animInitData,
-					CSkelton* pSkelton,
 					bool loadingAsynchronous,
 					bool regiseterAnimBank
 				);
@@ -149,7 +149,6 @@ namespace nsYMEngine
 				bool m_isPlaying = true;	// çÏê¨ÇµÇΩèuä‘Ç©ÇÁçƒê∂äJén
 				float m_animationSpeed = 1.0f;
 				bool m_isLoop = true;
-				CSkelton* m_pSkelton = nullptr;
 			};
 
 		}

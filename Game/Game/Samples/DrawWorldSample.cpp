@@ -79,6 +79,8 @@ namespace nsAWA
 			modelInitData.SetFlags(EnModelInitDataFlags::enShadowCaster);
 			modelInitData.retargetSkeltonName = m_kRetargetSkeltonName;
 			modelInitData.distanceToReducingUpdate = 50.0f;
+			//modelInitData.lodMedelFilePath = "Assets/Models/Humans/Player1_Low.fbx";
+			//modelInitData.distanceToLOD = 50.0f;
 
 			m_modelRenderer = NewGO<CModelRenderer>();
 			m_modelRenderer->SetPosition(pos);

@@ -129,6 +129,11 @@ namespace nsYMEngine
 				float GetAnimationScaled(
 					const std::string& nodeName, unsigned int boneIdx) const noexcept;
 
+				constexpr bool IsLoaded() const noexcept
+				{
+					return m_isLoaded;
+				}
+
 			private:
 
 				void InitializeRequiredNodeMap(const aiNode& node);
@@ -164,6 +169,7 @@ namespace nsYMEngine
 				std::vector<unsigned int> m_baseVertexNoArray = {};
 				std::vector<SVertexBoneData> m_vertexBoneDataArray = {};
 				const std::string* m_retargetSkeltonName = nullptr;
+				bool m_isLoaded = false;
 			};
 
 		}

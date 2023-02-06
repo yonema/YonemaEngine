@@ -1,6 +1,7 @@
 #include "ShadowMapRenderer.h"
 #include "../Renderers/RendererTable.h"
 #include "../Renderers/SpriteRenderer.h"
+#include "ShadowMapGenericRenderer.h"
 
 namespace nsYMEngine
 {
@@ -9,9 +10,12 @@ namespace nsYMEngine
 		namespace nsShadow
 		{
 			const float CShadowMapRenderer::m_kShadowMapSize = 512.0f;
-			const DXGI_FORMAT CShadowMapRenderer::m_kShadowMapFormat = DXGI_FORMAT_R32G32_FLOAT;
 			const nsMath::CVector4 CShadowMapRenderer::m_kClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
 			const DXGI_FORMAT CShadowMapRenderer::m_kDepthStencilFormat = DXGI_FORMAT_D32_FLOAT;
+			// ガウシアンブラーをかけるとき、頂点シェーダーでもピクセルシェーダーでも
+			// リソースにアクセスするためALLを指定。
+			const D3D12_RESOURCE_STATES CShadowMapRenderer::m_kResourceState = 
+				D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE;
 
 			const float CShadowMapRenderer::m_kShadowCameraOrthographicProjectionSize = 256.0f;
 			const float CShadowMapRenderer::m_kShadowCameraNearClip = 10.0f;
@@ -28,9 +32,10 @@ namespace nsYMEngine
 				auto res = m_shadowMapRT.Init(
 					static_cast<unsigned int>(m_kShadowMapSize),
 					static_cast<unsigned int>(m_kShadowMapSize),
-					m_kShadowMapFormat,
+					CShadowMapGenericRenderer::m_kRTVFormat,
 					m_kClearColor,
 					m_kDepthStencilFormat,
+					m_kResourceState,
 					L"ShadowMapRenderTarget"
 				);
 
@@ -99,7 +104,11 @@ namespace nsYMEngine
 			)
 			{
 				// 描画先を設定
-				commandList->TransitionFromPresentToRenderTarget(m_shadowMapRT);
+				commandList->TransitionResourceState(
+					m_shadowMapRT,
+					m_kResourceState,
+					D3D12_RESOURCE_STATE_RENDER_TARGET
+				);
 				commandList->SetRenderTarget(m_shadowMapRT);
 				// ビューポートとシザリング矩形を設定
 				commandList->SetViewportAndScissorRect(m_shadowMapRT);
@@ -135,7 +144,11 @@ namespace nsYMEngine
 				}
 
 				// 描画終了
-				commandList->TransitionFromRenderTargetToShaderResource(m_shadowMapRT);
+				commandList->TransitionResourceState(
+					m_shadowMapRT,
+					D3D12_RESOURCE_STATE_RENDER_TARGET,
+					m_kResourceState
+				);
 
 				m_blur.ExecuteOnGPU(commandList);
 

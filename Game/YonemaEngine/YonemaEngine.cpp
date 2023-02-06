@@ -25,6 +25,8 @@ namespace nsYMEngine
 
 	bool CYonemaEngine::Init()
 	{
+		m_gameTime.StartTimeMeasurement();
+
 		// リソースバンクは、グラフィックスエンジンより先に生成する。
 		m_resourceBankTable = nsMemory::CResourceBankTable::CreateInstance();
 
@@ -98,8 +100,6 @@ namespace nsYMEngine
 
 	void CYonemaEngine::Update()
 	{
-		m_gameTime.StartTimeMeasurement();
-
 		const float deltaTime = GetDeltaTime();
 
 		m_inputManager->Update(deltaTime);
@@ -116,7 +116,7 @@ namespace nsYMEngine
 
 		m_graphicsEngine->ExecuteDraw();
 
-		m_gameTime.EndTimeMeasurement();
+		m_gameTime.CalcDeltaTime();
 
 		return;
 	}

@@ -151,6 +151,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="YonemaEngine\Graphics\Dx12Wrappers\DescriptorHandle.cpp" />
+    <ClCompile Include="Game\Samples\LODSample.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\Animations2D\Animation2D.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\Animations2D\Animation2DData.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\Animations2D\Animation2DFrameData.cpp" />
@@ -285,7 +287,9 @@
     <Image Include="Assets\Images\StarMan.png" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="YonemaEngine\Graphics\Dx12Wrappers\DescriptorHandle.h" />
     <ClInclude Include="Game\RendererPriority.h" />
+    <ClInclude Include="Game\Samples\LODSample.h" />
     <ClInclude Include="YonemaEngine\Graphics\Animations2D\Animation2D.h" />
     <ClInclude Include="YonemaEngine\Graphics\Animations2D\Animation2DData.h" />
     <ClInclude Include="YonemaEngine\Graphics\Animations2D\Animation2DFrameData.h" />

@@ -14,17 +14,36 @@ namespace nsYMEngine
 				return m_commandList->Reset(commandAllorator, pipelineState);
 			}
 
-			inline void CCommandList::TransitionFromShaderResourceToRenderTarget(
-				ID3D12Resource* renderTarget)
+			inline void CCommandList::TransitionResourceState(
+				ID3D12Resource* renderTarget,
+				D3D12_RESOURCE_STATES stateBefore,
+				D3D12_RESOURCE_STATES stateAfter)
 			{
 				D3D12_RESOURCE_BARRIER barrier =
 					CD3DX12_RESOURCE_BARRIER::Transition(
 						renderTarget,
-						D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
-						D3D12_RESOURCE_STATE_RENDER_TARGET
+						stateBefore,
+						stateAfter
 					);
 
 				m_commandList->ResourceBarrier(1, &barrier);
+			}
+			inline void CCommandList::TransitionResourceState(
+				const CRenderTarget& renderTarget,
+				D3D12_RESOURCE_STATES stateBefore,
+				D3D12_RESOURCE_STATES stateAfter)
+			{
+				TransitionResourceState(renderTarget.Get(), stateBefore, stateAfter);
+			}
+
+			inline void CCommandList::TransitionFromShaderResourceToRenderTarget(
+				ID3D12Resource* renderTarget)
+			{
+				TransitionResourceState(
+					renderTarget,
+					D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
+					D3D12_RESOURCE_STATE_RENDER_TARGET
+				);
 				return;
 			}
 			inline void CCommandList::TransitionFromShaderResourceToRenderTarget(
@@ -36,14 +55,11 @@ namespace nsYMEngine
 			inline void CCommandList::TransitionFromRenderTargetToShaderResource(
 				ID3D12Resource* renderTarget)
 			{
-				D3D12_RESOURCE_BARRIER barrier =
-					CD3DX12_RESOURCE_BARRIER::Transition(
-						renderTarget,
-						D3D12_RESOURCE_STATE_RENDER_TARGET,
-						D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE
-					);
-
-				m_commandList->ResourceBarrier(1, &barrier);
+				TransitionResourceState(
+					renderTarget,
+					D3D12_RESOURCE_STATE_RENDER_TARGET,
+					D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE
+				);
 				return;
 			}
 			inline void CCommandList::TransitionFromRenderTargetToShaderResource(
@@ -55,14 +71,11 @@ namespace nsYMEngine
 			inline void CCommandList::TransitionFromPresentToRenderTarget(
 				ID3D12Resource* renderTarget)
 			{
-				D3D12_RESOURCE_BARRIER barrier =
-					CD3DX12_RESOURCE_BARRIER::Transition(
-						renderTarget,
-						D3D12_RESOURCE_STATE_PRESENT,
-						D3D12_RESOURCE_STATE_RENDER_TARGET
-					);
-
-				m_commandList->ResourceBarrier(1, &barrier);
+				TransitionResourceState(
+					renderTarget,
+					D3D12_RESOURCE_STATE_PRESENT,
+					D3D12_RESOURCE_STATE_RENDER_TARGET
+				);
 				return;
 			}
 			inline void CCommandList::TransitionFromPresentToRenderTarget(
@@ -80,14 +93,11 @@ namespace nsYMEngine
 			inline void CCommandList::TransitionFromRenderTargetToPresent(
 				ID3D12Resource* renderTarget)
 			{
-				D3D12_RESOURCE_BARRIER barrier =
-					CD3DX12_RESOURCE_BARRIER::Transition(
-						renderTarget,
-						D3D12_RESOURCE_STATE_RENDER_TARGET,
-						D3D12_RESOURCE_STATE_PRESENT
-					);
-
-				m_commandList->ResourceBarrier(1, &barrier);
+				TransitionResourceState(
+					renderTarget,
+					D3D12_RESOURCE_STATE_RENDER_TARGET,
+					D3D12_RESOURCE_STATE_PRESENT
+				);
 				return;
 			}
 			inline void CCommandList::TransitionFromRenderTargetToPresent(
@@ -363,22 +373,26 @@ namespace nsYMEngine
 				unsigned int numDescHeaps, const CDescriptorHeap* descHeaps[])
 			{
 				numDescHeaps = std::min(numDescHeaps, m_kMaxNumDescriptorHeaps);
+				ID3D12DescriptorHeap* descriptorHeaps[m_kMaxNumDescriptorHeaps] = { nullptr };
+
 				for (unsigned int i = 0; i < numDescHeaps; i++)
 				{
-					m_descriptorHeaps[i] = descHeaps[i]->Get();
+					descriptorHeaps[i] = descHeaps[i]->Get();
 				}
-				m_commandList->SetDescriptorHeaps(numDescHeaps, m_descriptorHeaps);
+				m_commandList->SetDescriptorHeaps(numDescHeaps, descriptorHeaps);
 				return;
 			}
 			inline void CCommandList::SetDescriptorHeaps(
 				unsigned int numDescHeaps, ID3D12DescriptorHeap* descHeaps[])
 			{
 				numDescHeaps = std::min(numDescHeaps, m_kMaxNumDescriptorHeaps);
+				ID3D12DescriptorHeap* descriptorHeaps[m_kMaxNumDescriptorHeaps] = { nullptr };
+
 				for (unsigned int i = 0; i < numDescHeaps; i++)
 				{
-					m_descriptorHeaps[i] = descHeaps[i];
+					descriptorHeaps[i] = descHeaps[i];
 				}
-				m_commandList->SetDescriptorHeaps(numDescHeaps, m_descriptorHeaps);
+				m_commandList->SetDescriptorHeaps(numDescHeaps, descriptorHeaps);
 				return;
 			}
 

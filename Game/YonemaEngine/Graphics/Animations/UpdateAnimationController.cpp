@@ -23,7 +23,7 @@ namespace nsYMEngine
 				return;
 			}
 
-			void CUpdateAnimationController::Update(const nsMath::CVector3& pos)
+			void CUpdateAnimationController::Update(float distance)
 			{
 				if (m_distanceToReducingUpdate < 0.0f)
 				{
@@ -32,11 +32,7 @@ namespace nsYMEngine
 				}
 
 
-				const auto toCamPos =
-					CGraphicsEngine::GetInstance()->GetMainCamera()->GetPosition() - pos;
-				const float toCamDist = toCamPos.Length();
-
-				if (toCamDist > m_distanceToReducingUpdate)
+				if (distance > m_distanceToReducingUpdate)
 				{
 					m_isReducingUpdate = true;
 				}

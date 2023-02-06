@@ -14,6 +14,16 @@ namespace nsYMEngine
 			return;
 		}
 
+		void CGameTime::CalcDeltaTime() noexcept
+		{
+			m_timer.EndTimer();
+			PushDeltaTimeToQue(static_cast<float>(m_timer.GetSeconds()));
+			m_timer.StartTimer();
+
+			return;
+		}
+
+
 		void CGameTime::PushDeltaTimeToQue(float deltaTime) noexcept
 		{
 			m_deltaTimeQue.emplace_back(deltaTime);

@@ -14,41 +14,41 @@ namespace nsYMEngine
 		{
 			void CBasicModelRenderer::Draw(nsDx12Wrappers::CCommandList* commandList)
 			{
-				if (m_loadingState != EnLoadingState::enAfterLoading)
+				if (CheckIsDrawing() != true)
 				{
-					// ロード中は描画できない
 					return;
 				}
 
-				if (m_fixNumInstanceOnFrame <= 0)
-				{
-					// 描画するインスタンスがない
-					return;
-				}
+				commandList->SetDescriptorHeap(m_descriptorHeap);
+
 
 				// モデルごとの定数バッファのセット
-				commandList->SetDescriptorHeap(m_modelDH);
-				commandList->SetGraphicsRootDescriptorTable(0, m_modelDH);
+				auto handle = m_descHandlePerModel.GetGpuHandle(
+					static_cast<unsigned int>(EnDescHeapLayoutPerModel::enModelCBV));
+				commandList->SetGraphicsRootDescriptorTable(0, handle);
 
 				// スケルたタルアニメーションが有効なら、ボーン行列の配列をセット
 				if (IsSkeltalAnimationValid())
 				{
-					commandList->SetDescriptorHeap(m_boneMatrixArrayDH);
-					commandList->SetGraphicsRootDescriptorTable(1, m_boneMatrixArrayDH);
+					handle = m_descHandlePerModel.GetGpuHandle(
+						static_cast<unsigned int>(EnDescHeapLayoutPerModel::enBoneMatrixArraySRV));
+					commandList->SetGraphicsRootDescriptorTable(1, handle);
 				}
 
 				// インスタンシングが有効なら、ワールド行列の配列をセット
-				if (m_worldMatrixArrayDH.IsValid())
+				//if (m_worldMatrixArrayDH.IsValid())
+				if (m_modelInitDataRef->maxInstance > 1)
 				{
-					commandList->SetDescriptorHeap(m_worldMatrixArrayDH);
-					commandList->SetGraphicsRootDescriptorTable(2, m_worldMatrixArrayDH);
+					handle = m_descHandlePerModel.GetGpuHandle(
+						static_cast<unsigned int>(EnDescHeapLayoutPerModel::enWorldMatrixArraySRV));
+					commandList->SetGraphicsRootDescriptorTable(2, handle);
 				}
 
 				// シャドウマップをセット
-				commandList->SetDescriptorHeap(m_shadowMapDH);
-				commandList->SetGraphicsRootDescriptorTable(3, m_shadowMapDH);				
+				handle = m_descHandlePerModel.GetGpuHandle(
+					static_cast<unsigned int>(EnDescHeapLayoutPerModel::enShadowMapSRV));
+				commandList->SetGraphicsRootDescriptorTable(3, handle);
 				
-
 				// マテリアルごとに描画
 				// 最初にマテリアルごとにメッシュ分解しているため、メッシュごとに描画と同意。
 				const unsigned int numMeshes = static_cast<unsigned int>(m_meshInfoArray.size());
@@ -58,11 +58,11 @@ namespace nsYMEngine
 					const auto* vertexBuffer = m_vertexBuffers.at(meshIdx);
 					const auto& meshInfo = m_meshInfoArray.at(meshIdx);
 
-					// マテリアルごとの定数バッファをセット
-					const auto* materialDH = m_materialDHs.at(meshInfo.materialIndex);
-					ID3D12DescriptorHeap* materialDescHeaps[] = { materialDH->Get() };
-					commandList->SetDescriptorHeap(*materialDH);
-					commandList->SetGraphicsRootDescriptorTable(4, *materialDH);
+					// マテリアルごとの定数バッファをセット;
+					auto handleIdx = meshInfo.materialIndex * 
+						static_cast<unsigned int>(EnDescHeapLayoutPerMaterial::enNum);
+					handle = m_descHandlePerMaterial.GetGpuHandle(handleIdx);
+					commandList->SetGraphicsRootDescriptorTable(4, handle);
 
 					// 頂点バッファとインデックスバッファをセット
 					commandList->SetIndexBuffer(*indexBuffer);
@@ -75,8 +75,18 @@ namespace nsYMEngine
 				return;
 			}
 
-			CBasicModelRenderer::CBasicModelRenderer(const nsRenderers::SModelInitData& modelInitData)
+			CBasicModelRenderer::CBasicModelRenderer(
+				const nsRenderers::SModelInitData& modelInitData, 
+				bool isLODModel,
+				std::shared_ptr<nsAnimations::CAnimator>* pAnimator
+			)
 			{
+				m_isLODModel = isLODModel;
+				if (pAnimator)
+				{
+					m_animator = *pAnimator;
+				}
+
 				Init(modelInitData);
 
 				return;
@@ -113,19 +123,8 @@ namespace nsYMEngine
 				}
 				m_geometryDataArray.clear();
 
-				m_shadowMapDH.Release();
-				m_boneMatrixArrayDH.Release();
 				m_boneMatrixArraySB.Release();
-				m_worldMatrixArrayDH.Release();
 				m_worldMatrixArraySB.Release();
-				for (auto& materialDH : m_materialDHs)
-				{
-					if (materialDH)
-					{
-						materialDH->Release();
-						delete materialDH;
-					}
-				}
 				
 				for (auto& diffuseTexture : m_diffuseTextures)
 				{
@@ -163,8 +162,8 @@ namespace nsYMEngine
 					normalTexture = nullptr;
 				}
 				m_normalTextures.clear();
-				m_modelDH.Release();
 				m_modelCB.Release();
+				m_descriptorHeap.Release();
 				for (auto* indexBuffer : m_indexBuffers)
 				{
 					if (indexBuffer)
@@ -190,8 +189,7 @@ namespace nsYMEngine
 				}
 				if (m_animator)
 				{
-					delete m_animator;
-					m_animator = nullptr;
+					m_animator.reset();
 				}
 				return;
 			}
@@ -206,7 +204,8 @@ namespace nsYMEngine
 					m_loadingState = EnLoadingState::enNowLoading;
 					nsThread::CLoadModelThread::GetInstance()->PushLoadModelProcess(
 						nsThread::CLoadModelThread::EnLoadProcessType::enLoadModel,
-						this
+						this,
+						&m_animator
 					);
 
 					return true;
@@ -220,8 +219,18 @@ namespace nsYMEngine
 				Assimp::Importer* importer = nullptr;
 				const aiScene* scene = nullptr;
 
+				const char* modelFilePath = nullptr;
+				if (m_isLODModel != true)
+				{
+					modelFilePath = modelInitData.modelFilePath.c_str();
+				}
+				else
+				{
+					modelFilePath = modelInitData.lodMedelFilePath.c_str();
+				}
+
 				if (nsAssimpCommon::ImportScene(
-					modelInitData.modelFilePath,
+					modelFilePath,
 					importer,
 					scene,
 					nsAssimpCommon::g_kBasicRemoveComponentFlags,
@@ -240,10 +249,22 @@ namespace nsYMEngine
 				return true;
 			}
 
-			bool CBasicModelRenderer::InitAsynchronous() noexcept
+			bool CBasicModelRenderer::InitAsynchronous(
+				std::shared_ptr<nsAnimations::CAnimator>* pAnimator) noexcept
 			{
+				m_animator = *pAnimator;
+				const char* modelFilePath = nullptr;
+				if (m_isLODModel != true)
+				{
+					modelFilePath = m_modelInitDataRef->modelFilePath.c_str();
+				}
+				else
+				{
+					modelFilePath = m_modelInitDataRef->lodMedelFilePath.c_str();
+				}
+
 				if (nsAssimpCommon::ImportScene(
-					m_modelInitDataRef->modelFilePath,
+					modelFilePath,
 					m_importerForLoadAsynchronous,
 					m_sceneForLoadAsynchronous,
 					nsAssimpCommon::g_kBasicRemoveComponentFlags,
@@ -290,9 +311,10 @@ namespace nsYMEngine
 						kNumMeshes,
 						scene->mMeshes,
 						baseVertexNoArray,
-						numVertices, 
+						numVertices,
 						modelInitData.retargetSkeltonName
 					);
+
 				}
 				else
 				{
@@ -304,6 +326,10 @@ namespace nsYMEngine
 				LoadMaterials(modelInitData, scene);
 				CreateVertexAndIndexBuffer(dstMeshes);
 				CopyToPhysicsMeshGeometryBuffer(dstMeshes, modelInitData, numVertices, numIndices);
+				
+
+
+				CreateDescriptorHeap();
 				CreateModelCBV();
 				CreateMaterialSRV();
 				CreateBoneMatrisArraySB();
@@ -368,6 +394,8 @@ namespace nsYMEngine
 
 				EnableDrawing();
 
+
+
 				//if (m_importerForLoadAsynchronous)
 				//{
 				//	m_importerForLoadAsynchronous->FreeScene();
@@ -384,10 +412,16 @@ namespace nsYMEngine
 						{
 							DrawShadowModel(commandList);
 						},
-						GetRenderType()
+						GetRenderType(),
+						&m_boneMatrices,
+						m_modelInitDataRef->maxInstance
 					);
 				}
 
+				if (m_isLODModel != true)
+				{
+					SetDrawingFlag(true);
+				}
 
 				return;
 			}
@@ -401,14 +435,21 @@ namespace nsYMEngine
 				{
 					m_skelton = new nsAnimations::CSkelton();
 					m_skelton->Init(*scene->mRootNode);
-					m_animator = new nsAnimations::CAnimator();
-					isSkeltalAnimation = 
-						m_animator->Init(
-							modelInitData.animInitData,
-							m_skelton, 
-							modelInitData.GetFlags(EnModelInitDataFlags::enLoadingAsynchronous),
-							modelInitData.GetFlags(EnModelInitDataFlags::enRegisterAnimationBank)
-						);
+
+					if (m_animator == nullptr)
+					{
+						m_animator = std::make_shared<nsAnimations::CAnimator>();
+						isSkeltalAnimation =
+							m_animator->Init(
+								modelInitData.animInitData,
+								modelInitData.GetFlags(EnModelInitDataFlags::enLoadingAsynchronous),
+								modelInitData.GetFlags(EnModelInitDataFlags::enRegisterAnimationBank)
+							);
+					}
+					else
+					{
+						isSkeltalAnimation = true;
+					}
 				}
 
 				return isSkeltalAnimation;
@@ -730,15 +771,25 @@ namespace nsYMEngine
 			{
 				std::string texFilePathFromModel = "Textures/";
 
-				if (modelInitData.textureRootPath)
+				if (modelInitData.textureRootPath.empty())
 				{
 					texFilePathFromModel += modelInitData.textureRootPath;
 					texFilePathFromModel += "/";
 				}
 				texFilePathFromModel += texFileName;
 
+				const char* modelFilePath = nullptr;
+				if (m_isLODModel != true)
+				{
+					modelFilePath = m_modelInitDataRef->modelFilePath.c_str();
+				}
+				else
+				{
+					modelFilePath = m_modelInitDataRef->lodMedelFilePath.c_str();
+				}
+
 				return nsUtils::GetTexturePathFromModelAndTexPath(
-					modelInitData.modelFilePath, texFilePathFromModel.c_str());
+					modelFilePath, texFilePathFromModel.c_str());
 			}
 
 
@@ -820,6 +871,38 @@ namespace nsYMEngine
 				return;
 			}
 
+			void CBasicModelRenderer::CreateDescriptorHeap()
+			{
+				constexpr unsigned int kNumDescHeapsPerModel =
+					static_cast<unsigned int>(EnDescHeapLayoutPerModel::enNum);
+
+				constexpr unsigned int kNumSRVDescHeapsPerMat =
+					static_cast<unsigned int>(EnDescHeapLayoutPerMaterial::enNum);
+				const unsigned int kNumMaterials =
+					static_cast<unsigned int>(m_diffuseTextures.size());
+				const unsigned int kNumDescHeapsPerMaterial = kNumSRVDescHeapsPerMat * kNumMaterials;
+
+				const unsigned int kNumDescHeaps =
+					kNumDescHeapsPerModel + kNumDescHeapsPerMaterial;
+
+				m_descriptorHeap.InitAsCbvSrvUav(kNumDescHeaps, L"ModelRendererDH");
+				auto descHandleCPU = m_descriptorHeap.GetCPUHandle();
+				auto descHandleGPU = m_descriptorHeap.GetGPUHandle();
+
+				m_descHandlePerModel.Init(kNumDescHeapsPerModel, descHandleCPU, descHandleGPU);
+
+				const unsigned int lastIndex =
+					static_cast<unsigned int>(EnDescHeapLayoutPerModel::enNum) - 1;
+				descHandleCPU = m_descHandlePerModel.GetCpuHandle(lastIndex);
+				descHandleGPU = m_descHandlePerModel.GetGpuHandle(lastIndex);
+
+				m_descHandlePerMaterial.Init(kNumDescHeapsPerMaterial, descHandleCPU, descHandleGPU);
+
+
+				return;
+			}
+
+
 			bool CBasicModelRenderer::CreateModelCBV()
 			{
 				// 定数バッファ作成
@@ -845,12 +928,10 @@ namespace nsYMEngine
 				mappedCB->isShadowReceiver = 
 					m_modelInitDataRef->GetFlags(nsRenderers::EnModelInitDataFlags::enShadowReceiver);
 
-				// ディスクリプタヒープ作成
-				constexpr unsigned int kNumDescHeaps = 1;
-				m_modelDH.InitAsCbvSrvUav(kNumDescHeaps, L"ModelDH");
-
 				// 定数バッファビュー作成
-				m_modelCB.CreateConstantBufferView(m_modelDH.GetCPUHandle());
+				auto handle = m_descHandlePerModel.GetCpuHandle(
+					static_cast<unsigned int>(EnDescHeapLayoutPerModel::enModelCBV));
+				m_modelCB.CreateConstantBufferView(handle);
 
 				return true;
 			}
@@ -858,7 +939,6 @@ namespace nsYMEngine
 
 			bool CBasicModelRenderer::CreateMaterialSRV()
 			{
-				constexpr unsigned int numDescHeaps = 2;
 				auto* device = CGraphicsEngine::GetInstance()->GetDevice();
 
 				D3D12_SHADER_RESOURCE_VIEW_DESC matSRVDesc = {};
@@ -867,34 +947,28 @@ namespace nsYMEngine
 				matSRVDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 				matSRVDesc.Texture2D.MipLevels = 1;
 
-				const auto inc = CGraphicsEngine::GetInstance()->GetDescriptorSizeOfCbvSrvUav();
-
 				unsigned int kNumTextures = static_cast<unsigned int>(m_diffuseTextures.size());
-				m_materialDHs.reserve(kNumTextures);
+				unsigned int handleIdx = 0;
+
 				for (unsigned int texIdx = 0; texIdx < kNumTextures; texIdx++)
 				{
-					auto* materialDH = new nsDx12Wrappers::CDescriptorHeap();
-
-					materialDH->InitAsCbvSrvUav(numDescHeaps, L"MaterialDH");
-					auto matDescHandle = materialDH->GetCPUHandle();
-
 					matSRVDesc.Format = m_diffuseTextures[texIdx]->GetResource()->GetDesc().Format;
 					device->CreateShaderResourceView(
 						m_diffuseTextures[texIdx]->GetResource(),
 						&matSRVDesc,
-						matDescHandle
+						m_descHandlePerMaterial.GetCpuHandle(handleIdx)
 					);
 
-					matDescHandle.ptr += inc;
+					handleIdx++;
 
 					matSRVDesc.Format = m_normalTextures[texIdx]->GetResource()->GetDesc().Format;
 					device->CreateShaderResourceView(
 						m_normalTextures[texIdx]->GetResource(),
 						&matSRVDesc,
-						matDescHandle
+						m_descHandlePerMaterial.GetCpuHandle(handleIdx)
 					);
 
-					m_materialDHs.emplace_back(materialDH);
+					handleIdx++;
 
 				}
 
@@ -913,8 +987,6 @@ namespace nsYMEngine
 				m_boneMatrices.resize(numBoneInfoArray);
 
 
-				m_boneMatrixArrayDH.InitAsCbvSrvUav(1, L"BoneMatrixArrayDH");
-
 				bool res =
 					m_boneMatrixArraySB.Init(sizeof(nsMath::CMatrix), numBoneInfoArray);
 
@@ -924,7 +996,9 @@ namespace nsYMEngine
 					return false;
 				}
 
-				m_boneMatrixArraySB.RegistShaderResourceView(m_boneMatrixArrayDH.GetCPUHandle());
+				auto handle = m_descHandlePerModel.GetCpuHandle(
+					static_cast<unsigned int>(EnDescHeapLayoutPerModel::enBoneMatrixArraySRV));
+				m_boneMatrixArraySB.RegistShaderResourceView(handle);
 
 				return true;
 			}
@@ -938,9 +1012,6 @@ namespace nsYMEngine
 					return true;
 				}
 
-
-				m_worldMatrixArrayDH.InitAsCbvSrvUav(1, L"WorldMatrixArrayDH");
-
 				bool res = 
 					m_worldMatrixArraySB.Init(sizeof(nsMath::CMatrix), modelInitData.maxInstance);
 
@@ -950,7 +1021,9 @@ namespace nsYMEngine
 					return false;
 				}
 
-				m_worldMatrixArraySB.RegistShaderResourceView(m_worldMatrixArrayDH.GetCPUHandle());
+				auto handle = m_descHandlePerModel.GetCpuHandle(
+					static_cast<unsigned int>(EnDescHeapLayoutPerModel::enWorldMatrixArraySRV));
+				m_worldMatrixArraySB.RegistShaderResourceView(handle);
 
 				return true;
 			}
@@ -960,9 +1033,6 @@ namespace nsYMEngine
 				auto* device = CGraphicsEngine::GetInstance()->GetDevice();
 				auto* shadowMapTexture =
 					CGraphicsEngine::GetInstance()->GetShadowMapRenderer()->GetShadowBokeTexture();
-					//CGraphicsEngine::GetInstance()->GetShadowMapRenderer()->GetShadowMapSprite()->GetTexture();
-				m_shadowMapDH.InitAsCbvSrvUav(1, L"ShadowMapDH");
-				auto matDescHandle = m_shadowMapDH.GetCPUHandle();
 
 				D3D12_SHADER_RESOURCE_VIEW_DESC matSRVDesc = {};
 				matSRVDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -970,10 +1040,12 @@ namespace nsYMEngine
 				matSRVDesc.Texture2D.MipLevels = 1;
 				matSRVDesc.Format = shadowMapTexture->GetResource()->GetDesc().Format;
 
+				auto handle = m_descHandlePerModel.GetCpuHandle(
+					static_cast<unsigned int>(EnDescHeapLayoutPerModel::enShadowMapSRV));
 				device->CreateShaderResourceView(
 					shadowMapTexture->GetResource(),
 					&matSRVDesc,
-					matDescHandle
+					handle
 				);
 
 				return true;
@@ -987,6 +1059,11 @@ namespace nsYMEngine
 				const nsMath::CVector3& scale
 			) noexcept
 			{
+				if (IsDrawingFlag() != true)
+				{
+					return;
+				}
+
 				// ワールド行列作成。
 				nsMath::CMatrix mTrans, mRot, mScale;
 				mTrans.MakeTranslation(position);
@@ -1033,10 +1110,14 @@ namespace nsYMEngine
 
 				m_animator->UpdateAnimation(deltaTime);
 
-				if (m_geometryDataArray[0]->IsInViewFrustum() && updateAnimMatrix)
+				if (m_geometryDataArray[0]->IsInViewFrustum() && 
+					updateAnimMatrix &&
+					IsDrawingFlag())
 				{
-					m_animator->CalcAndGetAnimatedBoneTransforms(&m_boneMatrices);
+					m_animator->CalcAndGetAnimatedBoneTransforms(&m_boneMatrices, m_skelton);
 					m_boneMatrixArraySB.CopyToMappedStructuredBuffer(m_boneMatrices.data());
+
+					m_shadowModelRenderer.UpdateBoneMatrixArray(&m_boneMatrices);
 				}
 
 
@@ -1092,7 +1173,7 @@ namespace nsYMEngine
 			void CBasicModelRenderer::UpdateWorldMatrixArray(
 				const std::vector<nsMath::CMatrix>& worldMatrixArray)
 			{
-				if (m_worldMatrixArrayDH.IsValid() != true)
+				if (m_modelInitDataRef->maxInstance > 1 != true || IsDrawingFlag() != true)
 				{
 					return;
 				}
@@ -1118,38 +1199,18 @@ namespace nsYMEngine
 					fixWorldMatrixArray.data(), 
 					sizeof(nsMath::CMatrix) * m_fixNumInstanceOnFrame);
 
+				m_shadowModelRenderer.UpdateWorldMatrixArray(
+					&fixWorldMatrixArray, m_fixNumInstanceOnFrame);
+
 				return;
 			}
 
 
 			void CBasicModelRenderer::DrawShadowModel(nsDx12Wrappers::CCommandList* commandList)
 			{
-				if (m_loadingState != EnLoadingState::enAfterLoading)
+				if (CheckIsDrawing() != true)
 				{
-					// ロード中は描画できない
 					return;
-				}
-
-				if (m_fixNumInstanceOnFrame <= 0)
-				{
-					// 描画するインスタンスがない
-					return;
-				}
-
-				// モデルごとの定数バッファのはCShadowModelRendererで設定している。
-
-				// スケルたタルアニメーションが有効なら、ボーン行列の配列をセット
-				if (IsSkeltalAnimationValid())
-				{
-					commandList->SetDescriptorHeap(m_boneMatrixArrayDH);
-					commandList->SetGraphicsRootDescriptorTable(1, m_boneMatrixArrayDH);
-				}
-
-				// インスタンシングが有効なら、ワールド行列の配列をセット
-				if (m_worldMatrixArrayDH.IsValid())
-				{
-					commandList->SetDescriptorHeap(m_worldMatrixArrayDH);
-					commandList->SetGraphicsRootDescriptorTable(2, m_worldMatrixArrayDH);
 				}
 
 				// マテリアルごとに描画

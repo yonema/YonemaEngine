@@ -9,6 +9,9 @@ namespace nsYMEngine
 		{
 			class CShadowMapGenericRenderer : public nsRenderers::IGenericRenderer
 			{
+			public:
+				static const DXGI_FORMAT m_kRTVFormat = DXGI_FORMAT_R32G32_FLOAT;
+
 			private:
 				enum class EnDescRangeType : unsigned int
 				{
@@ -59,6 +62,13 @@ namespace nsYMEngine
 				inline std::wstring CreatePipelineStateName() const noexcept override
 				{
 					return L"ShadowMapGenericRenderer";
+				}
+
+				inline void CreateRenderTargetFomrmat(
+					DXGI_FORMAT rtvFormats[], UINT* pNumRenderTargets) const noexcept override
+				{
+					*pNumRenderTargets = 1;
+					rtvFormats[0] = m_kRTVFormat;
 				}
 
 			public:
