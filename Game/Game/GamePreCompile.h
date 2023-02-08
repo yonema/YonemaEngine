@@ -6,6 +6,7 @@
 #include "../YonemaEngine/Graphics/Animations/Animator.h"
 #include "../YonemaEngine/Graphics/Renderers/SpriteRenderer.h"
 #include "../YonemaEngine/Graphics/Renderers/AnimatedSpriteRenderer.h"
+#include "../YonemaEngine/Graphics/Environment/SkyCubeRenderer.h"
 #include "../YonemaEngine/Graphics/Sprites/Sprite.h"
 #include "../YonemaEngine/Graphics/Fonts/FontRenderer.h"
 #include "../YonemaEngine/Physics/PhysicsEngine.h"
@@ -41,6 +42,8 @@ using EnAxisMapping = nsInput::EnAxisMapping;
 using CModelRenderer = nsGraphics::nsRenderers::CModelRenderer;
 using SModelInitData = nsGraphics::nsRenderers::SModelInitData;
 using EnModelInitDataFlags = nsGraphics::nsRenderers::EnModelInitDataFlags;
+using CSkyCubeRenderer = nsGraphics::nsEnvironment::CSkyCubeRenderer;
+using EnSkyType = nsGraphics::nsEnvironment::EnSkyType;
 
 // スプライト
 using CSpriteRenderer = nsGraphics::nsRenderers::CSpriteRenderer;

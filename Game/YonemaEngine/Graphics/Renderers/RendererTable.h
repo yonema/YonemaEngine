@@ -47,7 +47,7 @@ namespace nsYMEngine
 				static const unsigned int m_kFirstIndexOfModel =
 					static_cast<unsigned int>(EnRendererType::enBasicModel);
 				static const unsigned int m_kLastIndexOfModel =
-					static_cast<unsigned int>(EnRendererType::enInstancingNonCullingModel);
+					static_cast<unsigned int>(EnRendererType::enSkyCube);
 
 				static const unsigned int m_kFirstIndexOfShadowModel =
 					static_cast<unsigned int>(EnRendererType::enShadowModel);

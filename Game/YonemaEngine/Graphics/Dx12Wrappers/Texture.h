@@ -32,6 +32,8 @@ namespace nsYMEngine
 
 				void InitFromTexture(CTexture* texture);
 
+				void InitFromDDSFile(const char* filePath);
+
 
 				void Release();
 

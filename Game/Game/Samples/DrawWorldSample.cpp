@@ -251,6 +251,12 @@ namespace nsAWA
 				}
 			);
 
+
+			m_skyCubeRenderer = NewGO<CSkyCubeRenderer>();
+			m_skyCubeRenderer->Init(EnSkyType::enNormal);
+			m_skyCubeRenderer->SetAutoFollowCameraFlag(true);
+			m_skyCubeRenderer->SetAutoRotateFlag(true);
+
 			m_debugPlayer = NewGO<CDebugPlayer>();
 
 			SFontParameter fontParam;
@@ -269,6 +275,8 @@ namespace nsAWA
 			DeleteGO(m_fontRenderer);
 
 			DeleteGO(m_debugPlayer);
+
+			DeleteGO(m_skyCubeRenderer);
 
 			for (auto& human : m_humansMap)
 			{
@@ -312,6 +320,8 @@ namespace nsAWA
 			}
 
 			m_fontRenderer->SetText(text.c_str());
+
+
 
 			return;
 		}

@@ -151,6 +151,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="YonemaEngine\Graphics\Environment\SkyCubeGenericRenderer.cpp" />
+    <ClCompile Include="YonemaEngine\Graphics\Environment\SkyCubeRenderer.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\Dx12Wrappers\DescriptorHandle.cpp" />
     <ClCompile Include="Game\Samples\LODSample.cpp" />
     <ClCompile Include="YonemaEngine\Graphics\Animations2D\Animation2D.cpp" />
@@ -287,6 +289,8 @@
     <Image Include="Assets\Images\StarMan.png" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="YonemaEngine\Graphics\Environment\SkyCubeGenericRenderer.h" />
+    <ClInclude Include="YonemaEngine\Graphics\Environment\SkyCubeRenderer.h" />
     <ClInclude Include="YonemaEngine\Graphics\Dx12Wrappers\DescriptorHandle.h" />
     <ClInclude Include="Game\RendererPriority.h" />
     <ClInclude Include="Game\Samples\LODSample.h" />

@@ -123,6 +123,7 @@ namespace nsYMEngine
 				switch (modelInitData.rendererType)
 				{
 				case CRendererTable::EnRendererType::enBasicModel:
+				case CRendererTable::EnRendererType::enSkyCube:
 					m_renderer = new nsModels::CBasicModelRenderer(modelInitData);
 					if (IsEnableLOD() && m_enableLoadingAsynchronous != true)
 					{
@@ -130,7 +131,6 @@ namespace nsYMEngine
 							modelInitData, true, m_renderer->GetAnimator());
 					}
 					break;
-				case CRendererTable::EnRendererType::enSkyCube:
 					break;
 				default:
 					msg = modelInitData.modelFilePath;

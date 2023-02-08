@@ -64,6 +64,7 @@ namespace nsYMEngine
 				float distanceToReducingUpdate = -1.0f;
 				std::string lodMedelFilePath = {};
 				float distanceToLOD = -1.0f;
+				nsDx12Wrappers::CConstantBuffer* pExpandConstantBuffer = nullptr;
 
 			private:
 				std::bitset<static_cast<int>(EnModelInitDataFlags::enNum)> flags = kDefaultFlags;

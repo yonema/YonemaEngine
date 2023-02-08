@@ -162,7 +162,7 @@ namespace nsYMEngine
 				// CalcShadowOffset
 				nsMath::CVector3 shadowCameraOffset = nsMath::CVector3::Zero();
 				{
-					auto camDirXZ = mainCamera->GetForeardDirection();
+					auto camDirXZ = mainCamera->GetForwardDirection();
 					camDirXZ.y = 0.0f;
 					camDirXZ.Normalize();
 					

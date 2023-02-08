@@ -490,7 +490,7 @@ namespace nsYMEngine
 			auto* camera = nsGraphics::CGraphicsEngine::GetInstance()->GetMainCamera();
 
 			const auto& origin = camera->GetPosition();
-			const auto& dirVec = camera->GetForeardDirection();
+			const auto& dirVec = camera->GetForwardDirection();
 
 			nsMath::CVector3 toCenterVec(dirVec * m_cullingBoxHalfExtent);
 			nsMath::CVector3 centerPos = origin + toCenterVec;

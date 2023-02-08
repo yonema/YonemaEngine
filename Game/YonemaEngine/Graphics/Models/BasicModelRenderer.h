@@ -102,7 +102,7 @@ namespace nsYMEngine
 					unsigned int materialIndex = 0;
 				};
 
-				struct SCconstantBufferData
+				struct SConstantBufferData
 				{
 					nsMath::CMatrix mWorld;
 					nsMath::CMatrix mViewProj;
@@ -114,6 +114,7 @@ namespace nsYMEngine
 				enum class EnDescHeapLayoutPerModel
 				{
 					enModelCBV,
+					enExpandCBV,
 					enShadowMapSRV,
 					enBoneMatrixArraySRV,
 					enWorldMatrixArraySRV,
@@ -343,6 +344,8 @@ namespace nsYMEngine
 				void CreateDescriptorHeap();
 
 				bool CreateModelCBV();
+
+				bool CreateExpandCBV();
 
 				bool CreateMaterialSRV();
 

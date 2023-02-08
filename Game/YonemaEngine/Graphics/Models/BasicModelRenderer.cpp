@@ -45,9 +45,13 @@ namespace nsYMEngine
 				}
 
 				// シャドウマップをセット
-				handle = m_descHandlePerModel.GetGpuHandle(
-					static_cast<unsigned int>(EnDescHeapLayoutPerModel::enShadowMapSRV));
-				commandList->SetGraphicsRootDescriptorTable(3, handle);
+				if (m_modelInitDataRef->rendererType !=
+					nsRenderers::CRendererTable::EnRendererType::enSkyCube)
+				{
+					handle = m_descHandlePerModel.GetGpuHandle(
+						static_cast<unsigned int>(EnDescHeapLayoutPerModel::enShadowMapSRV));
+					commandList->SetGraphicsRootDescriptorTable(3, handle);
+				}
 				
 				// マテリアルごとに描画
 				// 最初にマテリアルごとにメッシュ分解しているため、メッシュごとに描画と同意。
@@ -62,7 +66,15 @@ namespace nsYMEngine
 					auto handleIdx = meshInfo.materialIndex * 
 						static_cast<unsigned int>(EnDescHeapLayoutPerMaterial::enNum);
 					handle = m_descHandlePerMaterial.GetGpuHandle(handleIdx);
-					commandList->SetGraphicsRootDescriptorTable(4, handle);
+					if (m_modelInitDataRef->rendererType ==
+						nsRenderers::CRendererTable::EnRendererType::enSkyCube)
+					{
+						commandList->SetGraphicsRootDescriptorTable(1, handle);
+					}
+					else
+					{
+						commandList->SetGraphicsRootDescriptorTable(4, handle);
+					}
 
 					// 頂点バッファとインデックスバッファをセット
 					commandList->SetIndexBuffer(*indexBuffer);
@@ -331,6 +343,7 @@ namespace nsYMEngine
 
 				CreateDescriptorHeap();
 				CreateModelCBV();
+				CreateExpandCBV();
 				CreateMaterialSRV();
 				CreateBoneMatrisArraySB();
 				CreateWorldMatrixArraySB(modelInitData);
@@ -748,7 +761,15 @@ namespace nsYMEngine
 					// textureBankに未登録のため、新規作成。
 
 					texture = new nsDx12Wrappers::CTexture();
-					texture->Init(texFilePath.c_str());
+					if (m_modelInitDataRef->rendererType ==
+						nsRenderers::CRendererTable::EnRendererType::enSkyCube)
+					{
+						texture->InitFromDDSFile(texFilePath.c_str());
+					}
+					else
+					{
+						texture->Init(texFilePath.c_str());
+					}
 
 					if (modelInitData.GetFlags(
 						nsRenderers::EnModelInitDataFlags::enRegisterTextureBank))
@@ -885,7 +906,15 @@ namespace nsYMEngine
 				const unsigned int kNumDescHeaps =
 					kNumDescHeapsPerModel + kNumDescHeapsPerMaterial;
 
-				m_descriptorHeap.InitAsCbvSrvUav(kNumDescHeaps, L"ModelRendererDH");
+				if (m_modelInitDataRef->rendererType == 
+					nsRenderers::CRendererTable::EnRendererType::enSkyCube)
+				{
+					m_descriptorHeap.InitAsCbvSrvUav(kNumDescHeaps, L"SkyCubeModelRendererDH");
+				}
+				else
+				{
+					m_descriptorHeap.InitAsCbvSrvUav(kNumDescHeaps, L"ModelRendererDH");
+				}
 				auto descHandleCPU = m_descriptorHeap.GetCPUHandle();
 				auto descHandleGPU = m_descriptorHeap.GetGPUHandle();
 
@@ -909,14 +938,14 @@ namespace nsYMEngine
 
 				// ワールド行列 + ワールドビュープロジェクション行列 + 
 				// ライトビュープロジェクション行列 = 3
-				auto cbSize = sizeof(SCconstantBufferData);
+				auto cbSize = sizeof(SConstantBufferData);
 
 				m_modelCB.Init(static_cast<unsigned int>(cbSize), L"ModelCB");
 
 				const auto& mWorld = nsMath::CMatrix::Identity();
 				const auto& mViewProj = CGraphicsEngine::GetInstance()->GetMatrixViewProj();
 				auto* mappedCB =
-					static_cast<SCconstantBufferData*>(m_modelCB.GetMappedConstantBuffer());
+					static_cast<SConstantBufferData*>(m_modelCB.GetMappedConstantBuffer());
 				auto* shadowCamera =
 					CGraphicsEngine::GetInstance()->GetShadowMapRenderer()->GetCamera();
 				const auto& mLightViewProj = shadowCamera->GetViewProjectionMatirx();
@@ -936,6 +965,23 @@ namespace nsYMEngine
 				return true;
 			}
 
+			bool CBasicModelRenderer::CreateExpandCBV()
+			{
+				if (m_modelInitDataRef->pExpandConstantBuffer == nullptr)
+				{
+					return true;
+				}
+
+				// 定数バッファビュー作成
+				auto handle = m_descHandlePerModel.GetCpuHandle(
+					static_cast<unsigned int>(EnDescHeapLayoutPerModel::enExpandCBV));
+				m_modelInitDataRef->pExpandConstantBuffer->CreateConstantBufferView(handle);
+
+
+				return true;
+			}
+
+
 
 			bool CBasicModelRenderer::CreateMaterialSRV()
 			{
@@ -946,13 +992,26 @@ namespace nsYMEngine
 				matSRVDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 				matSRVDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 				matSRVDesc.Texture2D.MipLevels = 1;
+				matSRVDesc.TextureCube.MipLevels = 1;
 
 				unsigned int kNumTextures = static_cast<unsigned int>(m_diffuseTextures.size());
 				unsigned int handleIdx = 0;
 
 				for (unsigned int texIdx = 0; texIdx < kNumTextures; texIdx++)
 				{
-					matSRVDesc.Format = m_diffuseTextures[texIdx]->GetResource()->GetDesc().Format;
+					const auto& diffuseTexDesc = m_diffuseTextures[texIdx]->GetResource()->GetDesc();
+					
+					matSRVDesc.Format = diffuseTexDesc.Format;
+					if (m_diffuseTextures[texIdx]->IsCubemap())
+					{
+						matSRVDesc.TextureCube.MipLevels = diffuseTexDesc.MipLevels;
+						matSRVDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
+					}
+					else
+					{
+						matSRVDesc.Texture2D.MipLevels = diffuseTexDesc.MipLevels;
+						matSRVDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+					}
 					device->CreateShaderResourceView(
 						m_diffuseTextures[texIdx]->GetResource(),
 						&matSRVDesc,
@@ -961,7 +1020,18 @@ namespace nsYMEngine
 
 					handleIdx++;
 
-					matSRVDesc.Format = m_normalTextures[texIdx]->GetResource()->GetDesc().Format;
+					const auto& normalTexDesc = m_normalTextures[texIdx]->GetResource()->GetDesc();
+					matSRVDesc.Format = normalTexDesc.Format;
+					if (m_normalTextures[texIdx]->IsCubemap())
+					{
+						matSRVDesc.TextureCube.MipLevels = normalTexDesc.MipLevels;
+						matSRVDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
+					}
+					else
+					{
+						matSRVDesc.Texture2D.MipLevels = normalTexDesc.MipLevels;
+						matSRVDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+					}
 					device->CreateShaderResourceView(
 						m_normalTextures[texIdx]->GetResource(),
 						&matSRVDesc,
@@ -1073,7 +1143,7 @@ namespace nsYMEngine
 
 				// 定数バッファにコピー。
 				auto mappedCB =
-					static_cast<SCconstantBufferData*>(m_modelCB.GetMappedConstantBuffer());
+					static_cast<SConstantBufferData*>(m_modelCB.GetMappedConstantBuffer());
 				mappedCB->mWorld = m_worldMatrix;
 				const auto& mViewProj = CGraphicsEngine::GetInstance()->GetMatrixViewProj();
 				mappedCB->mViewProj = mViewProj;

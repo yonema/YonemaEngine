@@ -96,6 +96,7 @@ namespace nsAWA
 			CDebugPlayer* m_debugPlayer = nullptr;
 			std::unordered_map<std::string, CHumans*> m_humansMap = {};
 			CFontRenderer* m_fontRenderer = nullptr;
+			nsGraphics::nsEnvironment::CSkyCubeRenderer* m_skyCubeRenderer = nullptr;
 		};
 
 	}

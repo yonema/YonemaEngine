@@ -14,6 +14,7 @@
 #include "../SimplePostEffectGenericRenderer.h"
 #include "../ImageProcessing/GaussianBlurXGenericRenderer.h"
 #include "../ImageProcessing/GaussianBlurYGenericRenderer.h"
+#include "../Environment/SkyCubeGenericRenderer.h"
 
 namespace nsYMEngine
 {
@@ -58,6 +59,8 @@ namespace nsYMEngine
 					new nsModels::CSkinNonCullingGenericRenderer();
 				m_genericRendererTable[static_cast<int>(EnRendererType::enInstancingNonCullingModel)] =
 					new nsModels::CInstancingNonCullingGenericRenderer();
+				m_genericRendererTable[static_cast<int>(EnRendererType::enSkyCube)] =
+					new nsEnvironment::CSkyCubeGenericRenderer();
 				m_genericRendererTable[static_cast<int>(EnRendererType::enCollisionRenderer)] =
 					new nsDebugRenderers::CPhysicsDebugLineGenericRenderer();
 				m_genericRendererTable[static_cast<int>(EnRendererType::enSimplePostEffect)] =

@@ -61,7 +61,7 @@ namespace nsYMEngine
 				return m_upDirection;
 			}
 
-			constexpr const nsMath::CVector3& GetForeardDirection() const noexcept
+			constexpr const nsMath::CVector3& GetForwardDirection() const noexcept
 			{
 				return m_forwardDirection;
 			}

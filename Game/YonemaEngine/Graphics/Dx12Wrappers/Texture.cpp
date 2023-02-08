@@ -2,6 +2,8 @@
 #include "../GraphicsEngine.h"
 #include "../../Utils/StringManipulation.h"
 #include "../../Utils/AlignSize.h"
+#include <ResourceUploadBatch.h>
+#include <DDSTextureLoader.h>
 
 namespace nsYMEngine
 {
@@ -72,6 +74,43 @@ namespace nsYMEngine
 
 				return;
 			}
+
+			void CTexture::InitFromDDSFile(const char* filePath)
+			{
+				Release();
+
+				
+				auto* device = CGraphicsEngine::GetInstance()->GetDevice();
+				DirectX::ResourceUploadBatch re(device);
+				re.Begin();
+				ID3D12Resource* texture;
+				auto hr = DirectX::CreateDDSTextureFromFileEx(
+					device,
+					re,
+					nsUtils::GetWideStringFromString(filePath).c_str(),
+					0,
+					D3D12_RESOURCE_FLAG_NONE,
+					DirectX::DDS_LOADER_DEFAULT,
+					&texture,
+					nullptr,
+					&m_isCubemap
+				);
+				re.End(CGraphicsEngine::GetInstance()->GetCommandQueue());
+
+				if (FAILED(hr)) {
+					//テクスチャの作成に失敗しました。
+					return;
+				}
+
+				//m_texture = texture;
+				CopyTextureParam(texture);
+				texture->Release();
+
+				//m_textureDesc = m_texture->GetDesc();
+
+				return;
+			}
+
 
 
 			void CTexture::Terminate()
