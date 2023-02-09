@@ -292,7 +292,7 @@ namespace nsAWA
 						constexpr unsigned int numAnims = 1;
 						constexpr const char* const animFilePaths[numAnims] =
 						{
-							"Assets/Animations/Monster/Giyara/Giyara_Idle.fbx"
+							"Assets/Animations/Monsters/Giyara/Giyara_Idle.fbx"
 						};
 
 						SModelInitData modelInitData;

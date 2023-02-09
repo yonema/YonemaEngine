@@ -40,6 +40,20 @@ namespace nsYMEngine
 				}
 			}
 
+			/**
+			 * @brief 
+			 * @param animationName 登録するアニメーション名
+			 * @param eventName 登録するイベント名
+			 * @param eventFunc 登録するイベント
+			*/
+			void RegisterAnimationEvent(std::string animationName, std::string eventName, std::function<void(const nsGraphics::nsAnimations2D::SAnimation2DFrameData&)> eventFunc)
+			{
+				for (nsGraphics::nsRenderers::CAnimatedSpriteRenderer* sprite : m_spritesList)
+				{
+					sprite->RegisterAnimationEvent(animationName, eventName, eventFunc);
+				}
+			}
+
 			~CLevel2D()
 			{
 				for (nsGraphics::nsRenderers::CAnimatedSpriteRenderer* sprite : m_spritesList)
