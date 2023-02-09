@@ -27,21 +27,14 @@ namespace nsYMEngine
 					static_cast<unsigned int>(EnDescHeapLayoutPerModel::enModelCBV));
 				commandList->SetGraphicsRootDescriptorTable(0, handle);
 
-				// スケルたタルアニメーションが有効なら、ボーン行列の配列をセット
-				if (IsSkeltalAnimationValid())
+				// スケルタルアニメーションが有効なら、ボーン行列の配列をセット
+				// インスタンシングが有効なら、ワールド行列の配列をセット
+				// ボーン行列の配列とワールド行列の配列は、一緒のディスクリプタテーブルにある。
+				if (IsSkeltalAnimationValid() || m_modelInitDataRef->maxInstance > 1)
 				{
 					handle = m_descHandlePerModel.GetGpuHandle(
 						static_cast<unsigned int>(EnDescHeapLayoutPerModel::enBoneMatrixArraySRV));
 					commandList->SetGraphicsRootDescriptorTable(1, handle);
-				}
-
-				// インスタンシングが有効なら、ワールド行列の配列をセット
-				//if (m_worldMatrixArrayDH.IsValid())
-				if (m_modelInitDataRef->maxInstance > 1)
-				{
-					handle = m_descHandlePerModel.GetGpuHandle(
-						static_cast<unsigned int>(EnDescHeapLayoutPerModel::enWorldMatrixArraySRV));
-					commandList->SetGraphicsRootDescriptorTable(2, handle);
 				}
 
 				// シャドウマップをセット
@@ -50,7 +43,7 @@ namespace nsYMEngine
 				{
 					handle = m_descHandlePerModel.GetGpuHandle(
 						static_cast<unsigned int>(EnDescHeapLayoutPerModel::enShadowMapSRV));
-					commandList->SetGraphicsRootDescriptorTable(3, handle);
+					commandList->SetGraphicsRootDescriptorTable(2, handle);
 				}
 				
 				// マテリアルごとに描画
@@ -73,7 +66,7 @@ namespace nsYMEngine
 					}
 					else
 					{
-						commandList->SetGraphicsRootDescriptorTable(4, handle);
+						commandList->SetGraphicsRootDescriptorTable(3, handle);
 					}
 
 					// 頂点バッファとインデックスバッファをセット
@@ -922,8 +915,11 @@ namespace nsYMEngine
 
 				const unsigned int lastIndex =
 					static_cast<unsigned int>(EnDescHeapLayoutPerModel::enNum) - 1;
+				auto inc = CGraphicsEngine::GetInstance()->GetDescriptorSizeOfCbvSrvUav();
 				descHandleCPU = m_descHandlePerModel.GetCpuHandle(lastIndex);
 				descHandleGPU = m_descHandlePerModel.GetGpuHandle(lastIndex);
+				descHandleCPU.ptr += inc;
+				descHandleGPU.ptr += inc;
 
 				m_descHandlePerMaterial.Init(kNumDescHeapsPerMaterial, descHandleCPU, descHandleGPU);
 
@@ -1047,18 +1043,19 @@ namespace nsYMEngine
 
 			bool CBasicModelRenderer::CreateBoneMatrisArraySB()
 			{
-				if (IsSkeltalAnimationValid() != true)
+				unsigned int size = 1;
+				unsigned int num = 1;
+
+				if (IsSkeltalAnimationValid())
 				{
-					return true;
+					size = static_cast<unsigned int>(sizeof(nsMath::CMatrix));
+					const auto& boneInfoArray = m_skelton->GetBoneInfoArray();
+					num = static_cast<unsigned int>(boneInfoArray.size());
+					m_boneMatrices.resize(num);
 				}
 
-				const auto& boneInfoArray = m_skelton->GetBoneInfoArray();
-				unsigned int numBoneInfoArray = static_cast<unsigned int>(boneInfoArray.size());
-				m_boneMatrices.resize(numBoneInfoArray);
-
-
 				bool res =
-					m_boneMatrixArraySB.Init(sizeof(nsMath::CMatrix), numBoneInfoArray);
+					m_boneMatrixArraySB.Init(size, num);
 
 				if (res != true)
 				{
@@ -1077,13 +1074,17 @@ namespace nsYMEngine
 			bool CBasicModelRenderer::CreateWorldMatrixArraySB(
 				const nsRenderers::SModelInitData& modelInitData)
 			{
-				if (modelInitData.maxInstance <= 1)
+				unsigned int size = 1;
+				unsigned int num = 1;
+
+				if (modelInitData.maxInstance > 1)
 				{
-					return true;
+					size = static_cast<unsigned int>(sizeof(nsMath::CMatrix));
+					num = modelInitData.maxInstance;
 				}
 
 				bool res = 
-					m_worldMatrixArraySB.Init(sizeof(nsMath::CMatrix), modelInitData.maxInstance);
+					m_worldMatrixArraySB.Init(size, num);
 
 				if (res != true)
 				{

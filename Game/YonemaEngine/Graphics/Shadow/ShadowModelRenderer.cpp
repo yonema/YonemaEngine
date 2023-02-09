@@ -22,20 +22,15 @@ namespace nsYMEngine
 				commandList->SetGraphicsRootDescriptorTable(0, handle);
 
 				// スケルたタルアニメーションが有効なら、ボーン行列の配列をセット
-				if (m_isSkeltalAnimation)
+				// インスタンシングが有効なら、ワールド行列の配列をセット
+				// ボーン行列の配列とワールド行列の配列は、一緒のディスクリプタテーブルにある。
+				if (m_isSkeltalAnimation || m_isInstancing)
 				{
 					handle = m_descHandle.GetGpuHandle(
 						static_cast<unsigned int>(EnDescHeapLayout::enBoneMatrixArraySRV));
 					commandList->SetGraphicsRootDescriptorTable(1, handle);
 				}
 
-				// インスタンシングが有効なら、ワールド行列の配列をセット
-				if (m_isInstancing)
-				{
-					handle = m_descHandle.GetGpuHandle(
-						static_cast<unsigned int>(EnDescHeapLayout::enWorldMatrixArraySRV));
-					commandList->SetGraphicsRootDescriptorTable(2, handle);
-				}
 
 				m_drawFunc(commandList);
 
@@ -174,17 +169,18 @@ namespace nsYMEngine
 			void CShadowModelRenderer::CreateBoneMatrixArraySB(
 				const std::vector<nsMath::CMatrix>* pBoneMatrixArray)
 			{
-				if (pBoneMatrixArray == nullptr || pBoneMatrixArray->empty())
+				unsigned int size = 1;
+				unsigned int num = 1;
+
+				if (pBoneMatrixArray != nullptr && pBoneMatrixArray->empty() != true)
 				{
-					return;
+					size = static_cast<unsigned int>(sizeof(nsMath::CMatrix));
+					num = static_cast<unsigned int>(pBoneMatrixArray->size());
+					m_isSkeltalAnimation = true;
 				}
 
-				m_isSkeltalAnimation = true;
-
-
 				bool res =
-					m_boneMatrixArraySB.Init(
-						sizeof(nsMath::CMatrix), static_cast<unsigned int>(pBoneMatrixArray->size()));
+					m_boneMatrixArraySB.Init(size, num);
 
 				if (res != true)
 				{
@@ -202,15 +198,18 @@ namespace nsYMEngine
 
 			void CShadowModelRenderer::CreateWorldMatrixArraySB(unsigned int maxInstance)
 			{
-				if (maxInstance <= 1)
+				unsigned int size = 1;
+				unsigned int num = 1;
+
+				if (maxInstance > 1)
 				{
-					return;
+					size = static_cast<unsigned int>(sizeof(nsMath::CMatrix));
+					num = maxInstance;
+					m_isInstancing = true;
 				}
 
-				m_isInstancing = true;
-
 				bool res =
-					m_worldMatrixArraySB.Init(sizeof(nsMath::CMatrix), maxInstance);
+					m_worldMatrixArraySB.Init(size, num);
 
 				if (res != true)
 				{
@@ -260,7 +259,7 @@ namespace nsYMEngine
 				unsigned int fixNumInstanceOnFrame
 			) noexcept
 			{
-				if (pWrldMatrixArray || m_isInstancing != true)
+				if (pWrldMatrixArray == nullptr || m_isInstancing != true)
 				{
 					return;
 				}

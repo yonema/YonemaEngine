@@ -136,7 +136,7 @@ namespace nsAWA
 
 			// CreateSimpleMover
 			m_simpleMover = NewGO<nsDebugSystem::CSimpleMover>();
-			m_simpleMover->SetPosition({ 0.0f,0.0f,0.0f });
+			m_simpleMover->SetPosition(m_spawnPoint);
 
 			return true;
 		}
@@ -184,8 +184,16 @@ namespace nsAWA
 
 		bool CDrawWorldSample::Start()
 		{
+			constexpr float kFarClip = 5000.0f;
+
 			// CameraSetting
-			MainCamera()->SetFarClip(1000.0f);
+			MainCamera()->SetFarClip(kFarClip);
+
+			m_skyCubeRenderer = NewGO<CSkyCubeRenderer>();
+			m_skyCubeRenderer->Init(EnSkyType::enNormal);
+			m_skyCubeRenderer->SetScale(kFarClip);
+			m_skyCubeRenderer->SetAutoFollowCameraFlag(true);
+			m_skyCubeRenderer->SetAutoRotateFlag(true);
 
 			// まず最初にベースとなるモデルをロードしておく。
 			// アニメーションやAnimationScaledのため。
@@ -193,11 +201,21 @@ namespace nsAWA
 
 			// CreateWorldFromLevel3D
 			SLevel3DInitData initData;
-			//initData.mBias.MakeScaling(0.01f, 0.01f, 0.01f);
 			initData.isCreateStaticPhysicsObjectForAll = false;
 
 			CQuaternion rot;
 			rot.SetRotationXDeg(-90.0f);
+
+			struct STRS
+			{
+				STRS(const CVector3& pos, const CQuaternion& rot, const CVector3& scale)
+					:pos(pos), rot(rot), scale(scale)
+				{};
+				CVector3 pos;
+				CQuaternion rot;
+				CVector3 scale;
+			};
+			std::unordered_map<std::string, std::list<STRS>> modelTRSArray = {};
 
 			m_level3D.Init(
 				"Assets/Level3D/WorldLevel.fbx",
@@ -240,16 +258,9 @@ namespace nsAWA
 						nameStr += ".fbx";
 
 						std::string filePath = rootPath + nameStr;
-						SModelInitData modelInitData;
-						modelInitData.modelFilePath = filePath;
-						//modelInitData.SetFlags(EnModelInitDataFlags::enNodeTransform);
-						modelInitData.SetFlags(EnModelInitDataFlags::enShadowCaster);
 
-						auto* mr = NewGO<CModelRenderer>();
-						mr->SetScale(chipData.scale);
-						mr->SetPosition(chipData.position);
-						mr->SetRotation(chipData.rotation);
-						mr->Init(modelInitData);
+						modelTRSArray[filePath].emplace_back(
+							chipData.position, chipData.rotation, chipData.scale);
 
 						return true;
 					}
@@ -262,16 +273,23 @@ namespace nsAWA
 						nameStr += ".fbx";
 
 						std::string filePath = rootPath + nameStr;
-						SModelInitData modelInitData;
-						modelInitData.modelFilePath = filePath;
-						//modelInitData.SetFlags(EnModelInitDataFlags::enNodeTransform);
-						modelInitData.SetFlags(EnModelInitDataFlags::enShadowCaster);
+						modelTRSArray[filePath].emplace_back(
+							chipData.position, chipData.rotation, chipData.scale);
 
-						auto* mr = NewGO<CModelRenderer>();
-						mr->SetScale(chipData.scale);
-						mr->SetPosition(chipData.position);
-						mr->SetRotation(chipData.rotation);
-						mr->Init(modelInitData);
+						return true;
+					}
+					else if (chipData.ForwardMatchName("Mountain_"))
+					{
+						constexpr const char* const rootPath = "Assets/Models/Mountain/";
+
+						std::string nameStr = chipData.name;
+
+						nameStr += ".fbx";
+
+						std::string filePath = rootPath + nameStr;
+						modelTRSArray[filePath].emplace_back(
+							chipData.position, chipData.rotation, chipData.scale);
+
 						return true;
 					}
 					else if (chipData.ForwardMatchName("Monster_"))
@@ -302,7 +320,6 @@ namespace nsAWA
 						modelInitData.SetFlags(EnModelInitDataFlags::enRegisterAnimationBank);
 						modelInitData.SetFlags(EnModelInitDataFlags::enRegisterTextureBank);
 						modelInitData.animInitData.Init(numAnims, animFilePaths);
-						//modelInitData.vertexBias.SetRotationXDeg(90.0f);
 						modelInitData.textureRootPath = "monster";
 
 
@@ -311,6 +328,13 @@ namespace nsAWA
 						mr->SetPosition(chipData.position);
 						mr->SetRotation(chipData.rotation * rot);
 						mr->Init(modelInitData);
+
+						return true;
+					}
+					else if (chipData.EqualObjectName("PlayerSpawn"))
+					{
+						m_debugPlayer = NewGO<CDebugPlayer>();
+						m_debugPlayer->SetSpawnPoint(chipData.position);
 
 						return true;
 					}
@@ -326,12 +350,47 @@ namespace nsAWA
 			);
 
 
-			m_skyCubeRenderer = NewGO<CSkyCubeRenderer>();
-			m_skyCubeRenderer->Init(EnSkyType::enNormal);
-			m_skyCubeRenderer->SetAutoFollowCameraFlag(true);
-			m_skyCubeRenderer->SetAutoRotateFlag(true);
+			for (const auto& modelTRS : modelTRSArray)
+			{
+				const auto& filePath = modelTRS.first;
 
-			m_debugPlayer = NewGO<CDebugPlayer>();
+				SModelInitData modelInitData;
+				modelInitData.modelFilePath = filePath;
+				//modelInitData.SetFlags(EnModelInitDataFlags::enNodeTransform);
+				modelInitData.SetFlags(EnModelInitDataFlags::enShadowCaster);
+				modelInitData.SetFlags(EnModelInitDataFlags::enRegisterTextureBank);
+				modelInitData.maxInstance = static_cast<unsigned int>(modelTRS.second.size());
+
+				auto* mr = NewGO<CModelRenderer>();
+				mr->Init(modelInitData);
+
+				if (modelInitData.maxInstance > 1)
+				{
+					auto* worldMatArray = mr->GetWorldMatrixArrayRef();
+
+					int idx = 0;
+					for (const auto& trs : modelTRS.second)
+					{
+						CMatrix mModel, mTrans, mRot, mScale;
+						mTrans.MakeTranslation(trs.pos);
+						mScale.MakeScaling(trs.scale);
+						mRot.MakeRotationFromQuaternion(trs.rot);
+
+						mModel = mScale * mRot * mTrans;
+
+						(*worldMatArray)[idx++] = mModel;
+					}
+				}
+				else
+				{
+					const auto& trs = modelTRS.second.begin();
+					mr->SetPosition(trs->pos);
+					mr->SetScale(trs->scale);
+					mr->SetRotation(trs->rot);
+				}
+
+			}
+
 
 			SFontParameter fontParam;
 			fontParam.position = { 10.0f, 30.0f };

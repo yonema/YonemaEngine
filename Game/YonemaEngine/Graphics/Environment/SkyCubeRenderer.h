@@ -65,7 +65,10 @@ namespace nsYMEngine
 					return m_modelRenderer ? 
 						m_modelRenderer->GetRotation() : nsMath::CQuaternion::Identity();
 				}
-
+				inline void SetScale(float scale) noexcept
+				{
+					SetScale({ scale, scale, scale });
+				}
 				inline void SetScale(const nsMath::CVector3& scale) noexcept
 				{
 					if (m_modelRenderer)

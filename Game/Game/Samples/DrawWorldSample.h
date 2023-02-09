@@ -72,9 +72,15 @@ namespace nsAWA
 				return m_modelRenderer ? m_modelRenderer->GetPosition() : CVector3::Zero();
 			}
 
+			inline void SetSpawnPoint(const CVector3& spawnPoint)
+			{
+				m_spawnPoint = spawnPoint;
+			}
+
 		private:
 			CModelRenderer* m_modelRenderer = nullptr;
 			nsYMEngine::nsDebugSystem::CSimpleMover* m_simpleMover = nullptr;
+			CVector3 m_spawnPoint = CVector3::Zero();
 		};
 
 

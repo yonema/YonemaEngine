@@ -23,8 +23,7 @@ namespace nsYMEngine
 				enum class EnRootParameterType : unsigned int
 				{
 					enModel,
-					enBoneMatrixArray,
-					enWorldMatrixArray,
+					enBoneAndWorldMatrixArray,
 					enNumRootParamerterTypes
 				};
 

@@ -44,10 +44,8 @@ namespace nsYMEngine
 					static_cast<unsigned int>(EnRootParameterType::enNumRootParamerterTypes);
 				constexpr unsigned int kParamNoForModel =
 					static_cast<unsigned int>(EnRootParameterType::enModel);
-				constexpr unsigned int kParamNoForBoneMatrixArray =
-					static_cast<unsigned int>(EnRootParameterType::enBoneMatrixArray);
-				constexpr unsigned int kParamNoForWorldMatrixArray =
-					static_cast<unsigned int>(EnRootParameterType::enWorldMatrixArray);
+				constexpr unsigned int kParamNoForBoneAndWorldMatrixArray =
+					static_cast<unsigned int>(EnRootParameterType::enBoneAndWorldMatrixArray);
 
 				pRootParameters->resize(kNumRootParameters);
 
@@ -56,14 +54,9 @@ namespace nsYMEngine
 					&pDescTblRanges->at(kRangeNoForModelCB),
 					D3D12_SHADER_VISIBILITY_ALL
 				);
-				pRootParameters->at(kParamNoForBoneMatrixArray).InitAsDescriptorTable(
-					1,
+				pRootParameters->at(kParamNoForBoneAndWorldMatrixArray).InitAsDescriptorTable(
+					2,
 					&pDescTblRanges->at(kRangeNoForBoneMatrixArraySRV),
-					D3D12_SHADER_VISIBILITY_VERTEX
-				);
-				pRootParameters->at(kParamNoForWorldMatrixArray).InitAsDescriptorTable(
-					1,
-					&pDescTblRanges->at(kRangeNoForWorldMatrixArraySRV),
 					D3D12_SHADER_VISIBILITY_VERTEX
 				);
 
