@@ -146,5 +146,40 @@ namespace nsYMEngine
 			return result;
 		}
 
+		std::wstring ReplaceWordFromWideString(const std::wstring& sentence, const std::wstring& target, const std::wstring& replacement)
+		{
+			std::wstring result = sentence;
+
+			//置き換えたい文字が存在する?
+			size_t pos = result.find(target);
+
+			//完全に見つからなくなるまで繰り返す
+			while (pos != std::string::npos)
+			{
+				auto len = target.length();
+
+				result.replace(pos, len, replacement);
+
+				pos = result.find(target);
+			}
+
+			return result;
+		}
+
+
+
+		bool ForwardMatchName(const char* str, const char* forwardStr)
+		{
+			auto len = strlen(forwardStr);
+			auto namelen = strlen(str);
+			if (len > namelen) 
+			{
+				//名前が長い。不一致。
+				return false;
+			}
+			return strncmp(str, forwardStr, len) == 0;
+		}
+
+
 	}
 }

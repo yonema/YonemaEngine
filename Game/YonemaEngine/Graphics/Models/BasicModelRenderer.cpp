@@ -792,7 +792,7 @@ namespace nsYMEngine
 			{
 				std::string texFilePathFromModel = "Textures/";
 
-				if (modelInitData.textureRootPath.empty())
+				if (modelInitData.textureRootPath.empty()!= true)
 				{
 					texFilePathFromModel += modelInitData.textureRootPath;
 					texFilePathFromModel += "/";

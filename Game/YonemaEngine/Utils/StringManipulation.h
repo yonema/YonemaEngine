@@ -75,6 +75,24 @@ namespace nsYMEngine
 
 		std::string ToUTF8(const std::wstring& wstr) noexcept;
 
+		/**
+		 * @brief 文字列中に一致する単語を置き換える
+		 * @param sentence 置き換えを行う文章
+		 * @param target 置き換え対象の単語
+		 * @param replacement 置き換え後の単語
+		 * @return 置き換えが行われた文章
+		*/
+		std::wstring ReplaceWordFromWideString(const std::wstring& sentence, const std::wstring& target, const std::wstring& replacement);
 
+
+		/**
+		 * @brief 文字列が前方一致するか調べる
+		 * @param str 調べられる文字列
+		 * @param forwardStr 調べる文字列
+		 * @return 一致しているかどうか
+		 * @retval true : 一致している
+		 * @retval false : 一致してない
+		*/
+		bool ForwardMatchName(const char* str, const char* forwardStr);
 	}
 }

@@ -74,7 +74,10 @@ namespace nsYMEngine
 
 		void CGeometryData::DebugUpdate(float deltaTime)
 		{
+
 			m_isDebugDraw = true;
+			nsPhysics::CPhysicsEngine::GetInstance()->EnableDebugDrawLine();
+			nsPhysics::CPhysicsEngine::GetInstance()->EnableAutoFitCullingBoxToMainCamera();
 			CalcDebugViewProjMat(deltaTime);
 
 			return;

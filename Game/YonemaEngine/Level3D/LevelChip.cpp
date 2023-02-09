@@ -32,7 +32,7 @@ namespace nsYMEngine
 			}
 
 			//ƒ‚ƒfƒ‹‚ğ“Ç‚İ‚ŞB
-			m_modelRenderer = NewGO<nsGraphics::nsRenderers::CModelRenderer>(firstChip->name);
+			m_modelRenderer = NewGO<nsGraphics::nsRenderers::CModelRenderer>(firstChip->name.c_str());
 
 			if (isInstancing != true)
 			{

@@ -19,7 +19,7 @@ namespace nsYMEngine
 			nsMath::CVector3 position;		//座標。
 			nsMath::CQuaternion rotation;	//回転。
 			nsMath::CVector3 scale;			//拡大率。
-			const char* name = nullptr;	//名前。
+			std::string name = {};	//名前。
 			int number = 0;
 			bool isCreateStaticPhysicsObject = true;
 
@@ -30,7 +30,7 @@ namespace nsYMEngine
 			/// <returns>名前が同じ場合にtrueを返します。</returns>
 			bool EqualObjectName(const char* objName) const noexcept
 			{
-				return strcmp(name, objName) == 0;
+				return name == objName;
 			}
 			/// <summary>
 			/// 名前が前方一致するか調べる。
@@ -40,12 +40,12 @@ namespace nsYMEngine
 			bool ForwardMatchName(const char* n) const noexcept
 			{
 				auto len = strlen(n);
-				auto namelen = strlen(name);
+				auto namelen = name.length();
 				if (len > namelen) {
 					//名前が長い。不一致。
 					return false;
 				}
-				return strncmp(n, name, len) == 0;
+				return strncmp(n, name.c_str(), len) == 0;
 			}
 		};
 

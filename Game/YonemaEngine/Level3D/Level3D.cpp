@@ -58,6 +58,17 @@ namespace nsYMEngine
 				levelChipData.number = chipIdx;
 				levelChipData.name = levelChip->mName.C_Str();
 
+				const auto* charName = levelChipData.name.c_str();
+				const char* findChar = strchr(charName, static_cast<int>('.'));
+				if (findChar)
+				{
+					const int copySize = static_cast<int>(findChar - charName);
+					char* fileName = new char[copySize + 1];
+					strncpy_s(fileName, copySize + 1, charName, copySize);
+					levelChipData.name = fileName;
+					delete[] fileName;
+				}
+
 
 				//Hookが登録済みならばマップチップは作成不要
 				//false のままなら作成する。
@@ -78,19 +89,7 @@ namespace nsYMEngine
 						modelFilePath += initData.modelRootPath;
 						modelFilePath += "/";
 					}
-					const char* findChar = strchr(levelChipData.name, static_cast<int>('.'));
-					if (findChar)
-					{
-						const int copySize = static_cast<int>(findChar - levelChipData.name);
-						char* fileName = new char[copySize + 1];
-						strncpy_s(fileName, copySize + 1, levelChipData.name, copySize);
-						modelFilePath += fileName;
-						delete[] fileName;
-					}
-					else
-					{
-						modelFilePath += levelChipData.name;
-					}
+					modelFilePath += levelChipData.name;
 					modelFilePath += ".fbx";
 					//マップチップレンダーを作成。
 					CreateMapChip(levelChipData, initData, modelFilePath.c_str());
