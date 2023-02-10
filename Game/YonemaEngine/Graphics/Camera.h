@@ -32,7 +32,7 @@ namespace nsYMEngine
 			 * @param worldPos ワールド座標
 			 * @return スクリーン座標
 			*/
-			nsMath::CVector2 CalcScreenPositionFromWorldPosition(nsMath::CVector3& worldPos) noexcept;
+			nsMath::CVector2 CalcScreenPositionFromWorldPosition(const nsMath::CVector3& worldPos) noexcept;
 
 			inline void SetPosition(const nsMath::CVector3& pos) noexcept
 			{

@@ -75,7 +75,7 @@ namespace nsYMEngine
 			return;
 		}
 
-		nsMath::CVector2 CCamera::CalcScreenPositionFromWorldPosition(nsMath::CVector3& worldPos) noexcept
+		nsMath::CVector2 CCamera::CalcScreenPositionFromWorldPosition(const nsMath::CVector3& worldPos) noexcept
 		{
 			float half_w = 
 				static_cast<float>(CApplication::GetInstance()->GetWindowWidth()) * 0.5f;

@@ -23,9 +23,17 @@ namespace nsAWA
 			{ "Tom", "Assets/Models/Humans/Tom.fbx" },
 			{ "James", "Assets/Models/Humans/James.fbx" },
 			{ "Kevin", "Assets/Models/Humans/Kevin.fbx" },
-			{ "Guardian", "Assets/Models/Humans/Guardian.fbx" },
-			{ "MobMan", "Assets/Models/Humans/MobMan.fbx" },
-			{ "MobWoman", "Assets/Models/Humans/MobWoman.fbx" },
+			{ "Markley", "Assets/Models/Humans/Guardian.fbx" },
+			{ "Jeff", "Assets/Models/Humans/Guardian.fbx" },
+			{ "Klein", "Assets/Models/Humans/Guardian.fbx" },
+			{ "Bobby", "Assets/Models/Humans/Guardian.fbx" },
+			{ "Tony", "Assets/Models/Humans/MobMan.fbx" },
+			{ "Eric", "Assets/Models/Humans/MobMan.fbx" },
+			{ "Ryan", "Assets/Models/Humans/MobMan.fbx" },
+			{ "Louise", "Assets/Models/Humans/MobWoman.fbx" },
+			{ "Alice", "Assets/Models/Humans/MobWoman.fbx" },
+			{ "Jessica", "Assets/Models/Humans/MobWoman.fbx" },
+			{ "Nina", "Assets/Models/Humans/MobWoman.fbx" },
 		};
 		const char* const CHumans::
 			m_kAnimFilePaths[static_cast<int>(EnAnimType::enNum)] =
